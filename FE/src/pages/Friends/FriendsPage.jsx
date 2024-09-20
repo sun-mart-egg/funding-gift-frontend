@@ -2,8 +2,8 @@ import { useState } from "react";
 // import { useNavigate } from "react-router-dom";
 import temp_img from "/imgs/cat.PNG";
 
-import FriendsList from "../components/FriendsList";
-import FriendsSearchBar from "../components/FriendsSearchBar";
+import FriendsList from "../../components/Friends/components/FriendsList";
+import FriendsSearchBar from "../../components/Friends/components/FriendsSearchBar";
 
 const FriendPage = () => {
   // const [isSearch, setIsSearch] = useState(false); // 검색창 on/off 위한 상태변수
