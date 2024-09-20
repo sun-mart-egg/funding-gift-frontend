@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainLayout from "./components/UI/MainLayout.jsx";
 import SubLayout from "./components/UI/SubLayout.jsx";
 
-import FriendPage from "./components/Friends/pages/FriendsPage.jsx";
+import FriendPage from "./pages/Friends/FriendsPage.jsx";
 
 import Login from "./components/Login/LoginPage.jsx";
 import LoginCallback from "./components/Login/LoginCallback.jsx";
@@ -12,7 +12,7 @@ import SignupFinish from "./components/Login/SignupFinish.jsx";
 import InputProfile from "./components/Login/InputProfile.jsx";
 import ParticipatePage from "./components/Funding/pages/ParticipatePage.jsx";
 // import Calendar from "./components/Friends/Calendar.jsx";
-// import Friends from "./components/Friends/Friends.jsx";
+
 import FriendFunding from "./components/Funding/pages/FriendFunding.jsx";
 import MyFunding from "./components/Funding/pages/MyFunding";
 import AccountListPage from "./components/Funding/pages/AccountListPage.jsx";
