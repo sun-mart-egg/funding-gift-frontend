@@ -46,40 +46,40 @@ function Friends() {
     handleRedis()
   }, []);
   
-  // redis에 친구목록 요청하는 api
-  const handleRedis = () => {
-    axios
-      .get(import.meta.env.VITE_BASE_URL + "/api/friends", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access-token")}`,
-        },
-      })
-      .then((res) => {
-        setFriends(res.data.data);
-        console.log("REDIS에 친구목록 요청 완료");
-      })
-      .catch((err) => {
-        console.error(err);
-        console.log("REDIS에 친구목록 요청 실패");
-      });
-  }
+  // // redis에 친구목록 요청하는 api
+  // const handleRedis = () => {
+  //   axios
+  //     .get(import.meta.env.VITE_BASE_URL + "/api/friends", {
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage.getItem("access-token")}`,
+  //       },
+  //     })
+  //     .then((res) => {
+  //       setFriends(res.data.data);
+  //       console.log("REDIS에 친구목록 요청 완료");
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //       console.log("REDIS에 친구목록 요청 실패");
+  //     });
+  // }
 
-  // 카카오 친구로 동기화를 위한 api 요청 함수
-  const handleKAKAO = () => {
-    axios.get(import.meta.env.VITE_BASE_URL + "/api/friends/kakao", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access-token")}`,
-      },
-    })
-      .then(() => {
-        console.log("KAKAO 친구목록 동기화 성공")
-        handleRedis()
-      })
-      .catch((err) => {
-        console.error(err)
-        console.log("KAKAO 친구목록 동기화 실패")
-      })
-  }
+  // // 카카오 친구로 동기화를 위한 api 요청 함수
+  // const handleKAKAO = () => {
+  //   axios.get(import.meta.env.VITE_BASE_URL + "/api/friends/kakao", {
+  //     headers: {
+  //       Authorization: `Bearer ${localStorage.getItem("access-token")}`,
+  //     },
+  //   })
+  //     .then(() => {
+  //       console.log("KAKAO 친구목록 동기화 성공")
+  //       handleRedis()
+  //     })
+  //     .catch((err) => {
+  //       console.error(err)
+  //       console.log("KAKAO 친구목록 동기화 실패")
+  //     })
+  // }
 
   // 친한친구 설정을 위한 api 요청 함수
   const handleFavorite = (consumerId) => {
