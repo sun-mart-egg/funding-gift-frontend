@@ -90,3 +90,7 @@ jobs:
               echo "Removing the existing image..."
               sudo docker rmi fe:latest || true
             fi
+
+            # 최종 확인을 위해 컨테이너 목록 출력
+            echo "Current running containers:"
+            sudo docker ps
