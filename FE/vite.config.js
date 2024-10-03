@@ -15,7 +15,7 @@ export default defineConfig({
         globPatterns: ["**/*.{js,jsx,ico,png,svg}"],
         skipWaiting: true,
         clientsClaim: true,
-        cleanupOutdateCaches: true,
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.mode === 'navigate',
