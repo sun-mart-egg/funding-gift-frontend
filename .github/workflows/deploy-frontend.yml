@@ -10,30 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout the main branch (default)ç
+      # 1. Checkout the main branch
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. Download environment variables or secrets if needed
-      # (프론트엔드에서 별도의 secrets가 필요한 경우 추가)
-
-      # 3. Build Docker Image
+      # 2. Build Docker Image
       - name: Build Docker Image
         run: |
           docker build -t fe:latest ./FE  # FE 디렉토리 경로에 맞게 수정
 
-      # 4. Save Docker Image to tar file
+      # 3. Save Docker Image to tar file
       - name: Save Docker Image
         run: |
           docker save fe:latest -o fe.tar
 
-      # 5. Set permissions for the tar file
+      # 4. Set permissions for the tar file
       - name: Set permissions for the tar file
         run: |
           chmod 755 fe.tar   # 권한을 변경하여 다른 프로세스가 접근할 수 있도록 설정
           ls -al             # 권한 변경 후 파일 확인
 
-      # 6. Copy Docker Image tar file to GCP server
+      # 5. Copy Docker Image tar file to GCP server
       - name: Copy Docker Image to GCP server
         uses: appleboy/scp-action@master
         with:
@@ -45,7 +42,7 @@ jobs:
           source: ./fe.tar
           target: /home/${{ secrets.FRONTEND_USERNAME }}
 
-      # 7. SSH to GCP server and load Docker Image, then run the container
+      # 6. SSH to GCP server and load Docker Image, then run the container
       - name: Deploy Docker Image on GCP server
         uses: appleboy/ssh-action@master
         with:
