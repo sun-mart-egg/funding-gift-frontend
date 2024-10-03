@@ -1,4 +1,4 @@
-name: Deploy Frontend Application with Docker
+name: Deploy Frontend Application with Docker ver2
 
 on:
   push:
