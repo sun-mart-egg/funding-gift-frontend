@@ -42,15 +42,15 @@ jobs:
           source: ./fe.tar
           target: /home/${{ secrets.FRONTEND_USERNAME }}
 
-      # 6. SSH to GCP server and deploy using Docker Compose
-      - name: Deploy Docker Images on GCP server
-        uses: appleboy/ssh-action@v0.1.6
+      # 6. SSH to GCP server and deploy Docker Image
+      - name: Deploy Docker Image on GCP server
+        uses: appleboy/ssh-action@v0.1.6  # 안정적인 버전 사용 권장
         with:
-          host: ${{ secrets.FRONTEND_HOST }}
-          username: ${{ secrets.FRONTEND_USERNAME }}
-          key: ${{ secrets.FRONTEND_SSH_KEY }}
+          host: ${{ secrets.FRONTEND_HOST }} # GCP 서버 호스트
+          username: ${{ secrets.FRONTEND_USERNAME }} # GCP 서버 유저명
+          key: ${{ secrets.FRONTEND_SSH_KEY }} # SSH 프라이빗 키
           port: 22
-          passphrase: ${{ secrets.FRONTEND_SSH_PASSPHRASE }}
+          passphrase: ${{ secrets.FRONTEND_SSH_PASSPHRASE }} # 패스프레이즈 있을 경우
           script: |
             set -e
 
@@ -63,17 +63,13 @@ jobs:
             fi
 
             # Docker 이미지 로드
-            sudo docker load -i /tmp/be.tar
             sudo docker load -i /tmp/fe.tar
 
-            # 기존 컨테이너 중지 및 삭제
-            RUNNING_BE_CONTAINER=$(sudo docker ps -a --filter "name=be" --format "{{.Names}}")
-            if [ "$RUNNING_BE_CONTAINER" ]; then
-              echo "Stopping and removing the existing BE container..."
-              sudo docker stop be || true
-              sudo docker rm be || true
-            fi
+            # 파일 존재 여부 확인 (디버깅용)
+            echo "Checking if /tmp/fe.tar exists:"
+            ls -al /tmp/fe.tar
 
+            # 기존 컨테이너 중지 및 삭제
             RUNNING_FE_CONTAINER=$(sudo docker ps -a --filter "name=frontend" --format "{{.Names}}")
             if [ "$RUNNING_FE_CONTAINER" ]; then
               echo "Stopping and removing the existing FE container..."
@@ -82,24 +78,15 @@ jobs:
             fi
 
             # Docker 이미지 실행
-            echo "Running new BE Docker container..."
-            sudo docker run -d --name be --network infra_web-network -p 8081:8081 be:latest
-
-            echo "Running new FE Docker container..."
+            echo "Running new Docker container..."
             sudo docker run -d --name frontend --network infra_web-network -p 5173:5173 fe:latest
 
-            # Cleanup tar files
-            sudo rm -rf /tmp/be.tar /tmp/fe.tar
+            # Cleanup tar file
+            sudo rm -rf /tmp/fe.tar
 
             # Docker 이미지 삭제 (필요 시)
-            EXISTING_BE_IMAGE=$(sudo docker images -q be:latest)
-            if [ "$EXISTING_BE_IMAGE" ]; then
-              echo "Removing the existing BE image..."
-              sudo docker rmi be:latest || true
-            fi
-
             EXISTING_FE_IMAGE=$(sudo docker images -q fe:latest)
             if [ "$EXISTING_FE_IMAGE" ]; then
-              echo "Removing the existing FE image..."
+              echo "Removing the existing image..."
               sudo docker rmi fe:latest || true
             fi
