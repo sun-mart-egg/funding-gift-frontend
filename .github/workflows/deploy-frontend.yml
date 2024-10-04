@@ -14,6 +14,13 @@ jobs:
             - name: Checkout Code
               uses: actions/checkout@v4
 
+              # 2. Download env from GitHub Secrets
+            - name: Download env
+              env:
+                SECRET_CONTENT: ${{ secrets.FRONTEND_ENV }}
+              run: |
+                echo "$SECRET_CONTENT" > ./FE
+
             # 2. Build Docker Image
             - name: Build Docker Image
               run: |
