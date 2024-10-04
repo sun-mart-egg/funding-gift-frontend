@@ -59,9 +59,6 @@ jobs:
                   port: 22
                   passphrase: ${{ secrets.FRONTEND_SSH_PASSPHRASE }} # 패스프레이즈 있을 경우
                   script: |
-                      # Docker 이미지 로드
-                      sudo docker load -i /home/${{ secrets.FRONTEND_USERNAME }}/fe.tar
-
                       # 파일 존재 여부 확인 (디버깅용)
                       echo "Checking if fe.tar exists:"
                       ls -al /home/${{ secrets.FRONTEND_USERNAME }}/fe.tar
@@ -74,6 +71,16 @@ jobs:
                         sudo docker rm fe || true
                       fi
 
+                      # Docker 이미지 삭제 (필요 시)
+                      EXISTING_IMAGE=$(sudo docker images -q fe:latest)
+                      if [ "$EXISTING_IMAGE" ]; then
+                        echo "Removing the existing image..."
+                        sudo docker rmi fe:latest || true
+                      fi
+
+                      # Docker 이미지 로드
+                      sudo docker load -i /home/${{ secrets.FRONTEND_USERNAME }}/fe.tar
+
                       # Docker 이미지 실행
                       echo "Running new Docker container..."
                       sudo docker run -d --name fe --network infra_web-network -p 5173:5173 fe:latest
@@ -84,3 +91,4 @@ jobs:
                       # 최종 확인을 위해 컨테이너 목록 출력
                       echo "Current running containers:"
                       sudo docker ps
+                      
