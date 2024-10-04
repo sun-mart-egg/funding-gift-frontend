@@ -19,7 +19,7 @@ jobs:
               env:
                 SECRET_CONTENT: ${{ secrets.FRONTEND_ENV }}
               run: |
-                echo "$SECRET_CONTENT" > ./FE
+                echo "$SECRET_CONTENT" > ./FE/.env
 
             # 2. Build Docker Image
             - name: Build Docker Image
