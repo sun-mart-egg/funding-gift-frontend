@@ -10,14 +10,13 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
-     import { isSupported } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-messaging.js";
-
-      // 서비스 워커 등록 함수
+     // 서비스 워커 등록 함수
       async function registerServiceWorker() {
         if ('serviceWorker' in navigator) {
           try {
             // Firebase Messaging 지원 여부 확인
-            const messagingSupported = await isSupported();
+            const firebaseMessaging = await import("https://www.gstatic.com/firebasejs/10.10.0/firebase-messaging.js");
+            const messagingSupported = await firebaseMessaging.isSupported();
             
             if (messagingSupported) {
               // Firebase Messaging을 지원하면 firebase-messaging-sw.js를 등록
