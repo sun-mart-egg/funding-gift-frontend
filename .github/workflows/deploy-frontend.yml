@@ -81,13 +81,6 @@ jobs:
                       # Cleanup tar file
                       sudo rm -rf /home/${{ secrets.FRONTEND_USERNAME }}/fe.tar
 
-                      # Docker 이미지 삭제 (필요 시)
-                      EXISTING_IMAGE=$(sudo docker images -q fe:latest)
-                      if [ "$EXISTING_IMAGE" ]; then
-                        echo "Removing the existing image..."
-                        sudo docker rmi fe:latest || true
-                      fi
-
                       # 최종 확인을 위해 컨테이너 목록 출력
                       echo "Current running containers:"
                       sudo docker ps
