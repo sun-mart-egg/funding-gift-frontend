@@ -14,9 +14,6 @@ import ScrollToTop from "../UI/ScrollToTop";
 import { initializeApp } from "firebase/app";
 import { getMessaging, onMessage } from "firebase/messaging";
 
-// import { initializeApp } from 'firebase/app';
-// import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-
 function Home() {
   const observer = useRef();
   const navigate = useNavigate();
@@ -29,7 +26,7 @@ function Home() {
   const [currentPage, setCurrentPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
-  // firebase 연결
+  // Firebase 설정
   const firebaseConfig = {
     apiKey: "AIzaSyBE1OaWA2Bo3bxh-8oUfJCKGGFz6DkNYbA",
     authDomain: "funding-gift.firebaseapp.com",
@@ -43,21 +40,31 @@ function Home() {
   const firebaseApp = initializeApp(firebaseConfig);
   const messaging = getMessaging(firebaseApp);
 
-  // 권한 요청
-  Notification.requestPermission().then((permission) => {
-    if (permission === "granted") {
-      console.log("Notification permission granted.");
+  // 알림 권한 요청
+  useEffect(() => {
+    if ("Notification" in window) {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          console.log("Notification permission granted.");
+        } else {
+          console.log("Notification permission not granted.");
+        }
+      });
     } else {
-      console.log("not granted");
+      console.warn("이 브라우저는 알림 기능을 지원하지 않습니다.");
+      alert("이 브라우저는 알림 기능을 지원하지 않습니다.");
     }
-  });
+  }, []);
 
-  // fcm 알림 받기
-  onMessage(messaging, (payload) => {
-    console.log("Message received. ", payload);
-    alert(payload.notification.body);
-    // ...
-  });
+  // FCM 알림 수신 설정
+  useEffect(() => {
+    if ("Notification" in window) {
+      onMessage(messaging, (payload) => {
+        console.log("Message received. ", payload);
+        alert(payload.notification.body);
+      });
+    }
+  }, [messaging]);
 
   const lastProductElementRef = useCallback(
     (node) => {
@@ -82,7 +89,6 @@ function Home() {
       );
       const json = await response.json();
       if (json.code === 200 && json.data) {
-        // 중복된 데이터 필터링하여 새 데이터 추가
         setProducts((prevProducts) => {
           const newData = json.data.data.filter(
             (newItem) =>
@@ -111,8 +117,8 @@ function Home() {
       setCurrentBanner((prevIndex) => (prevIndex + 1) % bannerImages.length);
     }, 5000); // Change image every 5000 milliseconds
 
-    return () => clearInterval(interval); // Clean up interval on component unmount
-  }, []); // Empty dependency array means this runs once on mount
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="main-layer font-cusFont2">
