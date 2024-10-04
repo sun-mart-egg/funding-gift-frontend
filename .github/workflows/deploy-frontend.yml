@@ -1,96 +1,86 @@
 name: Deploy Frontend Application with Docker ver2
 
 on:
-  push:
-    branches:
-      - "main"  # main 브랜치에 push가 발생했을 때만 실행
+    push:
+        branches:
+            - "main" # main 브랜치에 push가 발생했을 때만 실행
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+    deploy:
+        runs-on: ubuntu-latest
 
-    steps:
-      # 1. Checkout the main branch
-      - name: Checkout Code
-        uses: actions/checkout@v4
+        steps:
+            # 1. Checkout the main branch
+            - name: Checkout Code
+              uses: actions/checkout@v4
 
-      # 2. Build Docker Image
-      - name: Build Docker Image
-        run: |
-          docker build -t fe:latest ./FE  # FE 디렉토리 경로에 맞게 수정
+            # 2. Build Docker Image
+            - name: Build Docker Image
+              run: |
+                  docker build -t fe:latest ./FE  # FE 디렉토리 경로에 맞게 수정
 
-      # 3. Save Docker Image to tar file
-      - name: Save Docker Image
-        run: |
-          docker save fe:latest -o fe.tar
+            # 3. Save Docker Image to tar file
+            - name: Save Docker Image
+              run: |
+                  docker save fe:latest -o fe.tar
 
-      # 4. Set permissions for the tar file
-      - name: Set permissions for the tar file
-        run: |
-          chmod 755 fe.tar   # 권한을 변경하여 다른 프로세스가 접근할 수 있도록 설정
-          ls -al             # 권한 변경 후 파일 확인
+            # 4. Set permissions for the tar file
+            - name: Set permissions for the tar file
+              run: |
+                  chmod 755 fe.tar   # 권한을 변경하여 다른 프로세스가 접근할 수 있도록 설정
+                  ls -al             # 권한 변경 후 파일 확인
 
-      # 5. Copy Docker Image tar file to GCP server
-      - name: Copy Docker Image to GCP server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.FRONTEND_HOST }} # GCP 서버 호스트
-          username: ${{ secrets.FRONTEND_USERNAME }} # GCP 서버 유저명
-          key: ${{ secrets.FRONTEND_SSH_KEY }} # SSH 프라이빗 키
-          port: 22
-          passphrase: ${{ secrets.FRONTEND_SSH_PASSPHRASE }}
-          source: ./fe.tar
-          target: /home/${{ secrets.FRONTEND_USERNAME }}
+            # 5. Copy Docker Image tar file to GCP server
+            - name: Copy Docker Image to GCP server
+              uses: appleboy/scp-action@master
+              with:
+                  host: ${{ secrets.FRONTEND_HOST }} # GCP 서버 호스트
+                  username: ${{ secrets.FRONTEND_USERNAME }} # GCP 서버 유저명
+                  key: ${{ secrets.FRONTEND_SSH_KEY }} # SSH 프라이빗 키
+                  port: 22
+                  passphrase: ${{ secrets.FRONTEND_SSH_PASSPHRASE }}
+                  source: ./fe.tar
+                  target: /home/${{ secrets.FRONTEND_USERNAME }}
 
-      # 6. SSH to GCP server and deploy Docker Image
-      - name: Deploy Docker Image on GCP server
-        uses: appleboy/ssh-action@v0.1.6  # 안정적인 버전 사용 권장
-        with:
-          host: ${{ secrets.FRONTEND_HOST }} # GCP 서버 호스트
-          username: ${{ secrets.FRONTEND_USERNAME }} # GCP 서버 유저명
-          key: ${{ secrets.FRONTEND_SSH_KEY }} # SSH 프라이빗 키
-          port: 22
-          passphrase: ${{ secrets.FRONTEND_SSH_PASSPHRASE }} # 패스프레이즈 있을 경우
-          script: |
-            set -e
+            # 6. SSH to GCP server and deploy Docker Image
+            - name: Deploy Docker Image on GCP server
+              uses: appleboy/ssh-action@v0.1.6 # 안정적인 버전 사용 권장
+              with:
+                  host: ${{ secrets.FRONTEND_HOST }} # GCP 서버 호스트
+                  username: ${{ secrets.FRONTEND_USERNAME }} # GCP 서버 유저명
+                  key: ${{ secrets.FRONTEND_SSH_KEY }} # SSH 프라이빗 키
+                  port: 22
+                  passphrase: ${{ secrets.FRONTEND_SSH_PASSPHRASE }} # 패스프레이즈 있을 경우
+                  script: |
+                      # Docker 이미지 로드
+                      sudo docker load -i /home/${{ secrets.FRONTEND_USERNAME }}/fe.tar
 
-            # Docker 네트워크 존재 여부 확인 및 생성
-            # if ! sudo docker network ls | grep -q infra_web-network; then
-            #  echo "Creating Docker network: infra_web-network"
-            #  sudo docker network create infra_web-network
-            #else
-            #  echo "Docker network infra_web-network already exists."
-            #fi
+                      # 파일 존재 여부 확인 (디버깅용)
+                      echo "Checking if fe.tar exists:"
+                      ls -al /home/${{ secrets.FRONTEND_USERNAME }}/fe.tar
 
-            # Docker 이미지 로드
-            sudo docker load -i /home/${{ secrets.USERNAME }}/fe.tar
+                      # 기존 컨테이너 중지 및 삭제
+                      RUNNING_CONTAINER=$(sudo docker ps -a --filter "name=fe" --format "{{.Names}}")
+                      if [ "$RUNNING_FE_CONTAINER" ]; then
+                        echo "Stopping and removing the existing fe container..."
+                        sudo docker stop fe || true
+                        sudo docker rm fe || true
+                      fi
 
-            # 파일 존재 여부 확인 (디버깅용)
-            echo "Checking if /tmp/fe.tar exists:"
-            ls -al /tmp/fe.tar
+                      # Docker 이미지 실행
+                      echo "Running new Docker container..."
+                      sudo docker run -d --name fe --network infra_web-network -p 5173:5173 fe:latest
 
-            # 기존 컨테이너 중지 및 삭제
-            RUNNING_FE_CONTAINER=$(sudo docker ps -a --filter "name=fe" --format "{{.Names}}")
-            if [ "$RUNNING_FE_CONTAINER" ]; then
-              echo "Stopping and removing the existing fe container..."
-              sudo docker stop fe || true
-              sudo docker rm fe || true
-            fi
+                      # Cleanup tar file
+                      sudo rm -rf /home/${{ secrets.FRONTEND_USERNAME }}/fe.tar
 
-            # Docker 이미지 실행
-            echo "Running new Docker container..."
-            sudo docker run -d --name fe --network infra_web-network -p 5173:5173 fe:latest
+                      # Docker 이미지 삭제 (필요 시)
+                      EXISTING_IMAGE=$(sudo docker images -q fe:latest)
+                      if [ "$EXISTING_FE_IMAGE" ]; then
+                        echo "Removing the existing image..."
+                        sudo docker rmi fe:latest || true
+                      fi
 
-            # Cleanup tar file
-            sudo rm -rf /home/${{ secrets.USERNAME }}/fe.tar
-
-            # Docker 이미지 삭제 (필요 시)
-            EXISTING_FE_IMAGE=$(sudo docker images -q fe:latest)
-            if [ "$EXISTING_FE_IMAGE" ]; then
-              echo "Removing the existing image..."
-              sudo docker rmi fe:latest || true
-            fi
-
-            # 최종 확인을 위해 컨테이너 목록 출력
-            echo "Current running containers:"
-            sudo docker ps
+                      # 최종 확인을 위해 컨테이너 목록 출력
+                      echo "Current running containers:"
+                      sudo docker ps
