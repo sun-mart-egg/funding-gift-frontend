@@ -9,20 +9,6 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-<!--     <script>
-      <!-- 서비스 워커 등록 -->
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('/firebase-messaging-sw.js')
-            .then(function(registration) {
-              console.log('서비스 워커 등록 성공:', registration);
-            })
-            .catch(function(error) {
-              console.warn('서비스 워커 등록 실패:', error);
-            });
-        });
-      }
-    </script> -->
 
     <script>
       // 서비스 워커 등록을 별도의 비동기 함수로 처리하여 화면 렌더링과 분리
