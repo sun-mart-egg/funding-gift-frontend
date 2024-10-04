@@ -10,8 +10,16 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
-      <!-- 서비스 워커 등록 -->
-      if ('serviceWorker' in navigator) {
+      // 지원되는 브라우저인지 확인하는 함수
+      function isSupportedBrowser() {
+        const userAgent = navigator.userAgent;
+        const isIOS = /iPhone|iPad|iPod/.test(userAgent); // iOS Safari 여부 확인
+        const isInAppBrowser = /KAKAOTALK|NAVER|Instagram/.test(userAgent); // 인앱 브라우저 확인
+        return !isIOS && !isInAppBrowser; // iOS 및 인앱 브라우저 제외
+      }
+  
+      // 서비스워커 등록
+      if ('serviceWorker' in navigator && isSupportedBrowser()) {
         window.addEventListener('load', function() {
           navigator.serviceWorker.register('/firebase-messaging-sw.js')
             .then(function(registration) {
@@ -21,6 +29,8 @@
               console.error('서비스 워커 등록 실패:', error);
             });
         });
+      } else {
+        console.warn('이 브라우저는 Firebase Messaging을 지원하지 않습니다.');
       }
     </script>
   </body>
