@@ -55,34 +55,34 @@ jobs:
             set -e
 
             # Docker 네트워크 존재 여부 확인 및 생성
-            if ! sudo docker network ls | grep -q infra_web-network; then
-              echo "Creating Docker network: infra_web-network"
-              sudo docker network create infra_web-network
-            else
-              echo "Docker network infra_web-network already exists."
-            fi
+            # if ! sudo docker network ls | grep -q infra_web-network; then
+            #  echo "Creating Docker network: infra_web-network"
+            #  sudo docker network create infra_web-network
+            #else
+            #  echo "Docker network infra_web-network already exists."
+            #fi
 
             # Docker 이미지 로드
-            sudo docker load -i /tmp/fe.tar
+            sudo docker load -i /home/${{ secrets.USERNAME }}/fe.tar
 
             # 파일 존재 여부 확인 (디버깅용)
             echo "Checking if /tmp/fe.tar exists:"
             ls -al /tmp/fe.tar
 
             # 기존 컨테이너 중지 및 삭제
-            RUNNING_FE_CONTAINER=$(sudo docker ps -a --filter "name=frontend" --format "{{.Names}}")
+            RUNNING_FE_CONTAINER=$(sudo docker ps -a --filter "name=fe" --format "{{.Names}}")
             if [ "$RUNNING_FE_CONTAINER" ]; then
-              echo "Stopping and removing the existing FE container..."
-              sudo docker stop frontend || true
-              sudo docker rm frontend || true
+              echo "Stopping and removing the existing fe container..."
+              sudo docker stop fe || true
+              sudo docker rm fe || true
             fi
 
             # Docker 이미지 실행
             echo "Running new Docker container..."
-            sudo docker run -d --name frontend --network infra_web-network -p 5173:5173 fe:latest
+            sudo docker run -d --name fe --network infra_web-network -p 5173:5173 fe:latest
 
             # Cleanup tar file
-            sudo rm -rf /tmp/fe.tar
+            sudo rm -rf /home/${{ secrets.USERNAME }}/fe.tar
 
             # Docker 이미지 삭제 (필요 시)
             EXISTING_FE_IMAGE=$(sudo docker images -q fe:latest)
