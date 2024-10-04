@@ -15,65 +15,61 @@ function LoginCallback() {
       const accessToken = await searchParams.get("access-token");
       const consumerId = await searchParams.get("consumer-id");
       const nextPage = await searchParams.get("next-page");
-
-      console.log("받은 토큰: ", accessToken);
-      console.log("받은 소비자아이디: ", consumerId);
-      console.log("다음페이지: ", nextPage);
       
       // firebase 연결
-      //const vapidKey = import.meta.env.VITE_FCM_VAPID_KEY;
+      const vapidKey = import.meta.env.VITE_FCM_VAPID_KEY;
 
-      // const firebaseConfig = {
-      //   apiKey: 'AIzaSyBE1OaWA2Bo3bxh-8oUfJCKGGFz6DkNYbA',
-      //   authDomain: 'funding-gift.firebaseapp.com',
-      //   projectId: 'funding-gift',
-      //   storageBucket: 'funding-gift.appspot.com',
-      //   messagingSenderId: '184194517827',
-      //   appId: '1:184194517827:web:f2a715c4f6c082503afdf6',
-      //   measurementId: 'G-GPCQJX1FSL',
-      // };
+      const firebaseConfig = {
+        apiKey: 'AIzaSyBE1OaWA2Bo3bxh-8oUfJCKGGFz6DkNYbA',
+        authDomain: 'funding-gift.firebaseapp.com',
+        projectId: 'funding-gift',
+        storageBucket: 'funding-gift.appspot.com',
+        messagingSenderId: '184194517827',
+        appId: '1:184194517827:web:f2a715c4f6c082503afdf6',
+        measurementId: 'G-GPCQJX1FSL',
+      };
 
-      // const firebaseApp = initializeApp(firebaseConfig);
-      // const messaging = getMessaging(firebaseApp);
+      const firebaseApp = initializeApp(firebaseConfig);
+      const messaging = getMessaging(firebaseApp);
 
-      // // fcm 토큰 요청
-      // getToken(messaging, { vapidKey: `${vapidKey}` }).then((currentToken) => {
-      //   if (currentToken) {
-      //     saveToken(currentToken);
-      //   } else {
-      //     console.log('No registration token available. Request permission to generate one.');
-      //   }
-      // }).catch((err) => {
-      //   console.log('An error occurred while retrieving token. ', err);
-      // });
+      // fcm 토큰 요청
+      getToken(messaging, { vapidKey: `${vapidKey}` }).then((currentToken) => {
+        if (currentToken) {
+          saveToken(currentToken);
+        } else {
+          console.log('No registration token available. Request permission to generate one.');
+        }
+      }).catch((err) => {
+        console.log('An error occurred while retrieving token. ', err);
+      });
 
-      // // fcm 토큰 저장 -> 서버에.
-      // const saveToken = async (token) => {
+      // fcm 토큰 저장 -> 서버에.
+      const saveToken = async (token) => {
         
-      //   // 위에서 요청한 fcm 토큰을 localStorage에도 저장
-      //   localStorage.setItem("fcm-token", token)
-      //   const postData = {
-      //     fcmToken: token
-      //   };
+        // 위에서 요청한 fcm 토큰을 localStorage에도 저장
+        localStorage.setItem("fcm-token", token)
+        const postData = {
+          fcmToken: token
+        };
 
-      //   try {
-      //     console.log("토큰 저장 요청");
+        try {
+          console.log("토큰 저장 요청");
           
-      //     const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/fcm-tokens`, {
-      //       method: 'POST',
-      //       headers: {
-      //         'Content-Type': 'application/json',
-      //         'Authorization': `Bearer ${accessToken}`
-      //       },
-      //       body: JSON.stringify(postData)
-      //     });
+          const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/fcm-tokens`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify(postData)
+          });
 
-      //     const responseData = await response.json();
-      //     console.log(responseData);
-      //   } catch (error) {
-      //     console.error('POST 요청 중 에러 발생:', error);
-      //   }
-      // };
+          const responseData = await response.json();
+          console.log(responseData);
+        } catch (error) {
+          console.error('POST 요청 중 에러 발생:', error);
+        }
+      };
 
       // 토큰값이 null 이 아닌 경우
       // localStroage에 access-token, consumer-id를 설정
