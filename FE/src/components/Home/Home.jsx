@@ -14,6 +14,12 @@ import ScrollToTop from "../UI/ScrollToTop";
 import { initializeApp } from "firebase/app";
 import { getMessaging, onMessage } from "firebase/messaging";
 
+// iOS 카카오톡 인앱 브라우저 확인 함수
+function isIOSKakaoInAppBrowser() {
+  const userAgent = navigator.userAgent;
+  return /iPhone|iPad/.test(userAgent) && /KAKAOTALK/.test(userAgent);
+}
+
 function Home() {
   const observer = useRef();
   const navigate = useNavigate();
@@ -42,7 +48,10 @@ function Home() {
 
   // 알림 권한 요청
   useEffect(() => {
-    if ("Notification" in window) {
+    if (isIOSKakaoInAppBrowser()) {
+      console.warn("iOS 카카오톡 브라우저에서는 알림이 지원되지 않습니다.");
+      alert("iOS 카카오톡 브라우저에서는 알림 기능이 지원되지 않습니다. 다른 브라우저를 이용해 주세요.");
+    } else if ("Notification" in window) {
       Notification.requestPermission().then((permission) => {
         if (permission === "granted") {
           console.log("Notification permission granted.");
@@ -58,7 +67,7 @@ function Home() {
 
   // FCM 알림 수신 설정
   useEffect(() => {
-    if ("Notification" in window) {
+    if (!isIOSKakaoInAppBrowser() && "Notification" in window) {
       onMessage(messaging, (payload) => {
         console.log("Message received. ", payload);
         alert(payload.notification.body);
