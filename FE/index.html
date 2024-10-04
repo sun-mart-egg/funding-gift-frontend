@@ -8,24 +8,31 @@
   </head>
   <body>
     <div id="root"></div>
+
     <script type="module" src="/src/main.jsx"></script>
 
     <script>
-      // 서비스 워커 등록을 별도의 비동기 함수로 처리하여 화면 렌더링과 분리
+      // Firebase Messaging 지원 여부 확인 후 서비스 워커 등록
       async function registerServiceWorker() {
         if ('serviceWorker' in navigator) {
           try {
-            const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-            console.log('서비스 워커 등록 성공:', registration);
+            // Firebase Messaging 지원 여부 확인
+            const messagingSupported = await import('firebase/messaging').then(({ isSupported }) => isSupported());
+            
+            if (messagingSupported) {
+              const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+              console.log('서비스 워커 등록 성공:', registration);
+            } else {
+              console.warn('Firebase Messaging을 지원하지 않는 브라우저입니다.');
+            }
           } catch (error) {
             console.warn('서비스 워커 등록 실패:', error);
           }
         }
       }
 
-      // 페이지 로드 후 서비스 워커 등록 시도 (렌더링과 독립적으로 실행)
+      // 페이지 로드 후 서비스 워커 등록 시도
       window.addEventListener('load', registerServiceWorker);
     </script>
-    
   </body>
 </html>
