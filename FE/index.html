@@ -16,14 +16,14 @@
           try {
             // Firebase Messaging 지원 여부 확인
             const firebaseMessaging = await import("https://www.gstatic.com/firebasejs/10.10.0/firebase-messaging.js");
-            const messagingSupported = await firebaseMessaging.isSupported();
             
-            if (messagingSupported) {
-              // Firebase Messaging을 지원하면 firebase-messaging-sw.js를 등록
+            // Firebase Messaging 지원 여부에 따라 서비스 워커 등록
+            if (await firebaseMessaging.isSupported()) {
+              // Firebase Messaging을 지원하는 경우 firebase-messaging-sw.js 등록
               const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
               console.log('Firebase Messaging 서비스 워커 등록 성공:', registration);
             } else {
-              // Firebase Messaging을 지원하지 않으면 일반 서비스 워커(sw.js)를 등록
+              // Firebase Messaging을 지원하지 않는 경우 sw.js 등록
               const registration = await navigator.serviceWorker.register('/sw.js');
               console.log('기본 서비스 워커 등록 성공:', registration);
             }
