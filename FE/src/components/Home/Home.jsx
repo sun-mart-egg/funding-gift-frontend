@@ -32,19 +32,22 @@ function Home() {
   const [currentPage, setCurrentPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
-  // Firebase 설정
-  const firebaseConfig = {
-    apiKey: "AIzaSyBE1OaWA2Bo3bxh-8oUfJCKGGFz6DkNYbA",
-    authDomain: "funding-gift.firebaseapp.com",
-    projectId: "funding-gift",
-    storageBucket: "funding-gift.appspot.com",
-    messagingSenderId: "184194517827",
-    appId: "1:184194517827:web:f2a715c4f6c082503afdf6",
-    measurementId: "G-GPCQJX1FSL",
-  };
+  // iOS 카카오톡 브라우저에서는 Firebase 초기화하지 않음
+  let firebaseApp, messaging;
+  if (!isIOSKakaoInAppBrowser()) {
+    const firebaseConfig = {
+      apiKey: "AIzaSyBE1OaWA2Bo3bxh-8oUfJCKGGFz6DkNYbA",
+      authDomain: "funding-gift.firebaseapp.com",
+      projectId: "funding-gift",
+      storageBucket: "funding-gift.appspot.com",
+      messagingSenderId: "184194517827",
+      appId: "1:184194517827:web:f2a715c4f6c082503afdf6",
+      measurementId: "G-GPCQJX1FSL",
+    };
 
-  const firebaseApp = initializeApp(firebaseConfig);
-  const messaging = getMessaging(firebaseApp);
+    firebaseApp = initializeApp(firebaseConfig);
+    messaging = getMessaging(firebaseApp);
+  }
 
   // 알림 권한 요청
   useEffect(() => {
@@ -67,7 +70,7 @@ function Home() {
 
   // FCM 알림 수신 설정
   useEffect(() => {
-    if (!isIOSKakaoInAppBrowser() && "Notification" in window) {
+    if (!isIOSKakaoInAppBrowser() && "Notification" in window && messaging) {
       onMessage(messaging, (payload) => {
         console.log("Message received. ", payload);
         alert(payload.notification.body);
@@ -124,7 +127,7 @@ function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBanner((prevIndex) => (prevIndex + 1) % bannerImages.length);
-    }, 5000); // Change image every 5000 milliseconds
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
