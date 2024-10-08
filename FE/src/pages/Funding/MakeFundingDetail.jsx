@@ -1,14 +1,14 @@
-import React, { useState, useRef, forwardRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // useNavigate 사용
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useStore } from "../../Store/MakeStore";
-import useFormDataStore from "../../Store/FormDataStore";
-import { createFunding } from "../api/FundingAPI";
+import { useStore } from "../../components/Store/MakeStore";
+import useFormDataStore from "../../components/Store/FormDataStore";
+import { createFunding } from "../../components/Funding/api/FundingAPI";
 import { useLocation } from "react-router-dom";
-import useProductStore from "../../Store/ProductStore";
-import useUserStore from "../../Store/UserStore";
-import { getAnniversaryList } from "../api/Anniversary";
+import useProductStore from "../../components/Store/ProductStore";
+import useUserStore from "../../components/Store/UserStore";
+import { getAnniversaryList } from "../../components/Funding/api/Anniversary";
 
 function MakeFundingDetail() {
   const [accessToken, setAccessToken] = useState("");
@@ -69,16 +69,6 @@ function MakeFundingDetail() {
   useEffect(() => {
     console.log("기념일 카테고리? : ", anniversaryCategory[0]);
   }, [anniversaryCategory]);
-
-  const CustomInput = forwardRef(({ value, onClick }, ref) => (
-    <button
-      onClick={() => setShowDatePicker(true)}
-      ref={ref}
-      className="calendar-button common-btn h-6 bg-gray-500 text-xs"
-    >
-      선택
-    </button>
-  ));
 
   // product 상태가 변경될 때마다 실행되는
   useEffect(() => {
@@ -324,7 +314,6 @@ function MakeFundingDetail() {
                       formData.endDate ? new Date(formData.endDate) : null
                     }
                     dateFormat="yyyy/MM/dd"
-                    customInput={<CustomInput />}
                     className="p-2"
                   />
                 </div>

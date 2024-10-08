@@ -1,21 +1,19 @@
 import { BsPeopleFill } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
-import SearchBar from "../../UI/SearchBar";
-import CardList from "../component/CardList";
+import SearchBar from "../../components/UI/SearchBar";
+import CardList from "../../components/Funding/component/CardList";
 import { useState, useEffect } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { fetchMyFundings } from "../api/FundingAPI";
-import { getMyAttendance } from "../api/AttendanceAPI";
+import { fetchMyFundings } from "../../components/Funding/api/FundingAPI";
+import { getMyAttendance } from "../../components/Funding/api/AttendanceAPI";
 
 function MyFunding() {
   const navigate = useNavigate();
   const [buttonSelected, setButtonSelected] = useState(true);
   const [myFundings, setMyFundings] = useState([]); // API로부터 받은 데이터를 저장할 상태
   const [friendFundings, setFriendFundings] = useState([]); // API로부터 받은 데이터를 저장할 상태
-
-  const [isLoading, setIsLoading] = useState(true);
 
   const [userInfo, setUserInfo] = useState({
     name: "",
@@ -58,11 +56,10 @@ function MyFunding() {
     const token = localStorage.getItem("access-token");
     if (!token) {
       console.log("토큰이 존재하지 않습니다.");
-      setIsLoading(false);
       navigate("/login-page");
       return;
     }
-    fetchMyFundings(token, setMyFundings, setIsLoading);
+    fetchMyFundings(token, setMyFundings);
   }, []);
 
   //버튼 클릭 시 api 불러오는거 연결
@@ -72,13 +69,12 @@ function MyFunding() {
     setButtonSelected(buttonName === "myFunding");
     if (!token) {
       console.log("토큰이 존재하지 않습니다.");
-      setIsLoading(false);
       navigate("/login-page");
       return;
     }
     //내가 만든 펀딩 정보 불러오기
     if (buttonName === "myFunding") {
-      fetchMyFundings(token, setMyFundings, setIsLoading);
+      fetchMyFundings(token, setMyFundings);
     }
     //내가 참여한 펀딩 정보 불러오기
     if (buttonName === "friendsFunding") {

@@ -4,12 +4,6 @@ import { FaCheckCircle } from "react-icons/fa";
 function MakeFundingFinish() {
   const navigate = useNavigate(); // useNavigate 훅 사용
 
-  const navigateHome = () => {
-    // navigate("/make-funding-finish");
-  };
-  const navigateMypage = () => {
-    navigate("/my-funding");
-  };
   return (
     <div
       className="sub-layer font-cusFont3"

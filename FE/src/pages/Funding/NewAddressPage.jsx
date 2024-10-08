@@ -1,7 +1,6 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DaumPostcodeEmbed from "react-daum-postcode";
-import { createAddress } from "../api/AddressAPI";
+import { createAddress } from "../../components/Funding/api/AddressAPI";
 import { useNavigate } from "react-router";
 function NewAddressPage() {
   // 상세주소 검색창 on/off 상태변수
@@ -27,12 +26,12 @@ function NewAddressPage() {
     setDetailAddress(event.target.value);
   };
 
-  const handleIsDefault = (event) => {
+  const handleIsDefault = () => {
     setIsDefault((prevIsDefault) => !prevIsDefault);
     console.log(isDefault);
   };
 
-  const handleCreate = (event) => {
+  const handleCreate = () => {
     createAddress(
       addressName,
       defaultAddress,

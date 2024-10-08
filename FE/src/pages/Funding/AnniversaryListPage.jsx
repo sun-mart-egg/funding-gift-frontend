@@ -1,7 +1,7 @@
-import AnniversaryList from "../component/AnniversaryList";
-import anniversaryData from "../data";
+import AnniversaryList from "../../components/Funding/component/AnniversaryList";
+import anniversaryData from "../../components/Funding/data";
 import { useNavigate } from "react-router-dom"; // useNavigate 사용
-import { useStore } from "../../Store/MakeStore";
+import { useStore } from "../../components/Store/MakeStore";
 
 function AnniversaryListPage() {
   const navigate = useNavigate();

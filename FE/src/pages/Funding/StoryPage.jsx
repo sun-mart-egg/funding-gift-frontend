@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import egg from "/imgs/egg3.jpg";
-import ProgressBar from "../component/ProgressBar";
-import { getStory } from "../api/StoryAPI"; // API 호출 함수를 임포트합니다.
+import ProgressBar from "../../components/Funding/component/ProgressBar";
+import { getStory } from "../../components/Funding/api/StoryAPI"; // API 호출 함수를 임포트합니다.
 import { IoClose } from "react-icons/io5";
 import { HiMiniBackward } from "react-icons/hi2";
 import { HiMiniForward } from "react-icons/hi2";
+
 function StoryPage() {
   const { selectedItem } = useParams(); // URL에서 selectedItem 값을 추출합니다.
   const [stories, setStories] = useState([]);

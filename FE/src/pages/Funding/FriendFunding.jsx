@@ -1,18 +1,14 @@
-import { BsPeopleFill } from "react-icons/bs";
-import { IoMdSettings } from "react-icons/io";
-import SearchBar from "../../UI/SearchBar";
-import CardList from "../component/CardList";
+import SearchBar from "../../components/UI/SearchBar";
+import CardList from "../../components/Funding/component/CardList";
 import { useState, useEffect } from "react";
-import { AiOutlinePlus } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
-import { fetchFriendFunding } from "../api/FundingAPI";
-import { getFriendInfo } from "../api/UserAPI";
+import { fetchFriendFunding } from "../../components/Funding/api/FundingAPI";
+import { getFriendInfo } from "../../components/Funding/api/UserAPI";
 import { useParams } from "react-router-dom";
 
 function FriendFunding() {
   const { consumerId } = useParams(); // URL 파라미터에서 consumer-id 값을 추출합니다.
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
 
   const [friendFunding, setFriendFunding] = useState([]);
 
@@ -47,7 +43,7 @@ function FriendFunding() {
         } catch (error) {
           console.error("친구 정보 불러오기 실패:", error);
         } finally {
-          setIsLoading(false);
+          console.log("불러오기 성공");
         }
       };
 
@@ -60,10 +56,6 @@ function FriendFunding() {
   useEffect(() => {
     console.log("가져온 펀딩 입니다. " + friendFunding);
   }, [friendFunding]);
-
-  const handleCreateFundingClick = () => {
-    navigate("/make-funding-main");
-  };
 
   return (
     <div className="main-layer ">

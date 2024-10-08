@@ -1,25 +1,16 @@
-import FundingDetailInfo from "../component/FundingDetailInfo";
-import CongratulateList from "../component/CongratulateList";
-import BottomSheet from "../component/BottomSheet";
-import React, { useEffect, useState } from "react";
-import { Route } from "react-router";
+import FundingDetailInfo from "../../components/Funding/component/FundingDetailInfo";
+import CongratulateList from "../../components/Funding/component/CongratulateList";
+import BottomSheet from "../../components/Funding/component/BottomSheet";
+import { useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
-import { FaLongArrowAltRight } from "react-icons/fa";
+
 import { useParams } from "react-router-dom";
-import { fetchDetailFunding } from "../api/FundingAPI";
-import { getFundingAttendee } from "../api/AttendanceAPI";
+import { fetchDetailFunding } from "../../components/Funding/api/FundingAPI";
+import { getFundingAttendee } from "../../components/Funding/api/AttendanceAPI";
 
 function FriendFundingDetail() {
   const navigate = useNavigate();
-  const data = {
-    frinedName: "신시은",
-    title: "EGG IS MY LIFE",
-    name: "계란 토스트",
-    price: 760000,
-    detail:
-      "친구들아 안녕. 곧 내 생일인데 고오급 계란 토스트가 너무 가지고 싶어. 많은 참여 부탁해",
-    progress: 70,
-  };
 
   const myParticipate = {
     date: "2024.3.19.12:00",
@@ -32,8 +23,8 @@ function FriendFundingDetail() {
 
   const { fundingId } = useParams(); // URL 파라미터에서 fundingId를 가져옵니다.
   const [fundingDetail, setFundingDetail] = useState(null);
-  const [isBottomSheetOpen, setIsBottomSheetOpen, selectId] = useState(false);
-  const [selectedMessage, setSelectedMessage] = useState("");
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [selectedMessage] = useState("");
   const [attendeeList, setAttendeeList] = useState([]);
 
   useEffect(() => {
@@ -50,10 +41,10 @@ function FriendFundingDetail() {
     }
   }, [fundingDetail]);
 
-  const toggleBottomSheet = () => {
-    setSelectedMessage(myParticipate);
-    setIsBottomSheetOpen(!isBottomSheetOpen);
-  };
+  // const toggleBottomSheet = () => {
+  //   setSelectedMessage(myParticipate);
+  //   setIsBottomSheetOpen(!isBottomSheetOpen);
+  // };
 
   const handleItemClick = () => {
     alert("다른사람의 메세지 내용은 볼 수 없습니다.");

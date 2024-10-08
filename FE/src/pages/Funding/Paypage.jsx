@@ -1,20 +1,14 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import useAttendanceStore from "../../Store/AttendanceStore";
-import { createAttendance } from "../api/AttendanceAPI";
-import { fetchDetailFunding } from "../api/FundingAPI";
+import useAttendanceStore from "../../components/Store/AttendanceStore";
+import { createAttendance } from "../../components/Funding/api/AttendanceAPI";
+import { fetchDetailFunding } from "../../components/Funding/api/FundingAPI";
 function Paypage() {
   const navigate = useNavigate(); // useNavigate 훅을 사용합니다.
   const [fundingDetail, setFundingDetail] = useState(null);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const { sendMessage, sendMessageTitle, price, fundingId } =
     useAttendanceStore();
-
-  // 결제 수단을 선택하는 함수입니다.
-  const selectPaymentMethod = (method) => {
-    setSelectedPaymentMethod(method);
-  };
 
   const [attendanceResponse, setAttendanceResponse] = useState();
 

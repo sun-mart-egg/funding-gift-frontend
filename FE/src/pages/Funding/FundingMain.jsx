@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import StoryList from "../component/StoryList";
-import FundingList from "../component/FundingList";
-import ScrollToTopButton from "../../UI/ScrollToTop";
-import { getStoryList } from "../api/StoryAPI";
-import { getFundingFeed } from "../api/FundingAPI";
+import { useEffect, useState } from "react";
+import StoryList from "../../components/Funding/component/StoryList";
+import FundingList from "../../components/Funding/component/FundingList";
+import ScrollToTopButton from "../../components/UI/ScrollToTop";
+import { getStoryList } from "../../components/Funding/api/StoryAPI";
+import { getFundingFeed } from "../../components/Funding/api/FundingAPI";
 import axios from "axios";
 function FundingMain() {
   const [storyList, setStoryList] = useState([]); // 친구목록 받아올 배열
@@ -13,9 +13,6 @@ function FundingMain() {
     img: null,
     // 추가 정보가 있다면 여기에 포함할 수 있습니다.
   });
-
-  //친구가 만든 펀딩 받아올 배열
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     console.log("업데이트 된 스토리 목록");

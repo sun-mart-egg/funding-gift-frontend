@@ -1,5 +1,3 @@
-import React from "react";
-
 function NewAnniversaryPage() {
   return (
     <div className="sub-layer">

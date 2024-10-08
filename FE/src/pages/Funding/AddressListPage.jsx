@@ -1,7 +1,7 @@
-import AddressList from "../component/AddressList";
-import { useStore } from "../../Store/MakeStore";
+import AddressList from "../../components/Funding/component/AddressList";
+import { useStore } from "../../components/Store/MakeStore";
 import { useNavigate } from "react-router-dom"; // useNavigate 사용
-import { getAddressList } from "../api/AddressAPI";
+import { getAddressList } from "../../components/Funding/api/AddressAPI";
 import { useEffect, useState } from "react";
 
 function AddressListPage() {

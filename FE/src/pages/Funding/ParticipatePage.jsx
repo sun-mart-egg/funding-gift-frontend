@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import FundingDetailInfo from "../component/FundingDetailInfo";
-import { fetchDetailFunding } from "../api/FundingAPI";
+import FundingDetailInfo from "../../components/Funding/component/FundingDetailInfo";
+import { fetchDetailFunding } from "../../components/Funding/api/FundingAPI";
 import { useParams } from "react-router-dom";
-import useAttendanceStore from "../../Store/AttendanceStore";
+import useAttendanceStore from "../../components/Store/AttendanceStore";
 
 function ParticipatePage() {
-  const data = {
-    progress: 70,
-  };
   const navigate = useNavigate(); // useNavigate 훅을 사용합니다.
   const { fundingId } = useParams(); // URL 파라미터에서 fundingId를 가져옵니다.
   const [amount, setAmount] = useState("");
