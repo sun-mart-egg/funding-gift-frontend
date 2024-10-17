@@ -1,6 +1,6 @@
 import axiosInstance from "../../@common/axiosInstance";
 
-const getFriends = async() => {
+const getFriendsList = async() => {
   try {
     const response = await axiosInstance.get("/api/friends");
     console.log("REDIS에 친구목록 요청 완료")
@@ -12,4 +12,4 @@ const getFriends = async() => {
   }
 };
 
-export default getFriends;
+export default getFriendsList;
