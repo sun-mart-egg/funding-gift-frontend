@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+
+import AnniversaryList from "../../components/Calendar/AnniversaryList.jsx";
+import CalendarList from "../../components/Calendar/CalendarList.jsx";
+
+import getEventsList from "../../services/Calendar/getEventsList.js";
 
 const CalendarPage = () => {
   const [selectedEvents, setSelectedEvents] = useState([]); // 선택한 날짜에 있는 행사목록
   const [selectedDay, setSelectedDay] = useState(null); // 선택한 날짜에 대한 useState
   const [events, setEvents] = useState([]); // 친구들의 전체 펀딩목록
-  const navigate = useNavigate();
 
   // axios 요청을 위한 연도, 월 데이터
   const [curYear, setCurYear] = useState("");
@@ -29,19 +32,49 @@ const CalendarPage = () => {
       .replace(/\./, "");
     return formattedDate; // 'YYYY-MM-DD' 형태로 반환
   };
-  
+
   // 풀캘린더에서 날짜 받아서 split한 값을 curYear, curMonth에 할당
   const handleCurDate = (dateInfo) => {
     // 연도와 월의 형식이 2024-04-02로 들어오는데
     // "-"를 기준으로 나눈 후에, 10진수의 정수로 반환한다.
     let year = parseInt(dateInfo.startStr.split("-")[0], 10); // 년도
-    let month = parseInt(dateInfo.startStr.split("-")[1], 10) // 월
-    let day = parseInt(KoreaTime().split("-")[2], 10) // 일
-    
-    console.log(year, month, day)
+    let month = parseInt(dateInfo.startStr.split("-")[1], 10); // 월
+    let day = parseInt(KoreaTime().split("-")[2], 10); // 일
+
+    console.log(year, month, day);
     setCurYear(year);
     setCurMonth(month);
   };
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const eventsList = await getEventsList(curYear, curMonth);
+        const formatEvents = eventsList.map((item) => ({
+          title: item.title,
+          date: item.anniversaryDate,
+          name: item.consumerName,
+          fundingId: item.fundingId,
+          display: "background",
+        }));
+        setEvents(formatEvents);
+
+        // 페이지 접속 시, 오늘 날짜의 이벤트 목록들이 바로 출력되도록 설정
+        const today = KoreaTime(); // 한국 날짜 기준으로 받아오기.
+        const todayEvents = formatEvents.filter(
+          (event) => event.date === today,
+        ); // 오늘 날짜랑 event의 날짜랑 같은것만 필터링
+        setSelectedEvents(todayEvents);
+        setSelectedDay(today);
+      } catch (err) {
+        console.error("펀딩목록 받아오기 실패", err);
+      }
+    };
+
+    if (curYear && curMonth) {
+      fetchEvents();
+    }
+  }, [curYear, curMonth]);
 
   // 캘린더에서 날짜 선택 시
   const handleDateClick = (arg) => {
@@ -52,7 +85,7 @@ const CalendarPage = () => {
     });
     setSelectedEvents(ThisDate);
     setSelectedDay(clickedDate);
-    console.log(clickedDate)
+    console.log(clickedDate);
   };
 
   // 캘린더 header에서 'today' 버튼 선택 시 오늘 날짜로 focus
@@ -68,10 +101,20 @@ const CalendarPage = () => {
   };
 
   return (
-    <div>
-
+    <div className="sub-layer">
+      <CalendarList
+        ref={calendarRef}
+        events={events}
+        handleDateClick={handleDateClick}
+        handleCurDate={handleCurDate}
+        handleClickToday={handleClickToday}
+      />
+      <AnniversaryList
+        selectedEvents={selectedEvents}
+        selectedDay={selectedDay}
+      />
     </div>
-  )
-}
+  );
+};
 
 export default CalendarPage;
