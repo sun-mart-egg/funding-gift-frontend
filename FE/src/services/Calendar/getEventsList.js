@@ -1,4 +1,4 @@
-import axiosInstance from "../../@common/axiosInstance";
+import axiosInstance from "../../@common/axiosInstance.js";
 
 const getEventsList = async(year, month) => {
   try {
