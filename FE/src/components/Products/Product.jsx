@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+// import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import SearchBar from "../UI/SearchBar";
 
@@ -10,8 +10,10 @@ import Down from "/imgs/down.png";
 import ProductComponent from "./ProductComponent.jsx";
 import ScrollToTopButton from "../UI/ScrollToTop.jsx";
 
+// api 요청
+import getCategories from "../../services/Products/getCategories.js";
+
 function Product() {
-  const [buttons, setButtons] = useState([]);
   const [categories, setCategories] = useState([]);
 
   const [keyword, setKeyword] = useState(""); // 상태 및 업데이트 함수 정의
@@ -49,29 +51,25 @@ function Product() {
     fetchCategories();
   }, []);
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch(
-        "https://j10d201.p.ssafy.io/api/products/categories",
-      );
-      const json = await response.json();
-      if (json.code === 200) {
-        const fetchedButtons = [{ id: 1, text: "전체", image: Categories1 }];
-
-        json.data.forEach((category, index) => {
-          fetchedButtons.push({
-            id: index + 2, // "전체"가 첫 번째이므로 인덱스에 2를 더함
-            text: category.categoryName,
-            image: category.categoryImage,
-          });
-        });
-
-        setButtons(fetchedButtons);
-      }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
+	// 상품 카테고리 목록 출력
+	const fetchCategories = async () => {
+		try {
+			const categories = await getCategories();
+			const fetchedCategories = [{ id: 1, text: "전체", image: Categories1 }];
+	
+			categories.forEach((category, index) => {
+				fetchedCategories.push({
+					id: index + 2, // "전체"가 첫 번째이므로 인덱스에 2를 더함
+					text: category.categoryName,
+					image: category.categoryImage,
+				});
+			});
+	
+			setCategories(fetchedCategories);
+		} catch (error) {
+			console.error("Error fetching categories:", error);
+		}
+	};
 
   const loadProducts = async (page) => {
     setLoading(true);
@@ -214,24 +212,24 @@ function Product() {
 
         {/* 버튼 영역 */}
         <div className="flex w-[90.5%] justify-center space-x-1">
-          {buttons.map((button) => (
+          {categories.map((category) => (
             <div
-              key={button.id}
+              key={category.id}
               className="flex flex-1 flex-col items-center" // flex-1로 각 항목이 유연하게 크기 조정
             >
               <button
                 className={`flex h-full w-full items-center justify-center rounded-md p-1 
-                ${selectedButtonId === button.id ? "bg-cusColor3" : ""}`}
-                onClick={() => handleCategorySelection(button.id)}
+                ${selectedButtonId === category.id ? "bg-cusColor3" : ""}`}
+                onClick={() => handleCategorySelection(category.id)}
               >
                 <img
-                  src={button.image}
-                  alt={button.text}
+                  src={category.image}
+                  alt={category.text}
                   className={`h-[90%] w-[90%] 
-                    ${selectedButtonId === button.id ? "invert" : ""}`}
+                    ${selectedButtonId === category.id ? "invert" : ""}`}
                 />
               </button>
-              <span className="mt-2 text-xs">{button.text}</span>
+              <span className="mt-2 text-xs">{category.text}</span>
             </div>
           ))}
         </div>
