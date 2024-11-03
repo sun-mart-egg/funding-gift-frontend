@@ -4,15 +4,15 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import getCategories from "../../services/Products/getCategories.js";
 
 // 컴포넌트 호출
-import SearchBar from "../UI/SearchBar";
-import ProductComponent from "./ProductComponent.jsx";
-import ScrollToTopButton from "../UI/ScrollToTop.jsx";
+import SearchBar from "../../components/UI/SearchBar.jsx";
+import ProductComponent from "../../components/Products/ProductComponent.jsx";
+import ScrollToTopButton from "../../components/UI/ScrollToTop.jsx";
 
 // 이미지 호출
 import Categories1 from "/imgs/product_categories1.png";
 import Down from "/imgs/down.png";
 
-function Product() {
+function ProductPage() {
   const [categories, setCategories] = useState([]);
 
   const [keyword, setKeyword] = useState(""); // 상태 및 업데이트 함수 정의
@@ -320,4 +320,4 @@ function Product() {
   );
 }
 
-export default Product;
+export default ProductPage;

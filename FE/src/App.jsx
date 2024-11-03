@@ -17,8 +17,8 @@ import FriendFunding from "./components/Funding/pages/FriendFunding.jsx";
 import MyFunding from "./components/Funding/pages/MyFunding";
 import AccountListPage from "./components/Funding/pages/AccountListPage.jsx";
 import MakeFundingMain from "./components/Funding/pages/MakeFundingMain";
-import Product from "./components/Products/Product";
-import ProductDetail from "./components/Products/ProductDetail";
+import ProductPage from "./pages/Products/ProductPage.jsx";
+import ProductDetail from "./pages/Products/ProductDetailPage.jsx";
 import BrandStore from "./components/Products/BrandStore";
 import Wishlist from "./components/Products/Wishlist";
 import AddressListPage from "./components/Funding/pages/AddressListPage.jsx";
@@ -43,7 +43,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/my-funding" element={<MyFunding />} />
 
-          <Route path="/product" element={<Product />} />
+          <Route path="/product" element={<ProductPage />} />
           <Route path="/funding" element={<FundingMain />} />
         </Route>
 

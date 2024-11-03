@@ -8,12 +8,14 @@ import HeartFilled from "/imgs/heart_filled.png";
 import Down from "/imgs/down.png";
 import NoReview from "/imgs/no_review.png";
 
-import useProductStore from "../Store/ProductStore";
-import { useStore } from "../Store/MakeStore";
-import useFormDataStore from "../Store/FormDataStore";
-import Wishlist from "./Wishlist";
+import useProductStore from "../../components/Store/ProductStore.jsx";
+import { useStore } from "../../components/Store/MakeStore.jsx";
+import useFormDataStore from "../../components/Store/FormDataStore.jsx";
+import Wishlist from "../../components/Products/Wishlist.jsx";
 
-function ProductDetail() {
+import getDetail from "../../services/Products/getDetail.js";
+
+function ProductDetailPage() {
   const { productId } = useParams();
   const navigate = useNavigate();
   const resetStore = useStore((state) => state.reset);
@@ -58,18 +60,27 @@ function ProductDetail() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(
-          import.meta.env.VITE_BASE_URL + `/api/products/${productId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-        );
-        const json = await response.json();
-        setProduct(json.data); // 'data' 속성에 접근하여 상태에 저장
-        setIsWishlisted(json.data.isWishlist);
+          const response = await getDetail(productId); // getDetail 함수 호출
+          setProduct(response.data); // 'data' 속성에 접근하여 상태에 저장
+          setIsWishlisted(response.data.isWishlist);
       } catch (error) {
-        console.error("Error fetching product:", error);
+          console.error("Error fetching product:", error);
       }
-    };
+  };
+    // const fetchProduct = async () => {
+    //   try {
+    //     const response = await fetch(
+    //       import.meta.env.VITE_BASE_URL + `/api/products/${productId}`, {
+    //       headers: { Authorization: `Bearer ${token}` }
+    //     }
+    //     );
+    //     const json = await response.json();
+    //     setProduct(json.data); // 'data' 속성에 접근하여 상태에 저장
+    //     setIsWishlisted(json.data.isWishlist);
+    //   } catch (error) {
+    //     console.error("Error fetching product:", error);
+    //   }
+    // };
 
     fetchProduct();
   }, [productId]);
@@ -571,4 +582,4 @@ function ProductDetail() {
   );
 }
 
-export default ProductDetail;
+export default ProductDetailPage;

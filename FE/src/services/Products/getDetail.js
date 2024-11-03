@@ -1,6 +1,6 @@
 import axiosInstance from "../../@common/axiosInstance.js";
 
-const getDetail = async () => {
+const getDetail = async (productId) => {
   try {
     const response = await axiosInstance.get(`/api/products/${productId}`, {
       params: {
