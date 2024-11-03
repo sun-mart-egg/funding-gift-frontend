@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-// import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
+// API 호출
+import getCategories from "../../services/Products/getCategories.js";
+
+// 컴포넌트 호출
 import SearchBar from "../UI/SearchBar";
-
-import Categories1 from "/imgs/product_categories1.png";
-
-import Down from "/imgs/down.png";
-
 import ProductComponent from "./ProductComponent.jsx";
 import ScrollToTopButton from "../UI/ScrollToTop.jsx";
 
-// api 요청
-import getCategories from "../../services/Products/getCategories.js";
+// 이미지 호출
+import Categories1 from "/imgs/product_categories1.png";
+import Down from "/imgs/down.png";
 
 function Product() {
   const [categories, setCategories] = useState([]);
@@ -71,6 +70,7 @@ function Product() {
 		}
 	};
 
+	// 상품 목록 조회
   const loadProducts = async (page) => {
     setLoading(true);
     try {
@@ -78,6 +78,8 @@ function Product() {
         import.meta.env.VITE_BASE_URL +
           `/api/products?category-id=1&page=${page}&size=10&sort=0`,
       );
+			console.log("상품 조회 성공")
+			console.log(response.json())
       const json = await response.json();
       if (json.code === 200 && json.data) {
         // 중복된 데이터 필터링하여 새 데이터 추가
@@ -100,16 +102,16 @@ function Product() {
     setLoading(false);
   };
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState(products);
+  // const [searchTerm, setSearchTerm] = useState("");
+  // const [filteredProducts, setFilteredProducts] = useState(products);
 
-  const numberWithCommas = (number) => {
-    return number.toLocaleString();
-  };
+  // const numberWithCommas = (number) => {
+  //   return number.toLocaleString();
+  // };
 
-  const formatReviewNum = (num) => {
-    return num >= 1000 ? "999+" : num;
-  };
+  // const formatReviewNum = (num) => {
+  //   return num >= 1000 ? "999+" : num;
+  // };
 
   const [selectedButtonId, setSelectedButtonId] = useState(1);
 
