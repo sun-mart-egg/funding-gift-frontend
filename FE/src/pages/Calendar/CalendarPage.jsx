@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 
+// API 호출
+import getEventsList from "../../services/Calendar/getEventsList.js";
+
+// 컴포넌트 호출
 import AnniversaryList from "../../components/Calendar/AnniversaryList.jsx";
 import CalendarList from "../../components/Calendar/CalendarList.jsx";
 
-import getEventsList from "../../services/Calendar/getEventsList.js";
 
 const CalendarPage = () => {
   const [selectedEvents, setSelectedEvents] = useState([]); // 선택한 날짜에 있는 행사목록
