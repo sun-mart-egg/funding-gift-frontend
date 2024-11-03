@@ -7,6 +7,8 @@ import ImageComingSoon from '/imgs/image_coming_soon.png'
 
 import NoSearchResult from '/imgs/no_search_result.png'
 
+import getProducts from '../../services/Products/getProducts.js';
+
 function ProductComponent({ categoryId, keyword, sort }) {
 
   const [products, setProducts] = useState([]);
@@ -54,15 +56,15 @@ function ProductComponent({ categoryId, keyword, sort }) {
   const loadProducts = async (page) => {
     setLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/products?category-id=${categoryId}&keyword=${keyword}&page=${page}&size=10&sort=${sort}`);
-      const json = await response.json();
-      if (json.code === 200 && json.data) {
+      const response = await getProducts({categoryId, keyword, page, size: 10, sort: 0});
+      console.log("상품 목록 조회 성공")
+      if (response.code === 200 && response.data) {
         // 현재 페이지가 0인 경우 새 데이터 설정, 그 외에는 기존 데이터에 추가
-        const newData = page === 0 ? json.data.data : [...products, ...json.data.data.filter(newItem => !products.some(prevItem => prevItem.productId === newItem.productId))];
+        const newData = page === 0 ? response.data.data : [...products, ...response.data.data.filter(newItem => !products.some(prevItem => prevItem.productId === newItem.productId))];
         setProducts(newData);
-        setHasMore(json.data.hasNext === true);
+        setHasMore(response.data.hasNext === true);
       } else {
-        console.error('Error fetching products:', json.msg);
+        console.error('Error fetching products:', response.msg);
       }
     } catch (error) {
       console.error('Error fetching products:', error);

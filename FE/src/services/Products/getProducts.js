@@ -1,6 +1,6 @@
 import axiosInstance from "../../@common/axiosInstance.js";
 
-const getProducts = async ({ categoryId, keyword, page, size=10, sort=0 }) => {
+const getProducts = async ({ categoryId, keyword, page, size, sort }) => {
   try {
     const response = await axiosInstance.get("/api/products", {
       params: {
@@ -12,7 +12,8 @@ const getProducts = async ({ categoryId, keyword, page, size=10, sort=0 }) => {
       }
     })
     console.log("상품 목록 조회 성공")
-    return response.data.data
+    console.log(response.data)
+    return response.data
   }
   catch (err) {
     console.log("상품 목록 조회 실패")

@@ -17,34 +17,34 @@ function Product() {
 
   const [keyword, setKeyword] = useState(""); // 상태 및 업데이트 함수 정의
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
+  // const [hasMore, setHasMore] = useState(true);
 
   const handleSubmitSearch = () => {};
 
-  const observer = useRef();
-  const lastProductElementRef = useCallback(
-    (node) => {
-      if (loading) return;
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setCurrentPage((prevPage) => prevPage + 1);
-        }
-      });
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore],
-  );
+  // const observer = useRef();
+  // const lastProductElementRef = useCallback(
+  //   (node) => {
+  //     if (loading) return;
+  //     if (observer.current) observer.current.disconnect();
+  //     observer.current = new IntersectionObserver((entries) => {
+  //       if (entries[0].isIntersecting && hasMore) {
+  //         setCurrentPage((prevPage) => prevPage + 1);
+  //       }
+  //     });
+  //     if (node) observer.current.observe(node);
+  //   },
+  //   [loading, hasMore],
+  // );
 
-  useEffect(() => {
-    const loadNextPage = async () => {
-      await loadProducts(currentPage);
-    };
+  // useEffect(() => {
+  //   const loadNextPage = async () => {
+  //     await loadProducts(currentPage);
+  //   };
 
-    loadNextPage();
-  }, [currentPage]);
+  //   loadNextPage();
+  // }, [currentPage]);
 
   useEffect(() => {
     fetchCategories();
@@ -70,37 +70,37 @@ function Product() {
 		}
 	};
 
-	// 상품 목록 조회
-  const loadProducts = async (page) => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        import.meta.env.VITE_BASE_URL +
-          `/api/products?category-id=1&page=${page}&size=10&sort=0`,
-      );
-			console.log("상품 조회 성공")
-			console.log(response.json())
-      const json = await response.json();
-      if (json.code === 200 && json.data) {
-        // 중복된 데이터 필터링하여 새 데이터 추가
-        setProducts((prevProducts) => {
-          const newData = json.data.data.filter(
-            (newItem) =>
-              !prevProducts.some(
-                (prevItem) => prevItem.productId === newItem.productId,
-              ),
-          );
-          return [...prevProducts, ...newData];
-        });
-        setHasMore(json.data.hasNext === true);
-      } else {
-        console.error("Error fetching products:", json.msg);
-      }
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-    setLoading(false);
-  };
+	// // 상품 목록 조회
+  // const loadProducts = async (page) => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await fetch(
+  //       import.meta.env.VITE_BASE_URL +
+  //         `/api/products?category-id=1&page=${page}&size=10&sort=0`,
+  //     );
+	// 		console.log("상품 조회 성공")
+	// 		console.log(response.json())
+  //     const json = await response.json();
+  //     if (json.code === 200 && json.data) {
+  //       // 중복된 데이터 필터링하여 새 데이터 추가
+  //       setProducts((prevProducts) => {
+  //         const newData = json.data.data.filter(
+  //           (newItem) =>
+  //             !prevProducts.some(
+  //               (prevItem) => prevItem.productId === newItem.productId,
+  //             ),
+  //         );
+  //         return [...prevProducts, ...newData];
+  //       });
+  //       setHasMore(json.data.hasNext === true);
+  //     } else {
+  //       console.error("Error fetching products:", json.msg);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching products:", error);
+  //   }
+  //   setLoading(false);
+  // };
 
   // const [searchTerm, setSearchTerm] = useState("");
   // const [filteredProducts, setFilteredProducts] = useState(products);
