@@ -4,6 +4,7 @@ import MainLayout from "./components/UI/MainLayout.jsx";
 import SubLayout from "./components/UI/SubLayout.jsx";
 
 import FriendPage from "./pages/Friends/FriendsPage.jsx";
+import CalendarPage from "./pages/Calendar/CalendarPage.jsx";
 
 import Login from "./components/Login/LoginPage.jsx";
 import LoginCallback from "./components/Login/LoginCallback.jsx";
@@ -11,14 +12,13 @@ import Signup from "./components/Login/Signup.jsx";
 import SignupFinish from "./components/Login/SignupFinish.jsx";
 import InputProfile from "./components/Login/InputProfile.jsx";
 import ParticipatePage from "./components/Funding/pages/ParticipatePage.jsx";
-// import Calendar from "./components/Friends/Calendar.jsx";
 
 import FriendFunding from "./components/Funding/pages/FriendFunding.jsx";
 import MyFunding from "./components/Funding/pages/MyFunding";
 import AccountListPage from "./components/Funding/pages/AccountListPage.jsx";
 import MakeFundingMain from "./components/Funding/pages/MakeFundingMain";
-import Product from "./components/Products/Product";
-import ProductDetail from "./components/Products/ProductDetail";
+import ProductPage from "./pages/Products/ProductPage.jsx";
+import ProductDetail from "./pages/Products/ProductDetailPage.jsx";
 import BrandStore from "./components/Products/BrandStore";
 import Wishlist from "./components/Products/Wishlist";
 import AddressListPage from "./components/Funding/pages/AddressListPage.jsx";
@@ -43,7 +43,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/my-funding" element={<MyFunding />} />
 
-          <Route path="/product" element={<Product />} />
+          <Route path="/product" element={<ProductPage />} />
           <Route path="/funding" element={<FundingMain />} />
         </Route>
 
@@ -78,7 +78,7 @@ function App() {
           <Route path="/address-list" element={<AddressListPage />} />
           <Route path="/account-list" element={<AccountListPage />} />
           <Route path="/new-address" element={<NewAddressPage />} />
-          {/* <Route path="/calendar" element={<Calendar />} /> */}
+          <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/friends" element={<FriendPage />} />
           <Route path="/participate/:fundingId" element={<ParticipatePage />} />
           <Route path="/pay" element={<Paypage />} />
