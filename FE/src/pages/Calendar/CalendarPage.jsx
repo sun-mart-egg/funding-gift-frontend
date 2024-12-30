@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query"
 
 // API 호출
 import getEventsList from "../../services/Calendar/getEventsList.js";
@@ -11,11 +12,26 @@ import CalendarList from "../../components/Calendar/CalendarList.jsx";
 const CalendarPage = () => {
   const [selectedEvents, setSelectedEvents] = useState([]); // 선택한 날짜에 있는 행사목록
   const [selectedDay, setSelectedDay] = useState(null); // 선택한 날짜에 대한 useState
-  const [events, setEvents] = useState([]); // 친구들의 전체 펀딩목록
 
   // axios 요청을 위한 연도, 월 데이터
   const [curYear, setCurYear] = useState("");
   const [curMonth, setCurMonth] = useState("");
+  const { data: events = [] } = useQuery({
+    queryKey: ["events", curYear, curMonth],
+    queryFn: () => getEventsList(curYear, curMonth),
+    enabled: Boolean(curYear && curMonth),
+    staleTime: 1000 * 30,
+    select: (data) => data.map((item) => ({
+      title: item.title,
+      date: item.anniversaryDate,
+      name: item.consumerName,
+      fundingId: item.fundingId,
+      display: "background",
+    })),
+    onError: (error) => (
+      console.error("기념일 목록 조회 요청 실패", error)
+    )
+  });
 
   // today 버튼 로직을 위한 캘린더 참조 ref
   const calendarRef = useRef(null);
@@ -49,43 +65,20 @@ const CalendarPage = () => {
     setCurMonth(month);
   };
 
+  // 페이지 접속 시, 오늘 날짜의 이벤트 목록들이 바로 출력되도록 설정
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const eventsList = await getEventsList(curYear, curMonth);
-        const formatEvents = eventsList.map((item) => ({
-          title: item.title,
-          date: item.anniversaryDate,
-          name: item.consumerName,
-          fundingId: item.fundingId,
-          display: "background",
-        }));
-        setEvents(formatEvents);
-
-        // 페이지 접속 시, 오늘 날짜의 이벤트 목록들이 바로 출력되도록 설정
-        const today = KoreaTime(); // 한국 날짜 기준으로 받아오기.
-        const todayEvents = formatEvents.filter(
-          (event) => event.date === today,
-        ); // 오늘 날짜랑 event의 날짜랑 같은것만 필터링
-        setSelectedEvents(todayEvents);
-        setSelectedDay(today);
-      } catch (err) {
-        console.error("펀딩목록 받아오기 실패", err);
-      }
-    };
-
-    if (curYear && curMonth) {
-      fetchEvents();
+    if (events.length > 0) {
+      const today = KoreaTime(); // 한국 날짜 기준으로 받아오기.
+      const todayEvents = events.filter((event) => event.date === today); // 오늘 날짜랑 event의 날짜랑 같은것만 필터링
+      setSelectedEvents(todayEvents);
+      setSelectedDay(today);
     }
-  }, [curYear, curMonth]);
+  }, [events]);
 
   // 캘린더에서 날짜 선택 시
   const handleDateClick = (arg) => {
     const clickedDate = arg.dateStr;
-    const ThisDate = events.filter((event) => {
-      const clickDay = event.date;
-      return clickedDate === clickDay;
-    });
+    const ThisDate = events.filter((event) => {event.data === clickedDate});
     setSelectedEvents(ThisDate);
     setSelectedDay(clickedDate);
     console.log(clickedDate);
