@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 import MainLayout from "./components/UI/MainLayout.jsx";
 import SubLayout from "./components/UI/SubLayout.jsx";
@@ -36,60 +37,63 @@ import NewAddressPage from "./components/Funding/pages/NewAddressPage.jsx";
 import Alarm from "./components/Home/Alarm.jsx";
 
 function App() {
+  const queryClient = new QueryClient();
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/my-funding" element={<MyFunding />} />
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/my-funding" element={<MyFunding />} />
 
-          <Route path="/product" element={<ProductPage />} />
-          <Route path="/funding" element={<FundingMain />} />
-        </Route>
+            <Route path="/product" element={<ProductPage />} />
+            <Route path="/funding" element={<FundingMain />} />
+          </Route>
 
-        <Route element={<SubLayout />}>
-          <Route path="/login-page" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/input-profile" element={<InputProfile />} />
-          <Route path="/signupFin" element={<SignupFinish />} />
-          <Route path="/make-funding-main" element={<MakeFundingMain />} />
-          <Route
-            path="/my-funding-detail/:fundingId"
-            element={<MyFundingDetail />}
-          />
-          <Route
-            path="/friend-funding/:consumerId"
-            element={<FriendFunding />}
-          />
+          <Route element={<SubLayout />}>
+            <Route path="/login-page" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/input-profile" element={<InputProfile />} />
+            <Route path="/signupFin" element={<SignupFinish />} />
+            <Route path="/make-funding-main" element={<MakeFundingMain />} />
+            <Route
+              path="/my-funding-detail/:fundingId"
+              element={<MyFundingDetail />}
+            />
+            <Route
+              path="/friend-funding/:consumerId"
+              element={<FriendFunding />}
+            />
 
-          <Route
-            path="/friend-funding-detail/:fundingId"
-            element={<FriendFundingDetail />}
-          />
-          <Route path="/my-page" element={<MyPage />} />
-          <Route path="/alarm" element={<Alarm />} />
-          <Route path="/make-funding-detail" element={<MakeFundingDetail />} />
-          <Route path="/make-funding-finish" element={<MakeFundingFinish />} />
-          <Route
-            path="/participate-funding-finish"
-            element={<ParticipateFundingFinish />}
-          />
-          <Route path="/product/:productId" element={<ProductDetail />} />
-          <Route path="/address-list" element={<AddressListPage />} />
-          <Route path="/account-list" element={<AccountListPage />} />
-          <Route path="/new-address" element={<NewAddressPage />} />
-          <Route path="/calendar" element={<CalendarPage />} />
-          <Route path="/friends" element={<FriendPage />} />
-          <Route path="/participate/:fundingId" element={<ParticipatePage />} />
-          <Route path="/pay" element={<Paypage />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/brand/:brandId" element={<BrandStore />} />
-        </Route>
+            <Route
+              path="/friend-funding-detail/:fundingId"
+              element={<FriendFundingDetail />}
+            />
+            <Route path="/my-page" element={<MyPage />} />
+            <Route path="/alarm" element={<Alarm />} />
+            <Route path="/make-funding-detail" element={<MakeFundingDetail />} />
+            <Route path="/make-funding-finish" element={<MakeFundingFinish />} />
+            <Route
+              path="/participate-funding-finish"
+              element={<ParticipateFundingFinish />}
+            />
+            <Route path="/product/:productId" element={<ProductDetail />} />
+            <Route path="/address-list" element={<AddressListPage />} />
+            <Route path="/account-list" element={<AccountListPage />} />
+            <Route path="/new-address" element={<NewAddressPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/friends" element={<FriendPage />} />
+            <Route path="/participate/:fundingId" element={<ParticipatePage />} />
+            <Route path="/pay" element={<Paypage />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/brand/:brandId" element={<BrandStore />} />
+          </Route>
 
-        <Route path="/login-callback" element={<LoginCallback />} />
-        <Route path="/story/:selectedItem" element={<StoryPage />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="/login-callback" element={<LoginCallback />} />
+          <Route path="/story/:selectedItem" element={<StoryPage />} />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 

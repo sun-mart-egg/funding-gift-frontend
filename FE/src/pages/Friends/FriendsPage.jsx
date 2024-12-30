@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query"
 
 // API 호출
 import getFriendsList from "../../services/Friends/getFriendsList.js";
@@ -13,10 +14,19 @@ import FriendsSearchBar from "../../components/Friends/FriendsSearchBar.jsx";
 const FriendPage = () => {
   const [isSearch, setIsSearch] = useState(false); // 검색창 on/off 위한 상태변수
   const [isFilter, setIsFilter] = useState(false); // 필터창 on/off 위한 상태변수
-  const [friends, setFriends] = useState([]); // 친구목록 받아올 배열
   const [userInput, setUserInput] = useState(""); // 친구이름 검색
   const [filterOption, setsFilterOption] = useState("all"); // 전체, 친한친구 목록 출력
   const navigate = useNavigate();
+
+  // 친구목록 쿼리
+  const { data: friends = [], refetch } = useQuery({
+    queryKey: ["friends"],
+    queryFn: getFriendsList,
+    staleTime: 1000 * 30,
+    onError: (error) => (
+      console.error("친구목록 요청 실패", error)
+    )
+  });
 
   const searchState = () => {
     setIsSearch((prevSearch) => !prevSearch);
@@ -46,39 +56,21 @@ const FriendPage = () => {
     }
   };
 
-  useEffect(() => {
-    loadFriends();
-  }, []);
-
-  // REDIS에 친구목록 요청하는 API
-  const loadFriends = async () => {
-    try {
-      const friendsList = await getFriendsList();
-      setFriends(friendsList);
-    } catch (err) {
-      console.error("친구목록 불러오기 실패", err);
-    }
-  };
-
+  // KAKAO 친구목록과 동기화
   const syncKAKAO = async () => {
     try {
       await getKAKAO();
-      await loadFriends();
+      await refetch();
     } catch (err) {
       console.error("카카오 친구목록 동기화 실패", err);
     }
   };
 
+  // 친한친구 수정
   const handleFavorite = async (consumerId) => {
     try {
       await putFavorite(consumerId);
-      setFriends((prevFriends) => 
-        prevFriends.map((friend) => 
-          friend.consumerId === consumerId
-            ? { ...friend, favorite: !friend.favorite }
-            : friend
-        )
-      );
+      await refetch();
     } catch (err) {
       console.error("친한친구 설정 실패", err);
     }
