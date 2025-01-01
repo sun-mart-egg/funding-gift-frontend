@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 // API 호출
 import getCategories from "../../services/Products/getCategories.js";
@@ -14,37 +14,8 @@ import Down from "/imgs/down.png";
 
 function ProductPage() {
   const [categories, setCategories] = useState([]);
-
   const [keyword, setKeyword] = useState(""); // 상태 및 업데이트 함수 정의
-  const [products, setProducts] = useState([]);
-  // const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  // const [hasMore, setHasMore] = useState(true);
-
-  const handleSubmitSearch = () => {};
-
-  // const observer = useRef();
-  // const lastProductElementRef = useCallback(
-  //   (node) => {
-  //     if (loading) return;
-  //     if (observer.current) observer.current.disconnect();
-  //     observer.current = new IntersectionObserver((entries) => {
-  //       if (entries[0].isIntersecting && hasMore) {
-  //         setCurrentPage((prevPage) => prevPage + 1);
-  //       }
-  //     });
-  //     if (node) observer.current.observe(node);
-  //   },
-  //   [loading, hasMore],
-  // );
-
-  // useEffect(() => {
-  //   const loadNextPage = async () => {
-  //     await loadProducts(currentPage);
-  //   };
-
-  //   loadNextPage();
-  // }, [currentPage]);
 
   useEffect(() => {
     fetchCategories();
@@ -70,49 +41,6 @@ function ProductPage() {
 		}
 	};
 
-	// // 상품 목록 조회
-  // const loadProducts = async (page) => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await fetch(
-  //       import.meta.env.VITE_BASE_URL +
-  //         `/api/products?category-id=1&page=${page}&size=10&sort=0`,
-  //     );
-	// 		console.log("상품 조회 성공")
-	// 		console.log(response.json())
-  //     const json = await response.json();
-  //     if (json.code === 200 && json.data) {
-  //       // 중복된 데이터 필터링하여 새 데이터 추가
-  //       setProducts((prevProducts) => {
-  //         const newData = json.data.data.filter(
-  //           (newItem) =>
-  //             !prevProducts.some(
-  //               (prevItem) => prevItem.productId === newItem.productId,
-  //             ),
-  //         );
-  //         return [...prevProducts, ...newData];
-  //       });
-  //       setHasMore(json.data.hasNext === true);
-  //     } else {
-  //       console.error("Error fetching products:", json.msg);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching products:", error);
-  //   }
-  //   setLoading(false);
-  // };
-
-  // const [searchTerm, setSearchTerm] = useState("");
-  // const [filteredProducts, setFilteredProducts] = useState(products);
-
-  // const numberWithCommas = (number) => {
-  //   return number.toLocaleString();
-  // };
-
-  // const formatReviewNum = (num) => {
-  //   return num >= 1000 ? "999+" : num;
-  // };
-
   const [selectedButtonId, setSelectedButtonId] = useState(1);
 
   // categoryId와 sort 상태 추가
@@ -128,7 +56,7 @@ function ProductPage() {
     const categoryMap = [" ", "1", "2", "3", "4", "5", "6"];
     setCategoryId(categoryMap[categoryIndex]);
   };
-  useEffect(() => {}, [categoryId]);
+  useEffect(() => {}, [categoryId, sort]);
 
   // 토글 목록 보이기/숨기기 상태를 관리하는 state 변수 추가
   const [toggleListVisible, setToggleListVisible] = useState(false);
@@ -146,8 +74,6 @@ function ProductPage() {
     setSort(sortMap[selectedToggle]);
     setToggleListVisible(false);
   };
-
-  useEffect(() => {}, [sort]);
 
   // 선택된 옵션을 관리하는 state 변수 추가
   const [selectedToggle, setSelectedToggle] = useState("기본 순");
@@ -184,23 +110,6 @@ function ProductPage() {
     handleToggle(toggleType);
   };
 
-  useEffect(() => {
-    // 페이지 언마운트 시 상태 저장
-    return () => {
-      sessionStorage.setItem(
-        "productState",
-        JSON.stringify({
-          keyword,
-          currentPage,
-          products,
-          categoryId,
-          sort,
-          scrollPosition: window.scrollY, // 현재 스크롤 위치 저장
-        }),
-      );
-    };
-  }, [keyword, currentPage, products, categoryId, sort]);
-
   return (
     <>
       <div className="main-layer font-cusFont2">
@@ -208,7 +117,7 @@ function ProductPage() {
         <div className="mb-[20px] w-[94.5%]">
           <SearchBar
             setKeyword={setKeyword}
-            onSubmit={handleSubmitSearch} // New prop
+            onSubmit={() => {}} // 어떤 역할인지 모르겠음.
           />
         </div>
 
