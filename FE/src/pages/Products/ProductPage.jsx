@@ -12,6 +12,7 @@ import ScrollToTopButton from "../../components/UI/ScrollToTop.jsx";
 // 이미지 호출
 import Categories1 from "/imgs/product_categories1.png";
 import Down from "/imgs/down.png";
+import ProductCategoriesBar from "../../components/Products/ProductCaregoriesBar.jsx";
 
 function ProductPage() {
   const [keyword, setKeyword] = useState(""); // 상태 및 업데이트 함수 정의
@@ -109,29 +110,11 @@ function ProductPage() {
           />
         </div>
 
-        {/* 버튼 영역 */}
-        <div className="flex w-[90.5%] justify-center space-x-1">
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              className="flex flex-1 flex-col items-center" // flex-1로 각 항목이 유연하게 크기 조정
-            >
-              <button
-                className={`flex h-full w-full items-center justify-center rounded-md p-1 
-                ${selectedButtonId === category.id ? "bg-cusColor3" : ""}`}
-                onClick={() => handleCategorySelection(category.id)}
-              >
-                <img
-                  src={category.image}
-                  alt={category.text}
-                  className={`h-[90%] w-[90%] 
-                    ${selectedButtonId === category.id ? "invert" : ""}`}
-                />
-              </button>
-              <span className="mt-2 text-xs">{category.text}</span>
-            </div>
-          ))}
-        </div>
+        {/* 카테고리 목록 영역 */}
+        <ProductCategoriesBar categories={categories}
+        isSelected={selectedButtonId}
+        onSelect={handleCategorySelection}/>
+        
 
         {/* 물품 수, 정렬순서 토글, 필터 */}
         <div className="mt-2 flex h-[6%] w-[85.5%] items-center justify-between">
