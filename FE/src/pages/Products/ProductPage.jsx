@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query"
 
 // API 호출
 import getCategories from "../../services/Products/getCategories.js";
@@ -13,35 +14,25 @@ import Categories1 from "/imgs/product_categories1.png";
 import Down from "/imgs/down.png";
 
 function ProductPage() {
-  const [categories, setCategories] = useState([]);
   const [keyword, setKeyword] = useState(""); // 상태 및 업데이트 함수 정의
-  const [currentPage, setCurrentPage] = useState(0);
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-	// 상품 카테고리 목록 출력
-	const fetchCategories = async () => {
-		try {
-			const categories = await getCategories();
-			const fetchedCategories = [{ id: 1, text: "전체", image: Categories1 }];
-	
-			categories.forEach((category, index) => {
-				fetchedCategories.push({
-					id: index + 2, // "전체"가 첫 번째이므로 인덱스에 2를 더함
-					text: category.categoryName,
-					image: category.categoryImage,
-				});
-			});
-	
-			setCategories(fetchedCategories);
-		} catch (error) {
-			console.error("Error fetching categories:", error);
-		}
-	};
-
   const [selectedButtonId, setSelectedButtonId] = useState(1);
+
+  // 카테고리 목록 호출 쿼리
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    staleTime: 1000 * 10,
+    queryFn: async () => {
+      const categories = await getCategories();
+      return [
+        { id: 1, text: "전체", image: Categories1},
+        ...categories.map((category, index) => ({
+          id: index + 2,
+          text: category.categoryName,
+          image: category.categoryImage,
+        }))
+      ]
+    },
+  });
 
   // categoryId와 sort 상태 추가
   const [categoryId, setCategoryId] = useState(" "); // '전체'는 빈 문자열로 처리
@@ -49,9 +40,6 @@ function ProductPage() {
 
   const handleCategorySelection = (id) => {
     setSelectedButtonId(id);
-    // Reset currentPage to 0 when category changes
-    setCurrentPage(0);
-    // Update categoryId
     const categoryIndex = id - 1;
     const categoryMap = [" ", "1", "2", "3", "4", "5", "6"];
     setCategoryId(categoryMap[categoryIndex]);
