@@ -1,6 +1,6 @@
 import axiosInstance from "../../@common/axiosInstance";
 
-const getReviewList = async (productId, productOptionId = null, page, size, sort) => {
+const getReviews = async (productId, productOptionId = null, page, size, sort) => {
   const params = {
     "product-id": productId,
     page,
@@ -18,4 +18,4 @@ const getReviewList = async (productId, productOptionId = null, page, size, sort
   return response.data;
 }
 
-export default getReviewList;
+export default getReviews;

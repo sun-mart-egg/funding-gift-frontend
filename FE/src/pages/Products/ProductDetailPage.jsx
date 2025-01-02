@@ -13,7 +13,7 @@ import { useStore } from "../../components/Store/MakeStore.jsx";
 import useFormDataStore from "../../components/Store/FormDataStore.jsx";
 
 import getProductDetail from "../../services/Products/getProductDetail.js";
-import getReviewList from "../../services/Products/getReviewList.js";
+import getReviews from "../../services/Products/getReviews.js";
 
 function ProductDetailPage() {
   const { productId } = useParams(); // 상품번호 params
@@ -103,7 +103,7 @@ function ProductDetailPage() {
 
   const { data: reviews = [] } = useQuery({
     queryKey: ["reviews", productId, reviewOption, reviewSort],
-    queryFn: () => getReviewList(productId, reviewOption, 0, 10, 0),
+    queryFn: () => getReviews(productId, reviewOption, 0, 10, 0),
     select: (res) => res.data.data,
     staleTime: 1000 * 10,
     onError: (err) => {
@@ -146,15 +146,16 @@ function ProductDetailPage() {
       .catch((error) => console.error('Error:', error));
   };
 
-  useEffect(() => {
-    // 상품 정보를 가져온 후 위시리스트 상태를 설정합니다.
-    const fetchProduct = async () => {
-      // ... 기존 fetchProduct 로직 ...
-      if (product) {
-      setIsWishlisted(product.isWishlist)};
-    };
-    fetchProduct();
-  }, [productId]);
+  // // 무슨 로직인지 모르겠다
+  // useEffect(() => {
+  //   // 상품 정보를 가져온 후 위시리스트 상태를 설정합니다.
+  //   const fetchProduct = async () => {
+  //     // ... 기존 fetchProduct 로직 ...
+  //     if (product) {
+  //     setIsWishlisted(product.isWishlist)}
+  //   };
+  //   fetchProduct();
+  // }, [productId]);
 
   const handleAddWish = async () => {
     setIsWishlisted(true);
