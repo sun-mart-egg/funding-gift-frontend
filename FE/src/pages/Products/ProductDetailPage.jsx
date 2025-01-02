@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query"
 
@@ -14,6 +14,9 @@ import useFormDataStore from "../../components/Store/FormDataStore.jsx";
 
 import getProductDetail from "../../services/Products/getProductDetail.js";
 import getReviews from "../../services/Products/getReviews.js";
+import deleteReviews from "../../services/Products/deleteReviews.js";
+import addWishlists from "../../services/Products/addWishlists.js";
+import deleteWishlists from "../../services/Products/deleteWishlists.js";
 
 function ProductDetailPage() {
   const { productId } = useParams(); // 상품번호 params
@@ -22,7 +25,6 @@ function ProductDetailPage() {
   const resetProductData = useProductStore((state) => state.resetProductData);
   const resetFormData = useFormDataStore((state) => state.resetFormData);
   const [selectedOption, setSelectedOption] = useState(null);
-  const token = localStorage.getItem("access-token")
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   // 옵션 토글 가시성 상태
@@ -134,91 +136,23 @@ function ProductDetailPage() {
   };
 
   // 댓글 삭제
-  const handleDeleteReview = (reviewId) => {
-    fetch(import.meta.env.VITE_BASE_URL + `/api/reviews/${reviewId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` // 인증 토큰이 필요한 경우
-      }
-    })
-      .then(response => response.json())
-      .catch((error) => console.error('Error:', error));
+  // 추후 react-query의 useMutation 적용 예정
+  const handleDeleteReview = async (reviewId) => {
+    await deleteReviews(reviewId);
   };
 
-  // // 무슨 로직인지 모르겠다
-  // useEffect(() => {
-  //   // 상품 정보를 가져온 후 위시리스트 상태를 설정합니다.
-  //   const fetchProduct = async () => {
-  //     // ... 기존 fetchProduct 로직 ...
-  //     if (product) {
-  //     setIsWishlisted(product.isWishlist)}
-  //   };
-  //   fetchProduct();
-  // }, [productId]);
-
-  const handleAddWish = async () => {
+  // 위시리스트에 상품 추가하기
+  // 추후 react-query의 useMutation 적용 예정
+  const handleAddWish = async (productId) => {
     setIsWishlisted(true);
-    const requestBody = {
-      productId: Number(productId) // productId를 숫자로 변환
-    };
-
-    try {
-      const response = await fetch(import.meta.env.VITE_BASE_URL + '/api/wishlists', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // 인증 토큰이 필요한 경우
-        },
-        body: JSON.stringify(requestBody) // JSON 형식으로 요청 본문 구성
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const json = await response.json();
-      if (json.code === 200) {
-        console.log("Wishlist updated successfully");
-        // 추가적인 처리 (예: 상태 업데이트 또는 사용자에게 알림 표시)
-      } else {
-        console.error("Error updating wishlist:", json.msg);
-      }
-    } catch (error) {
-      console.error("Error updating wishlist:", error);
-    }
+    await addWishlists(productId)
   };
 
-  const handleDeleteWish = async () => {
+  // 위시리스트에서 상품 제외
+  // 추후 react-query의 useMutation 적용 예정
+  const handleDeleteWish = async (productId) => {
     setIsWishlisted(false);
-    const requestBody = {
-      productId: Number(productId) // productId를 숫자로 변환
-    };
-
-    try {
-      const response = await fetch(import.meta.env.VITE_BASE_URL + '/api/wishlists', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // 인증 토큰이 필요한 경우
-        },
-        body: JSON.stringify(requestBody) // JSON 형식으로 요청 본문 구성
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const json = await response.json();
-      if (json.code === 200) {
-        console.log("Wishlist updated successfully");
-        // 추가적인 처리 (예: 상태 업데이트 또는 사용자에게 알림 표시)
-      } else {
-        console.error("Error updating wishlist:", json.msg);
-      }
-    } catch (error) {
-      console.error("Error updating wishlist:", error);
-    }    
+    await deleteWishlists(productId)
   };
 
   const toggleWishlist = async () => {
