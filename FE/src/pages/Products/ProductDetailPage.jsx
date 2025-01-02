@@ -13,9 +13,10 @@ import { useStore } from "../../components/Store/MakeStore.jsx";
 import useFormDataStore from "../../components/Store/FormDataStore.jsx";
 
 import getProductDetail from "../../services/Products/getProductDetail.js";
+import getReviewList from "../../services/Products/getReviewList.js";
 
 function ProductDetailPage() {
-  const { productId } = useParams();
+  const { productId } = useParams(); // 상품번호 params
   const navigate = useNavigate();
   const resetStore = useStore((state) => state.reset);
   const resetProductData = useProductStore((state) => state.resetProductData);
@@ -54,9 +55,9 @@ function ProductDetailPage() {
     return number.toLocaleString();
   };
 
-  // 상품 상세 정보 관련 쿼리
+  // 상품 상세정보 관련 쿼리
   const { data: product = null } = useQuery({
-    queryKey: ["product", productId],
+    queryKey: ["products", productId],
     queryFn: async () => {
       const response = await getProductDetail(productId);
       setIsWishlisted(response.data.isWishlist);
@@ -96,40 +97,19 @@ function ProductDetailPage() {
     setToggleListVisible(false); // Close the filter menu
   };
 
-  // 댓글 정보 가져오기 API
-  const [reviews, setReviews] = useState([]);
+  // 후기목록 호출 관련 쿼리
   const [reviewOption, setReviewOption] = useState("");
   const [reviewSort, setReviewSort] = useState(0);
 
-
-  const fetchReview = async () => {
-    try {
-      let url = import.meta.env.VITE_BASE_URL + `/api/reviews?product-id=${productId}&page=0&size=10&sort=${reviewSort}`;
-      if (reviewOption !== null) {
-        url += `&product-option-id=${reviewOption}`;
-      }
-
-      const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const json = await response.json();
-      if (json && json.data && json.data.data) {
-        setReviews(json.data.data);
-      } else {
-        console.log("No review data available");
-        setReviews([]);
-      }
-    } catch (error) {
-      console.error("Error fetching reviews:", error);
+  const { data: reviews = [] } = useQuery({
+    queryKey: ["reviews", productId, reviewOption, reviewSort],
+    queryFn: () => getReviewList(productId, reviewOption, 0, 10, 0),
+    select: (res) => res.data.data,
+    staleTime: 1000 * 10,
+    onError: (err) => {
+      console.error("후기목록 호출 실패", err)
     }
-  };
-
-  useEffect(() => {
-    fetchReview();
-  }, [productId, reviewOption, reviewSort]);
+  })
 
   const [reviewOptionToggleVisible, setReviewOptionToggleVisible] =
     useState(false);
@@ -154,7 +134,6 @@ function ProductDetailPage() {
   };
 
   // 댓글 삭제
-
   const handleDeleteReview = (reviewId) => {
     fetch(import.meta.env.VITE_BASE_URL + `/api/reviews/${reviewId}`, {
       method: 'DELETE',
@@ -164,9 +143,6 @@ function ProductDetailPage() {
       }
     })
       .then(response => response.json())
-      .then(data => {
-        fetchReview();
-      })
       .catch((error) => console.error('Error:', error));
   };
 
