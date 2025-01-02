@@ -1,6 +1,6 @@
 import axiosInstance from "../../@common/axiosInstance.js";
 
-const getDetail = async (productId) => {
+const getProductDetail = async (productId) => {
   try {
     const response = await axiosInstance.get(`/api/products/${productId}`, {
       params: {
@@ -17,4 +17,4 @@ const getDetail = async (productId) => {
   }
 };
 
-export default getDetail;
+export default getProductDetail;

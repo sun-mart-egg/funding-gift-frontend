@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import SampleImage from "/imgs/image_coming_soon.png";
 
 import Star from "/imgs/star.png";
 import HeartEmpty from "/imgs/heart_empty.png";
@@ -9,11 +8,10 @@ import Down from "/imgs/down.png";
 import NoReview from "/imgs/no_review.png";
 
 import useProductStore from "../../components/Store/ProductStore.jsx";
-import { useStore } from "../../components/Store/MakeStore.jsx";
+import useStore from "../../components/Store/MakeStore.jsx";
 import useFormDataStore from "../../components/Store/FormDataStore.jsx";
-import Wishlist from "../../components/Products/Wishlist.jsx";
 
-import getDetail from "../../services/Products/getDetail.js";
+import getProductDetail from "../../services/Products/getProductDetail.js";
 
 function ProductDetailPage() {
   const { productId } = useParams();
@@ -60,7 +58,7 @@ function ProductDetailPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-          const response = await getDetail(productId); // getDetail 함수 호출
+          const response = await getProductDetail(productId); // getProductDetail 함수 호출
           setProduct(response.data); // 'data' 속성에 접근하여 상태에 저장
           setIsWishlisted(response.data.isWishlist);
       } catch (error) {
