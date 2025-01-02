@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query"
 
 import Star from "/imgs/star.png";
 import HeartEmpty from "/imgs/heart_empty.png";
@@ -8,7 +9,7 @@ import Down from "/imgs/down.png";
 import NoReview from "/imgs/no_review.png";
 
 import useProductStore from "../../components/Store/ProductStore.jsx";
-import useStore from "../../components/Store/MakeStore.jsx";
+import { useStore } from "../../components/Store/MakeStore.jsx";
 import useFormDataStore from "../../components/Store/FormDataStore.jsx";
 
 import getProductDetail from "../../services/Products/getProductDetail.js";
@@ -48,40 +49,24 @@ function ProductDetailPage() {
     }
   };
 
+  // 188000 -> 188,000 으로 변경하는 함수
   const numberWithCommas = (number) => {
     return number.toLocaleString();
   };
 
-  // 상품 상세 정보 가져오기 API
-  const [product, setProduct] = useState(null);
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-          const response = await getProductDetail(productId); // getProductDetail 함수 호출
-          setProduct(response.data); // 'data' 속성에 접근하여 상태에 저장
-          setIsWishlisted(response.data.isWishlist);
-      } catch (error) {
-          console.error("Error fetching product:", error);
-      }
-  };
-    // const fetchProduct = async () => {
-    //   try {
-    //     const response = await fetch(
-    //       import.meta.env.VITE_BASE_URL + `/api/products/${productId}`, {
-    //       headers: { Authorization: `Bearer ${token}` }
-    //     }
-    //     );
-    //     const json = await response.json();
-    //     setProduct(json.data); // 'data' 속성에 접근하여 상태에 저장
-    //     setIsWishlisted(json.data.isWishlist);
-    //   } catch (error) {
-    //     console.error("Error fetching product:", error);
-    //   }
-    // };
-
-    fetchProduct();
-  }, [productId]);
+  // 상품 상세 정보 관련 쿼리
+  const { data: product = null } = useQuery({
+    queryKey: ["product", productId],
+    queryFn: async () => {
+      const response = await getProductDetail(productId);
+      setIsWishlisted(response.data.isWishlist);
+      return response.data;
+    },
+    staleTime: 1000 * 10,
+    onError: (err) => {
+      console.error("상세정보 호출 실패", err)
+    },
+  });
 
   const [toggleListVisible, setToggleListVisible] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("최신 순");
