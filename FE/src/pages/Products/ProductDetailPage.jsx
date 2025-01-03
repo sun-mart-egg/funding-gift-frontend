@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 import Star from "/imgs/star.png";
 import HeartEmpty from "/imgs/heart_empty.png";
@@ -21,6 +21,7 @@ import deleteWishlists from "../../services/Products/deleteWishlists.js";
 function ProductDetailPage() {
   const { productId } = useParams(); // 상품번호 params
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const resetStore = useStore((state) => state.reset);
   const resetProductData = useProductStore((state) => state.resetProductData);
   const resetFormData = useFormDataStore((state) => state.resetFormData);
@@ -136,32 +137,51 @@ function ProductDetailPage() {
   };
 
   // 댓글 삭제
-  // 추후 react-query의 useMutation 적용 예정
+  const deleteReviewMutate = useMutation({
+    mutationFn: (reviewId) => deleteReviews(reviewId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reviews", productId]})
+    },
+    onError: (error) => {
+      console.error("댓글 삭제 실패", error)
+    },
+  });
+
   const handleDeleteReview = async (reviewId) => {
-    await deleteReviews(reviewId);
+    if (window.confirm("댓글 삭제 하시겠습니까?")) {
+      deleteReviewMutate.mutate(reviewId)
+    }
   };
 
   // 위시리스트에 상품 추가하기
-  // 추후 react-query의 useMutation 적용 예정
-  const handleAddWish = async (productId) => {
-    setIsWishlisted(true);
-    await addWishlists(productId)
-  };
+  const addWishMutate = useMutation({
+    mutationFn: () => addWishlists(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products", productId]})
+    },
+    onError: (error) => {
+      console.error("위시리스트 추가 실패", error)
+    },
+  });
 
   // 위시리스트에서 상품 제외
-  // 추후 react-query의 useMutation 적용 예정
-  const handleDeleteWish = async (productId) => {
-    setIsWishlisted(false);
-    await deleteWishlists(productId)
-  };
+  const deleteWishMutate = useMutation({
+    mutationFn: () => deleteWishlists(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products", productId]})
+    },
+    onError: (error) => {
+      console.error("위시리스트 삭제 실패", error)
+    },
+  });
 
-  const toggleWishlist = async () => {
+  const toggleWishlist = async (productId) => {
     if (isWishlisted) {
       // 위시리스트에서 삭제
-      await handleDeleteWish();
+      deleteWishMutate.mutate(productId);
     } else {
       // 위시리스트에 추가
-      await handleAddWish();
+      addWishMutate.mutate(productId);
     }
   };
 
