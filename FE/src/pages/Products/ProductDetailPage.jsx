@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import SampleImage from "/imgs/image_coming_soon.png";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 import Star from "/imgs/star.png";
 import HeartEmpty from "/imgs/heart_empty.png";
@@ -11,19 +11,21 @@ import NoReview from "/imgs/no_review.png";
 import useProductStore from "../../components/Store/ProductStore.jsx";
 import { useStore } from "../../components/Store/MakeStore.jsx";
 import useFormDataStore from "../../components/Store/FormDataStore.jsx";
-import Wishlist from "../../components/Products/Wishlist.jsx";
 
-import getDetail from "../../services/Products/getDetail.js";
+import getProductDetail from "../../services/Products/getProductDetail.js";
+import getReviews from "../../services/Products/getReviews.js";
+import deleteReviews from "../../services/Products/deleteReviews.js";
+import addWishlists from "../../services/Products/addWishlists.js";
+import deleteWishlists from "../../services/Products/deleteWishlists.js";
 
 function ProductDetailPage() {
-  const { productId } = useParams();
+  const { productId } = useParams(); // 상품번호 params
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const resetStore = useStore((state) => state.reset);
   const resetProductData = useProductStore((state) => state.resetProductData);
   const resetFormData = useFormDataStore((state) => state.resetFormData);
   const [selectedOption, setSelectedOption] = useState(null);
-  const token = localStorage.getItem("access-token")
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   // 옵션 토글 가시성 상태
   const [optionToggleVisible, setOptionToggleVisible] = useState(false);
@@ -50,40 +52,23 @@ function ProductDetailPage() {
     }
   };
 
+  // 188000 -> 188,000 으로 변경하는 함수
   const numberWithCommas = (number) => {
     return number.toLocaleString();
   };
 
-  // 상품 상세 정보 가져오기 API
-  const [product, setProduct] = useState(null);
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-          const response = await getDetail(productId); // getDetail 함수 호출
-          setProduct(response.data); // 'data' 속성에 접근하여 상태에 저장
-          setIsWishlisted(response.data.isWishlist);
-      } catch (error) {
-          console.error("Error fetching product:", error);
-      }
-  };
-    // const fetchProduct = async () => {
-    //   try {
-    //     const response = await fetch(
-    //       import.meta.env.VITE_BASE_URL + `/api/products/${productId}`, {
-    //       headers: { Authorization: `Bearer ${token}` }
-    //     }
-    //     );
-    //     const json = await response.json();
-    //     setProduct(json.data); // 'data' 속성에 접근하여 상태에 저장
-    //     setIsWishlisted(json.data.isWishlist);
-    //   } catch (error) {
-    //     console.error("Error fetching product:", error);
-    //   }
-    // };
-
-    fetchProduct();
-  }, [productId]);
+  // 상품 상세정보 관련 쿼리
+  const { data: product = null } = useQuery({
+    queryKey: ["products", productId],
+    queryFn: async () => {
+      const response = await getProductDetail(productId);
+      return response.data;
+    },
+    staleTime: 1000 * 10,
+    onError: (err) => {
+      console.error("상세정보 호출 실패", err)
+    },
+  });
 
   const [toggleListVisible, setToggleListVisible] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("최신 순");
@@ -113,40 +98,19 @@ function ProductDetailPage() {
     setToggleListVisible(false); // Close the filter menu
   };
 
-  // 댓글 정보 가져오기 API
-  const [reviews, setReviews] = useState([]);
+  // 후기목록 호출 관련 쿼리
   const [reviewOption, setReviewOption] = useState("");
   const [reviewSort, setReviewSort] = useState(0);
 
-
-  const fetchReview = async () => {
-    try {
-      let url = import.meta.env.VITE_BASE_URL + `/api/reviews?product-id=${productId}&page=0&size=10&sort=${reviewSort}`;
-      if (reviewOption !== null) {
-        url += `&product-option-id=${reviewOption}`;
-      }
-
-      const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const json = await response.json();
-      if (json && json.data && json.data.data) {
-        setReviews(json.data.data);
-      } else {
-        console.log("No review data available");
-        setReviews([]);
-      }
-    } catch (error) {
-      console.error("Error fetching reviews:", error);
+  const { data: reviews = [] } = useQuery({
+    queryKey: ["reviews", productId, reviewOption, reviewSort],
+    queryFn: () => getReviews(productId, reviewOption, 0, 10, 0),
+    select: (res) => res.data.data,
+    staleTime: 1000 * 10,
+    onError: (err) => {
+      console.error("후기목록 호출 실패", err)
     }
-  };
-
-  useEffect(() => {
-    fetchReview();
-  }, [productId, reviewOption, reviewSort]);
+  })
 
   const [reviewOptionToggleVisible, setReviewOptionToggleVisible] =
     useState(false);
@@ -171,103 +135,54 @@ function ProductDetailPage() {
   };
 
   // 댓글 삭제
+  const deleteReviewMutate = useMutation({
+    mutationFn: (reviewId) => deleteReviews(reviewId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reviews", productId]})
+    },
+    onError: (error) => {
+      console.error("댓글 삭제 실패", error)
+    },
+  });
 
-  const handleDeleteReview = (reviewId) => {
-    fetch(import.meta.env.VITE_BASE_URL + `/api/reviews/${reviewId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` // 인증 토큰이 필요한 경우
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        fetchReview();
-      })
-      .catch((error) => console.error('Error:', error));
-  };
-
-  useEffect(() => {
-    // 상품 정보를 가져온 후 위시리스트 상태를 설정합니다.
-    const fetchProduct = async () => {
-      // ... 기존 fetchProduct 로직 ...
-      if (product) {
-      setIsWishlisted(product.isWishlist)};
-    };
-    fetchProduct();
-  }, [productId]);
-
-  const handleAddWish = async () => {
-    setIsWishlisted(true);
-    const requestBody = {
-      productId: Number(productId) // productId를 숫자로 변환
-    };
-
-    try {
-      const response = await fetch(import.meta.env.VITE_BASE_URL + '/api/wishlists', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // 인증 토큰이 필요한 경우
-        },
-        body: JSON.stringify(requestBody) // JSON 형식으로 요청 본문 구성
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const json = await response.json();
-      if (json.code === 200) {
-        console.log("Wishlist updated successfully");
-        // 추가적인 처리 (예: 상태 업데이트 또는 사용자에게 알림 표시)
-      } else {
-        console.error("Error updating wishlist:", json.msg);
-      }
-    } catch (error) {
-      console.error("Error updating wishlist:", error);
+  const handleDeleteReview = async (reviewId) => {
+    if (window.confirm("댓글 삭제 하시겠습니까?")) {
+      deleteReviewMutate.mutate(reviewId)
     }
   };
 
-  const handleDeleteWish = async () => {
-    setIsWishlisted(false);
-    const requestBody = {
-      productId: Number(productId) // productId를 숫자로 변환
-    };
+  // 위시리스트에 상품 추가하기
+  const addWishMutate = useMutation({
+    mutationFn: () => addWishlists(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products", productId]})
+      queryClient.invalidateQueries({ queryKey: ["wishes"] })
+    },
+    onError: (error) => {
+      console.error("위시리스트 추가 실패", error)
+    },
+  });
 
-    try {
-      const response = await fetch(import.meta.env.VITE_BASE_URL + '/api/wishlists', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // 인증 토큰이 필요한 경우
-        },
-        body: JSON.stringify(requestBody) // JSON 형식으로 요청 본문 구성
-      });
+  // 위시리스트에서 상품 제외
+  const deleteWishMutate = useMutation({
+    mutationFn: () => deleteWishlists(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products", productId]})
+      queryClient.invalidateQueries({ queryKey: ["wishes"] })
+    },
+    onError: (error) => {
+      console.error("위시리스트 삭제 실패", error)
+    },
+  });
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const json = await response.json();
-      if (json.code === 200) {
-        console.log("Wishlist updated successfully");
-        // 추가적인 처리 (예: 상태 업데이트 또는 사용자에게 알림 표시)
-      } else {
-        console.error("Error updating wishlist:", json.msg);
-      }
-    } catch (error) {
-      console.error("Error updating wishlist:", error);
-    }    
-  };
-
-  const toggleWishlist = async () => {
-    if (isWishlisted) {
+  // 위시리스트 추가/제거 버튼에 적용시킬 함수
+  const toggleWishlist = async (productId) => {
+    if (product.isWishlist) {
       // 위시리스트에서 삭제
-      await handleDeleteWish();
+      await deleteWishMutate.mutate(productId);
     } else {
       // 위시리스트에 추가
-      await handleAddWish();
+      await addWishMutate.mutate(productId);
     }
   };
 
@@ -562,7 +477,7 @@ function ProductDetailPage() {
                   onClick={toggleWishlist}
                   className="absolute left-[8%] mr-[20px]"
                 >
-                  <img src={isWishlisted ? HeartFilled : HeartEmpty} alt="" className="w-[27px]" />
+                  <img src={product.isWishlist ? HeartFilled : HeartEmpty} alt="" className="w-[27px]" />
                 </button>
 
                 <button
