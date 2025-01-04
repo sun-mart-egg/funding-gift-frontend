@@ -1,58 +1,56 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useRef, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 
 import ScrollToTop from "../UI/ScrollToTop2";
 import ImageComingSoon from '/imgs/image_coming_soon.png'
 import NoWishlist from '/imgs/no_wishlist.png'
 
+import getWishlists from '../../services/Products/getWishLists';
+import { useInfiniteQuery } from '@tanstack/react-query';
+
 
 function Wishlist() {
-
-	const navigate = useNavigate();
-	const [loading, setLoading] = useState(true);
-	const [currentPage, setCurrentPage] = useState(0);
-	const [hasMore, setHasMore] = useState(true);
-	const [wishes, setWishes] = useState([]);
-
-	const token = localStorage.getItem("access-token");
-
-	useEffect(() => {
-
-		if (!token) {
-			console.log("토큰이 존재하지 않습니다.");
-			setLoading(false); // 토큰이 없는 경우 로딩 상태를 해제합니다.
-			// 추가적으로 사용자를 로그인 페이지로 리다이렉트할 수 있습니다.
-			navigate("/login-page");
-			return;
-		}
-	}, [token, navigate])
-
 	const observer = useRef();
+	const consumerId = localStorage.getItem("consumer-id")
 
+	// 위시리스트 관련 쿼리 ( + 무한 스크롤 기능 )
+	// 수정 필요
+	const { data = { pages: [] }, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery({
+		queryKey: ["wishes", consumerId],
+		queryFn: async ({ pageParam = 0 }) => {
+			const response = await getWishlists(pageParam, 4);
+			console.log("인피니티 쿼리 잘 작동하냐?")
+			console.log(data);
+			return response;
+		},
+		getNextPageParam: (lastPage, allPages) => {
+			return lastPage.hasNext ? allPages.length : undefined;
+		},
+		// select: (data) => {
+		// 	return data.pages.flatMap(page => page.data);
+		// },
+	});
+
+	// 현재 페이지의 위시리스트만 가져오도록 설정
+	// 수정 필요
+	const wishes = data.pages.flatMap(page => page.data);
+
+	// 스크롤 위치 저장 관련 로직
+	// 수정 필요
 	const lastProductElementRef = useCallback(node => {
-		if (loading) return;
+		if (isLoading || !hasNextPage) return;
 		if (observer.current) observer.current.disconnect();
 		observer.current = new IntersectionObserver(entries => {
-			if (entries[0].isIntersecting && hasMore) {
-				setCurrentPage(prevPage => prevPage + 1);
+			if (entries[0].isIntersecting && hasNextPage) {
+				fetchNextPage();
 			}
 		});
 		if (node) observer.current.observe(node);
-	}, [loading, hasMore]);
+	}, [isLoading, hasNextPage]);
 
-	useEffect(() => {
-		// Reset products when categoryId or sort changes
-		setCurrentPage(0);
-		setWishes([]);
-	}, []);
-
-	useEffect(() => {
-		// Fetch products when currentPage changes
-		loadWishes(currentPage);
-	}, [currentPage]);
-
+	// 위시리스트에 담아둔 물건이 없을 경우 보여줄 UI
 	const renderNoResultsMessage = () => {
-		if (!loading & wishes.length === 0) {
+		if (!isLoading && wishes.length === 0) {
 			return (
 				<div className='w-full h-full text-center flex flex-col items-center'>
 					<p className='text-2xl font-cusFont4 pt-[30px]'>상품 목록에서 위시리스트를 추가해보세요!</p>
@@ -69,35 +67,10 @@ function Wishlist() {
 		return null;
 	};
 
-	const loadWishes = async (page) => {
-		setLoading(true);
-		try {
-			const response = await fetch(import.meta.env.VITE_BASE_URL + `/api/wishlists?page=${page}&size=10`,
-				{ headers: { Authorization: `Bearer ${token}` } }
-			);
-			const json = await response.json();
-			if (json.code === 200 && json.data) {
-				const newData = page === 0 ? json.data.data : [...wishes, ...json.data.data.filter(newItem => !wishes.some(wish => wish.productId === newItem.productId))];
-				setWishes(newData);
-				setHasMore(json.data.hasNext === true);
-			} else {
-				console.error('Error fetching wishes:', json.msg);
-			}
-		} catch (error) {
-			console.error('Error fetching wishes:', error);
-		}
-		setLoading(false);
-	};
-
+	// 숫자 천 단위로 끊어주는 함수
 	const numberWithCommas = (number) => {
 		return number.toLocaleString();
 	};
-
-	const formatReviewNum = (num) => {
-		return num >= 1000 ? "999+" : num;
-	};
-
-
 
 	return (
 		<div className="sub-layer mt-[80px] justify-start min-h-screen overflow-hidden font-cusFont2 bg-white">
@@ -107,7 +80,7 @@ function Wishlist() {
 					<div
 						key={product.productId}
 						ref={index === wishes.length - 1 ? lastProductElementRef : null}
-						className="border-[1px] border-gray-300 m-2 h-[35%] w-[45%] flex-col rounded-md text-[12px]"
+						className="border-[1px] border-gray-300 m-2 h-[42%] w-[45%] flex-col rounded-md text-[12px]"
 					>
 						{/* 이미지 */}
 						<div className="w-full relative h-[70%] pt-[100%] rounded-md"> {/* paddingTop is same as width to maintain 1:1 aspect ratio */}
@@ -124,7 +97,7 @@ function Wishlist() {
 						</div>
 					</div>
 				))}
-				{loading && <p>Loading more products...</p>}
+				{isLoading && <p>Loading more products...</p>}
 				{renderNoResultsMessage()} {/* 검색 결과가 없을 때 메시지 표시 */}
 			</div>
 
