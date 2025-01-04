@@ -26,7 +26,6 @@ function ProductDetailPage() {
   const resetProductData = useProductStore((state) => state.resetProductData);
   const resetFormData = useFormDataStore((state) => state.resetFormData);
   const [selectedOption, setSelectedOption] = useState(null);
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   // 옵션 토글 가시성 상태
   const [optionToggleVisible, setOptionToggleVisible] = useState(false);
@@ -63,7 +62,6 @@ function ProductDetailPage() {
     queryKey: ["products", productId],
     queryFn: async () => {
       const response = await getProductDetail(productId);
-      setIsWishlisted(response.data.isWishlist);
       return response.data;
     },
     staleTime: 1000 * 10,
@@ -158,6 +156,7 @@ function ProductDetailPage() {
     mutationFn: () => addWishlists(productId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products", productId]})
+      queryClient.invalidateQueries({ queryKey: ["wishes"] })
     },
     onError: (error) => {
       console.error("위시리스트 추가 실패", error)
@@ -169,20 +168,21 @@ function ProductDetailPage() {
     mutationFn: () => deleteWishlists(productId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products", productId]})
+      queryClient.invalidateQueries({ queryKey: ["wishes"] })
     },
     onError: (error) => {
       console.error("위시리스트 삭제 실패", error)
     },
   });
 
+  // 위시리스트 추가/제거 버튼에 적용시킬 함수
   const toggleWishlist = async (productId) => {
-    setIsWishlisted((prevWish) => !prevWish)
-    if (isWishlisted) {
+    if (product.isWishlist) {
       // 위시리스트에서 삭제
-      deleteWishMutate.mutate(productId);
+      await deleteWishMutate.mutate(productId);
     } else {
       // 위시리스트에 추가
-      addWishMutate.mutate(productId);
+      await addWishMutate.mutate(productId);
     }
   };
 
@@ -477,7 +477,7 @@ function ProductDetailPage() {
                   onClick={toggleWishlist}
                   className="absolute left-[8%] mr-[20px]"
                 >
-                  <img src={isWishlisted ? HeartFilled : HeartEmpty} alt="" className="w-[27px]" />
+                  <img src={product.isWishlist ? HeartFilled : HeartEmpty} alt="" className="w-[27px]" />
                 </button>
 
                 <button
