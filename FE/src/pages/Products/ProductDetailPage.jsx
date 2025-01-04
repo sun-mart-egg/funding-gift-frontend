@@ -176,6 +176,7 @@ function ProductDetailPage() {
   });
 
   const toggleWishlist = async (productId) => {
+    setIsWishlisted((prevWish) => !prevWish)
     if (isWishlisted) {
       // 위시리스트에서 삭제
       deleteWishMutate.mutate(productId);
