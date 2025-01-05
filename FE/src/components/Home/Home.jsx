@@ -36,13 +36,13 @@ function Home() {
   let firebaseApp, messaging;
   if (!isIOSKakaoInAppBrowser()) {
     const firebaseConfig = {
-      apiKey: "AIzaSyBE1OaWA2Bo3bxh-8oUfJCKGGFz6DkNYbA",
-      authDomain: "funding-gift.firebaseapp.com",
-      projectId: "funding-gift",
-      storageBucket: "funding-gift.appspot.com",
-      messagingSenderId: "184194517827",
-      appId: "1:184194517827:web:f2a715c4f6c082503afdf6",
-      measurementId: "G-GPCQJX1FSL",
+      apiKey: import.meta.env.VITE_FCM_API_KEY,
+      authDomain: import.meta.env.VITE_FCM_AUTH_DOMAIN,
+      projectId: import.meta.env.VITE_FCM_PROJECT_ID,
+      storageBucket: import.meta.env.VITE_FCM_STORAGE_BUCKET,
+      messagingSenderId: import.meta.env.VITE_FCM_MESSAGING_SENDER_ID,
+      appId: import.meta.env.VITE_FCM_APP_ID,
+      measurementId: import.meta.env.VITE_FCM_MEASUREMENT_ID,
     };
 
     firebaseApp = initializeApp(firebaseConfig);
