@@ -1,14 +1,20 @@
-import React, { useState, useRef, forwardRef, useEffect } from "react";
+import { useState, useRef, forwardRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // useNavigate 사용
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useStore } from "../../Store/MakeStore";
 import useFormDataStore from "../../Store/FormDataStore";
-import { createFunding } from "../api/FundingAPI";
 import { useLocation } from "react-router-dom";
 import useProductStore from "../../Store/ProductStore";
 import useUserStore from "../../Store/UserStore";
-import { getAnniversaryList } from "../api/Anniversary";
+
+// import { getAnniversaryList } from "../api/Anniversary";
+import { getAnniversaryList } from "../../../services/Funding/getAnniversaryList";
+import { createFunding } from "../api/FundingAPI";
+
+import getProductDetail from "../../../services/Products/getProductDetail";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 function MakeFundingDetail() {
   const [accessToken, setAccessToken] = useState("");
@@ -17,10 +23,24 @@ function MakeFundingDetail() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const ref = useRef(null); // DatePicker에 대한 ref를 생성합니다.
   const { formData, updateFormData } = useFormDataStore();
-  const { product, setProduct } = useProductStore();
   const { option, setOption } = useProductStore();
   const [anniversaryCategory, setAnniversaryCategory] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+
+  const productId = location?.state?.params; // 상품 ID
+
+  //react-Query 이용해서 getProductDetail 호출
+  const { data: product = null } = useQuery({
+    queryKey: ["products", productId],
+    queryFn: async () => {
+      const response = await getProductDetail(productId);
+      return response.data;
+    },
+    staleTime: 1000 * 10,
+    onError: (err) => {
+      console.error("product 상세정보 호출 실패", err);
+    },
+  });
 
   const {
     contentIndex,
@@ -85,7 +105,6 @@ function MakeFundingDetail() {
     if (product) {
       console.log("product : " + product.imageUrl);
       console.log("option : " + option);
-
       updateFormData("targetPrice", product.price);
       updateFormData("productId", product.productId);
       updateFormData("productOptionId", option);
@@ -95,29 +114,9 @@ function MakeFundingDetail() {
   useEffect(() => {
     const token = localStorage.getItem("access-token");
     setAccessToken(token);
-
     console.log(location.state);
 
-    const fetchProduct = async () => {
-      try {
-        const response = await fetch(
-          `https://j10d201.p.ssafy.io/api/products/${location.state.params}`,
-        );
-        const json = await response.json();
-        setProduct(json.data); // 'data' 속성에 접근하여 상태에 저장
-      } catch (error) {
-        console.error("Error fetching product:", error);
-      }
-    };
-
     getAnniversaryList(token, setAnniversaryCategory);
-
-    // product가 null이면 fetchProduct 실행
-    if (!product && location.state.params) {
-      console.log("목록 가져오는거 실행했습니다.");
-      setOption(location.state.option);
-      fetchProduct();
-    }
 
     if (selectedAnniversary) {
       updateFormData("anniversaryDate", selectedAnniversary.anniversaryDate);

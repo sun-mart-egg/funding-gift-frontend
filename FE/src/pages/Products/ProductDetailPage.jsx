@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Star from "/imgs/star.png";
 import HeartEmpty from "/imgs/heart_empty.png";
@@ -66,7 +66,7 @@ function ProductDetailPage() {
     },
     staleTime: 1000 * 10,
     onError: (err) => {
-      console.error("상세정보 호출 실패", err)
+      console.error("상세정보 호출 실패", err);
     },
   });
 
@@ -108,9 +108,9 @@ function ProductDetailPage() {
     select: (res) => res.data.data,
     staleTime: 1000 * 10,
     onError: (err) => {
-      console.error("후기목록 호출 실패", err)
-    }
-  })
+      console.error("후기목록 호출 실패", err);
+    },
+  });
 
   const [reviewOptionToggleVisible, setReviewOptionToggleVisible] =
     useState(false);
@@ -138,16 +138,16 @@ function ProductDetailPage() {
   const deleteReviewMutate = useMutation({
     mutationFn: (reviewId) => deleteReviews(reviewId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["reviews", productId]})
+      queryClient.invalidateQueries({ queryKey: ["reviews", productId] });
     },
     onError: (error) => {
-      console.error("댓글 삭제 실패", error)
+      console.error("댓글 삭제 실패", error);
     },
   });
 
   const handleDeleteReview = async (reviewId) => {
     if (window.confirm("댓글 삭제 하시겠습니까?")) {
-      deleteReviewMutate.mutate(reviewId)
+      deleteReviewMutate.mutate(reviewId);
     }
   };
 
@@ -155,11 +155,11 @@ function ProductDetailPage() {
   const addWishMutate = useMutation({
     mutationFn: () => addWishlists(productId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products", productId]})
-      queryClient.invalidateQueries({ queryKey: ["wishes"] })
+      queryClient.invalidateQueries({ queryKey: ["products", productId] });
+      queryClient.invalidateQueries({ queryKey: ["wishes"] });
     },
     onError: (error) => {
-      console.error("위시리스트 추가 실패", error)
+      console.error("위시리스트 추가 실패", error);
     },
   });
 
@@ -167,11 +167,11 @@ function ProductDetailPage() {
   const deleteWishMutate = useMutation({
     mutationFn: () => deleteWishlists(productId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products", productId]})
-      queryClient.invalidateQueries({ queryKey: ["wishes"] })
+      queryClient.invalidateQueries({ queryKey: ["products", productId] });
+      queryClient.invalidateQueries({ queryKey: ["wishes"] });
     },
     onError: (error) => {
-      console.error("위시리스트 삭제 실패", error)
+      console.error("위시리스트 삭제 실패", error);
     },
   });
 
@@ -226,8 +226,8 @@ function ProductDetailPage() {
                       선택된 옵션:{" "}
                       {selectedOption
                         ? product.options.find(
-                          (option) => option.id === selectedOption,
-                        )?.name
+                            (option) => option.id === selectedOption,
+                          )?.name
                         : "옵션 선택 안 함"}
                     </button>
 
@@ -388,12 +388,21 @@ function ProductDetailPage() {
                             <div>{review.name}</div>
                           </div>
                           <div className="w-[20%]">
-                            {review.isMe && (<div onClick={() => handleDeleteReview((review.reviewId))} className="text-red-500">삭제</div>)}
+                            {review.isMe && (
+                              <div
+                                onClick={() =>
+                                  handleDeleteReview(review.reviewId)
+                                }
+                                className="text-red-500"
+                              >
+                                삭제
+                              </div>
+                            )}
                           </div>
                         </div>
 
                         {/* 리뷰 이미지 */}
-                        <div className="w-full flex">
+                        <div className="flex w-full">
                           {review.image2 && !review.image1 && (
                             <div className="my-[20px] flex w-full">
                               <div
@@ -446,7 +455,6 @@ function ProductDetailPage() {
                           )}
                         </div>
 
-
                         {/* 리뷰 내용 */}
                         <div className="ml-7-1 mb-2 h-[100px] w-[100%] rounded-md border-[2px] p-2">
                           <p className="text-xs">{review.content}</p>
@@ -477,7 +485,11 @@ function ProductDetailPage() {
                   onClick={toggleWishlist}
                   className="absolute left-[8%] mr-[20px]"
                 >
-                  <img src={product.isWishlist ? HeartFilled : HeartEmpty} alt="" className="w-[27px]" />
+                  <img
+                    src={product.isWishlist ? HeartFilled : HeartEmpty}
+                    alt=""
+                    className="w-[27px]"
+                  />
                 </button>
 
                 <button

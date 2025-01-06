@@ -14,7 +14,7 @@
         "@fullcalendar/daygrid": "^6.1.11",
         "@fullcalendar/interaction": "^6.1.11",
         "@fullcalendar/react": "^6.1.11",
-        "@tanstack/react-query": "^5.62.11",
+        "@tanstack/react-query": "^5.62.15",
         "axios": "^1.6.8",
         "bootstrap": "^5.3.3",
         "date-fns": "^3.6.0",
