@@ -14,7 +14,6 @@ function Wishlist() {
 	const consumerId = localStorage.getItem("consumer-id")
 
 	// 위시리스트 관련 쿼리 ( + 무한 스크롤 기능 )
-	// 수정 필요
 	const { data = { pages: [] }, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery({
 		queryKey: ["wishes", consumerId],
 		queryFn: async ({ pageParam = 0 }) => {
@@ -26,17 +25,12 @@ function Wishlist() {
 		getNextPageParam: (lastPage, allPages) => {
 			return lastPage.hasNext ? allPages.length : undefined;
 		},
-		// select: (data) => {
-		// 	return data.pages.flatMap(page => page.data);
-		// },
 	});
 
-	// 현재 페이지의 위시리스트만 가져오도록 설정
-	// 수정 필요
+	// 위시리스트 목록 평탄화
 	const wishes = data.pages.flatMap(page => page.data);
 
 	// 스크롤 위치 저장 관련 로직
-	// 수정 필요
 	const lastProductElementRef = useCallback(node => {
 		if (isLoading || !hasNextPage) return;
 		if (observer.current) observer.current.disconnect();
