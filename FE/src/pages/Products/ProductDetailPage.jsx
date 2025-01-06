@@ -64,7 +64,6 @@ function ProductDetailPage() {
       const response = await getProductDetail(productId);
       return response.data;
     },
-    staleTime: 1000 * 10,
     onError: (err) => {
       console.error("상세정보 호출 실패", err)
     },
@@ -106,7 +105,6 @@ function ProductDetailPage() {
     queryKey: ["reviews", productId, reviewOption, reviewSort],
     queryFn: () => getReviews(productId, reviewOption, 0, 10, 0),
     select: (res) => res.data.data,
-    staleTime: 1000 * 10,
     onError: (err) => {
       console.error("후기목록 호출 실패", err)
     }

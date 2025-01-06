@@ -21,7 +21,6 @@ function ProductPage() {
   // 카테고리 목록 호출 쿼리
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
-    staleTime: 1000 * 10,
     queryFn: async () => {
       const categories = await getCategories();
       return [
