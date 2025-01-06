@@ -12,19 +12,18 @@ function ProductComponent({ categoryId, keyword, sort }) {
   // 추천상품 호출 + 무한 스크롤 쿼리
   const { data = { pages: [] }, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery({
     queryKey: ["products"],
-    queryFn: async ({ pageParam }) => {
+    queryFn: async ({ pageParam = 0 }) => {
       const response = await getRecommendProducts(pageParam, 10);
       console.log("추천상품 무한 스크롤 작동")
-      console.log(data)
       return response;
     },
-    initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.hasNext ? allPages.length : undefined;
     }
   });
 
   // 상품 정보 데이터 평탄화 작업
+  // 기존 페이지의 상품 + 다음 페이지의 상품 데이터를 하나의 배열로 합쳐준다
   const products = data.pages.flatMap(page => page.data)
 
   // 이전에 보고있던 위치에 스크롤을 멈춰줌
