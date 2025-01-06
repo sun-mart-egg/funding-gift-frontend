@@ -1,75 +1,59 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { useInfiniteQuery } from "@tanstack/react-query"
 
 import Star from '/imgs/star.png';
 import ImageComingSoon from '/imgs/image_coming_soon.png'
+import getRecommendProducts from '../../services/Products/getRecommendProducts';
 
 function ProductComponent({ categoryId, keyword, sort }) {
-
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-
   const observer = useRef();
 
+  // 추천상품 호출 + 무한 스크롤 쿼리
+  const { data = { pages: [] }, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery({
+    queryKey: ["products"],
+    queryFn: async ({ pageParam }) => {
+      const response = await getRecommendProducts(pageParam, 10);
+      console.log("추천상품 무한 스크롤 작동")
+      console.log(data)
+      return response;
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.hasNext ? allPages.length : undefined;
+    }
+  });
+
+  // 상품 정보 데이터 평탄화 작업
+  const products = data.pages.flatMap(page => page.data)
+
+  // 이전에 보고있던 위치에 스크롤을 멈춰줌
   const lastProductElementRef = useCallback(node => {
-    if (loading) return;
+    if (isLoading || !hasNextPage) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
-        setCurrentPage(prevPage => prevPage + 1);
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage();
       }
     });
     if (node) observer.current.observe(node);
-  }, [loading, hasMore]);
+  }, [isLoading, hasNextPage]);
 
-  useEffect(() => {
-    // Reset products when categoryId or sort changes
-    setCurrentPage(0);
-    setProducts([]);
-  }, [categoryId, sort, keyword]);
-
-  useEffect(() => {
-    // Fetch products when currentPage changes
-    loadProducts(currentPage);
-  }, [currentPage, categoryId, sort, keyword]);
-
-
-  const loadProducts = async (page) => {
-    setLoading(true);
-    try {
-      const response = await fetch(import.meta.env.VITE_BASE_URL + `/api/products/rank?page=${page}&size=10`);
-      const json = await response.json();
-      if (json.code === 200 && json.data) {
-        // 현재 페이지가 0인 경우 새 데이터 설정, 그 외에는 기존 데이터에 추가
-        const newData = page === 0 ? json.data.data : [...products, ...json.data.data.filter(newItem => !products.some(prevItem => prevItem.productId === newItem.productId))];
-        setProducts(newData);
-        setHasMore(json.data.hasNext === true);
-      } else {
-        console.error('Error fetching products:', json.msg);
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
-    setLoading(false);
-  };
-
+  // 숫자 천단위로 끊어줌
   const numberWithCommas = (number) => {
     return number.toLocaleString();
   };
 
+  // 리뷰 갯수 1000개 이상일 경우 999+ 로 표기
   const formatReviewNum = (num) => {
     return num >= 1000 ? "999+" : num;
   };
-
-
 
   return (
     <div className="flex min-h-[63%] w-[95.5%] flex-grow flex-wrap justify-center overflow-y-auto bg-white font-cusfont2">
       {products.map((product, index) => (
         <div
-          key={product.productId}
+          key={`${product.productId}-${index}`}
           ref={index === products.length - 1 ? lastProductElementRef : null}
           className="m-2 h-[58.5%] w-[45%] flex-col rounded-md text-[12px]"
         >
@@ -94,7 +78,7 @@ function ProductComponent({ categoryId, keyword, sort }) {
           </div>
         </div>
       ))}
-      {loading && <p>Loading more products...</p>}
+      {isLoading && <p>Loading more products...</p>}
     </div>
   );
 }
