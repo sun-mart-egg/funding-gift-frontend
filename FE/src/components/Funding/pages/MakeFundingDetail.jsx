@@ -1,35 +1,52 @@
 import { useState, useRef, forwardRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // useNavigate 사용
-import DatePicker from "react-datepicker";
+import { useNavigate, useLocation } from "react-router-dom"; // useNavigate 사용
+import { useQuery } from "@tanstack/react-query";
 import "react-datepicker/dist/react-datepicker.css";
+
+//store
 import { useStore } from "../../Store/MakeStore";
 import useFormDataStore from "../../Store/FormDataStore";
-import { useLocation } from "react-router-dom";
-import useProductStore from "../../Store/ProductStore";
 import useUserStore from "../../Store/UserStore";
 
-// import { getAnniversaryList } from "../api/Anniversary";
+//api
 import { getAnniversaryList } from "../../../services/Funding/getAnniversaryList";
 import { postFunding } from "../../../services/Funding/postFunding";
-
 import getProductDetail from "../../../services/Products/getProductDetail";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+//page
+import FundingStep0 from "../../../pages/Funding/MakeFunding/FundingStep0";
+import FundingStep1 from "../../../pages/Funding/MakeFunding/FundingStep1";
+import FundingStep2 from "../../../pages/Funding/MakeFunding/FundingStep2";
+import FundingStep3 from "../../../pages/Funding/MakeFunding/FundingStep3";
+import FundingStep4 from "../../../pages/Funding/MakeFunding/FundingStep4";
 
 function MakeFundingDetail() {
-  const [accessToken, setAccessToken] = useState("");
+  const [accessToken, setAccessToken] = useState(""); //토큰
   const navigate = useNavigate(); // useNavigate 훅 사용
   const location = useLocation(); // useLocation 훅 사용
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const ref = useRef(null); // DatePicker에 대한 ref를 생성합니다.
+
   const { formData, updateFormData } = useFormDataStore();
-  const { option, setOption } = useProductStore();
   const [anniversaryCategory, setAnniversaryCategory] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  const productId = location?.state?.params; // 상품 ID
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  //react-Query 이용해서 getProductDetail 호출
+  const {
+    contentIndex, //현재 페이지
+    setContentIndex, //현재 페이지 설정
+    selectedAnniversary, //기념일
+    selectedAddress, //주소
+    selectedAccount, //계좌
+  } = useStore();
+
+  //사용자 이름, 핸드폰 번호
+  const { name, phoneNumber } = useUserStore();
+
+  // 상품 ID
+  const productId = location?.state?.params;
+
+  //react-Query 이용해서 getProductDetail 호출 해서 product에 정보 return
   const { data: product = null } = useQuery({
     queryKey: ["products", productId],
     queryFn: async () => {
@@ -40,15 +57,8 @@ function MakeFundingDetail() {
     onError: (err) => {
       console.error("product 상세정보 호출 실패", err);
     },
+    enabled: !!productId,
   });
-
-  const {
-    contentIndex,
-    setContentIndex,
-    selectedAnniversary,
-    selectedAddress,
-    selectedAccount,
-  } = useStore(); // Zustand에서 상태를 가져옵니다.
 
   // 기념일 카테고리 변경 처리
   const handleCategoryChange = (event) => {
@@ -77,8 +87,8 @@ function MakeFundingDetail() {
       ))}
     </select>
   );
-  const { name } = useUserStore();
 
+  //처음 화면 렌더링 되었을 때
   useEffect(() => {
     if (name) {
       console.log("이름 : ", name);
@@ -86,10 +96,7 @@ function MakeFundingDetail() {
     }
   }, []);
 
-  useEffect(() => {
-    console.log("기념일 카테고리? : ", anniversaryCategory[0]);
-  }, [anniversaryCategory]);
-
+  //커스텀된 datapicker 버튼
   const CustomInput = forwardRef(({ value, onClick }, ref) => (
     <button
       onClick={() => setShowDatePicker(true)}
@@ -135,11 +142,13 @@ function MakeFundingDetail() {
 
   // 다음 컨텐츠를 보여주는 함수
   const handleNext = async () => {
+    //4페이지 이하일 경우 index를 하나 높인다
     if (contentIndex < 4) {
       setContentIndex(contentIndex + 1);
-    } else {
+    }
+    //4페이지일 경우 펀딩을 생성하고 펀딩 생성 완료 페이지로 이동한다. 실패시 에러 메시지 콘ㅌ솔 출력
+    else {
       try {
-        console.log(accessToken);
         const result = await postFunding(formData, accessToken);
         console.log("Response from the server:", result);
         navigate("/make-funding-finish");
@@ -220,236 +229,52 @@ function MakeFundingDetail() {
     }
     switch (contentIndex) {
       case 0:
-        return (
-          <div className=" flex flex-col items-center justify-center text-center font-cusFont3 focus:border-cusColor3">
-            <div
-              id="imgSection"
-              className="mb-8 flex w-2/3 items-center justify-center text-center"
-            >
-              <img src={product.imageUrl} alt="" className="w-24" />
-            </div>
-            <div id="itemInfo">
-              <p className="p-2 font-cusFont2 text-xl">{product.productName}</p>
-              <p className="p-2 font-cusFont2 text-xl">
-                {product.productOptionId}
-              </p>
-              <p> {product.price} 원</p>
-
-              <p className="pt-2"> 선물은 만들어 볼까요?</p>
-            </div>
-          </div>
-        );
+        return <FundingStep0 product={product} />;
       case 1:
         return (
-          <div className="text-md flex flex-col  justify-center ">
-            <div id="card-content">
-              <div id="is-isPrivate" className="mb-6 flex">
-                <p className="mr-4 ">친한친구에게만 공개하기</p>
-                <input
-                  type="checkbox"
-                  name="isPrivate"
-                  checked={formData.isPrivate}
-                  onChange={handleInputChange}
-                  className="p-4"
-                />
-              </div>
-              <div id="funding-title" className="mb-6">
-                <p>펀딩 제목</p>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title || ""}
-                  placeholder="펀딩 제목을 입력해 주세요."
-                  onChange={handleInputChange}
-                  className="mt-2 h-7 w-full rounded-md border  border-gray-400 p-2 text-xs placeholder:text-xs"
-                />
-              </div>
-              <div id="funding-detail">
-                <p>펀딩 소개</p>
-                <textarea
-                  type="text"
-                  name="content"
-                  value={formData.content || ""}
-                  onChange={handleInputChange}
-                  placeholder="펀딩에 대해 소개해 주세요."
-                  className="mt-2 w-full rounded-md border  border-gray-400 p-2 text-xs placeholder:text-xs"
-                />
-              </div>
-            </div>
-          </div>
+          <FundingStep1
+            formData={formData}
+            handleInputChange={handleInputChange}
+          ></FundingStep1>
         );
       case 2:
         return (
-          <div className="text-md flex flex-col  justify-center">
-            <div id="card-content">
-              <div id="anniversaryDate" className="mb-6 ">
-                <div className=" flex-col justify-between">
-                  <p>기념일</p>
-                  {renderCategoryDropdown()}
-                  <input
-                    type="date"
-                    name="anniversaryDate"
-                    value={formData.anniversaryDate || ""}
-                    onChange={handleAnniversaryChange} // 이벤트 핸들러 설정
-                    className="mt-1 h-8 w-full rounded-md border border-[#9B9B9B] px-2 text-xs focus:border-cusColor3 focus:outline-none"
-                  />
-                </div>
-                <div className="mt-2 text-xs">
-                  {selectedAnniversary && (
-                    <div>
-                      <div className="flex">
-                        <p className="mb-1 mr-1">{selectedAnniversary.name}</p>
-                        <p>{selectedAnniversary.anniversaryName}</p>
-                      </div>
-                      <p>{selectedAnniversary.anniversaryDate}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div id="funding-date" className="mb-6">
-                <div className="flex justify-between">
-                  <p>펀딩 기간</p>
-                  <DatePicker
-                    ref={ref}
-                    selected={
-                      formData.startDate ? new Date(formData.startDate) : null
-                    }
-                    onChange={handleDateChange}
-                    onClickOutside={() => setShowDatePicker(false)}
-                    open={showDatePicker}
-                    selectsRange={true}
-                    startDate={
-                      formData.startDate ? new Date(formData.startDate) : null
-                    }
-                    endDate={
-                      formData.endDate ? new Date(formData.endDate) : null
-                    }
-                    dateFormat="yyyy/MM/dd"
-                    customInput={<CustomInput />}
-                    className="p-2"
-                  />
-                </div>
-                <div className="mt-2 flex w-full justify-between rounded-md border  border-gray-400 ">
-                  <p className=" w-[80%] p-2 text-xs">
-                    {formData.startDate && formData.endDate
-                      ? `${getFormattedDate(formData.startDate)} ~ ${getFormattedDate(formData.endDate)}`
-                      : "기간을 입력하세요"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <p>최소금액</p>
-                <input
-                  type="number"
-                  name="minPrice"
-                  value={formData.minPrice || ""}
-                  placeholder="최소 금액을 입력해주세요."
-                  className="mt-2 h-8 w-full rounded-md border border-gray-400 p-2 text-xs placeholder:text-xs"
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-          </div>
+          <FundingStep2
+            formData={formData}
+            handleInputChange={handleInputChange}
+            handleAnniversaryChange={handleAnniversaryChange}
+            selectedAnniversary={selectedAnniversary}
+            renderCategoryDropdown={renderCategoryDropdown}
+            showDatePicker={showDatePicker}
+            setShowDatePicker={setShowDatePicker}
+            refDatePicker={ref}
+            handleDateChange={handleDateChange}
+            getFormattedDate={getFormattedDate}
+            CustomInput={CustomInput}
+          ></FundingStep2>
         );
       case 3:
         return (
-          <div className="text-md flex flex-col  justify-center">
-            <div id="card-content ">
-              <div id="address" className="mb-6 ">
-                <div className=" flex justify-between">
-                  <p>주소</p>
-                  <button
-                    className="common-btn h-6 bg-gray-500 text-xs"
-                    onClick={() => navigate("/address-list")}
-                  >
-                    선택
-                  </button>
-                </div>
-                <div className="mt-4 h-[80px] rounded-md border border-gray-400 text-xs">
-                  {selectedAddress == null ? (
-                    "주소를 선택해 주세요"
-                  ) : (
-                    <div>
-                      <div className="flex">
-                        <p className="mb-1 mr-1">{selectedAddress.name}</p>
-                        <p>{selectedAddress.nickname}</p>
-                      </div>
-                      <p>{selectedAddress.phoneNumber}</p>
-                      <div className="flex">
-                        <p className="mr-1">{selectedAddress.defaultAddr}</p>
-                        <p className="mr-1">{selectedAddress.detailAddr}</p>
-                        <p className="mr-1">{selectedAddress.zipCode}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div id="account" className="">
-                <div className="flex justify-between">
-                  <p>환불 계좌</p>
-                  <button
-                    className="common-btn h-6 bg-gray-500 text-xs"
-                    onClick={() => navigate("/account-list")}
-                  >
-                    선택
-                  </button>
-                </div>
-                <div className="mt-4 h-[50px] rounded-md border border-gray-400 text-xs">
-                  {selectedAccount == null ? (
-                    "계좌를 선택해 주세요"
-                  ) : (
-                    <div>
-                      <p>{selectedAccount.name}</p>
-                      <div className="flex">
-                        <p className="mb-1 mr-1">
-                          {selectedAccount.accountBank}
-                        </p>
-                        <p>{selectedAccount.accountNo}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          <FundingStep3
+            selectedAddress={selectedAddress}
+            selectedAccount={selectedAccount}
+            navigate={navigate}
+          />
         );
 
       case 4:
-        console.log(formData);
-
         return (
-          <div className="flex flex-col items-center justify-center text-[12px]">
-            <img src={product.imageUrl} alt="" className="mb-4 w-[50%]" />
-            <p className="mb-1">{product.productName}</p>
-            <p className="mb-1">
-              {formData.isPrivate
-                ? "친한 친구에게만 공개하기"
-                : "모두에게 공개하기"}
-            </p>
-            <p className="mb-1">{formData.title}</p>
-            <p className="mb-1">{formData.content}</p>
-            <p className="mb-1">{formData.anniversaryDate}</p>
-            <p className="mb-1">
-              {getFormattedDate(formData.startDate)} ~{" "}
-              {getFormattedDate(formData.endDate)}
-            </p>
-
-            <p className="mb-1">{formData.minPrice}</p>
-
-            <div className="mb-1 flex">
-              <p className="mr-1">{formData.defaultAddr} </p>
-              <p className="mr-1">{formData.detailAddr} </p>
-              <p className="mr-1">{formData.zipCode} </p>
-            </div>
-            <p className="mb-1">{formData.accountBank}</p>
-            <p className="mb-1">{formData.accountNo}</p>
-          </div>
+          <FundingStep4
+            product={product}
+            formData={formData}
+            getFormattedDate={getFormattedDate}
+          ></FundingStep4>
         );
+      default:
+        return <div>잘못된 단계 입니다.</div>;
     }
   };
+
   return (
     <div
       className="sub-layer font-cusFont3 "

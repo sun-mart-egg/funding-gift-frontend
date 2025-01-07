@@ -19,6 +19,7 @@
         "bootstrap": "^5.3.3",
         "date-fns": "^3.6.0",
         "firebase": "^10.10.0",
+        "prop-types": "^15.8.1",
         "react": "^18.2.0",
         "react-bootstrap": "^2.10.1",
         "react-datepicker": "^6.4.0",
