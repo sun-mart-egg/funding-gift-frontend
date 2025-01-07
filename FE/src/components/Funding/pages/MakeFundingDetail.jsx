@@ -10,7 +10,7 @@ import useUserStore from "../../Store/UserStore";
 
 // import { getAnniversaryList } from "../api/Anniversary";
 import { getAnniversaryList } from "../../../services/Funding/getAnniversaryList";
-import { createFunding } from "../api/FundingAPI";
+import { postFunding } from "../../../services/Funding/postFunding";
 
 import getProductDetail from "../../../services/Products/getProductDetail";
 
@@ -103,11 +103,11 @@ function MakeFundingDetail() {
   // product 상태가 변경될 때마다 실행되는
   useEffect(() => {
     if (product) {
-      console.log("product : " + product.imageUrl);
-      console.log("option : " + option);
+      console.log("product : " + product);
+      console.log("option : " + location.state.option);
       updateFormData("targetPrice", product.price);
       updateFormData("productId", product.productId);
-      updateFormData("productOptionId", option);
+      updateFormData("productOptionId", location.state.option);
     }
   }, [product]);
 
@@ -140,11 +140,11 @@ function MakeFundingDetail() {
     } else {
       try {
         console.log(accessToken);
-        const result = await createFunding(formData, accessToken);
+        const result = await postFunding(formData, accessToken);
         console.log("Response from the server:", result);
         navigate("/make-funding-finish");
       } catch (error) {
-        console.error("Failed to create funding:", error);
+        console.error("펀딩 만들기 실패", error);
       }
     }
   };
@@ -230,6 +230,9 @@ function MakeFundingDetail() {
             </div>
             <div id="itemInfo">
               <p className="p-2 font-cusFont2 text-xl">{product.productName}</p>
+              <p className="p-2 font-cusFont2 text-xl">
+                {product.productOptionId}
+              </p>
               <p> {product.price} 원</p>
 
               <p className="pt-2"> 선물은 만들어 볼까요?</p>

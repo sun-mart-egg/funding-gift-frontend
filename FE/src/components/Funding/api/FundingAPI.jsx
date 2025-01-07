@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useNavigate } from "react-router";
 //펀딩 상세 조회 api
 async function fetchDetailFunding(token, fundingId, setData) {
   try {
