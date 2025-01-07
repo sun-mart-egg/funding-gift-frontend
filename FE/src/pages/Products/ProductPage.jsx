@@ -8,7 +8,7 @@ import getCategories from "../../services/Products/getCategories.js";
 import SearchBar from "../../components/UI/SearchBar.jsx";
 import ProductComponent from "../../components/Products/ProductComponent.jsx";
 import ScrollToTopButton from "../../components/UI/ScrollToTop.jsx";
-import ProductCategoriesBar from "../../components/Products/ProductCaregoriesBar.jsx";
+import ProductCategoriesBar from "../../components/Products/ProductCategoriesBar.jsx";
 import ToggleList from "../../components/Products/ToggleList.jsx";
 
 // 이미지 호출

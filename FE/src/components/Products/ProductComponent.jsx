@@ -14,7 +14,7 @@ function ProductComponent({ categoryId, keyword, sort }) {
 
   // 상품 목록 호출 쿼리 + 무한 스크롤
   const { data = { pages: [] }, fetchNextPage, hasNextPage, isLoading} = useInfiniteQuery({
-    queryKey: ["products"],
+    queryKey: ["products", categoryId, keyword, sort],
     queryFn: async ({ pageParam = 0 }) => {
       const response = await getProducts({categoryId, keyword, page:pageParam, size:10, sort});
       console.log("상품목록 무한 스크롤 작동 확인 문구")
