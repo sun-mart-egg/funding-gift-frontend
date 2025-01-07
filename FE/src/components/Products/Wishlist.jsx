@@ -7,6 +7,7 @@ import NoWishlist from '/imgs/no_wishlist.png'
 
 import getWishlists from '../../services/Products/getWishLists';
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { formattedPrice } from '../../@common/formattedNumber';
 
 
 function Wishlist() {
@@ -61,11 +62,6 @@ function Wishlist() {
 		return null;
 	};
 
-	// 숫자 천 단위로 끊어주는 함수
-	const numberWithCommas = (number) => {
-		return number.toLocaleString();
-	};
-
 	return (
 		<div className="sub-layer mt-[80px] justify-start min-h-screen overflow-hidden font-cusFont2 bg-white">
 			<p className="font-cusFont5 text-4xl">나의 위시리스트</p>
@@ -86,7 +82,7 @@ function Wishlist() {
 						<div className="m-[1px] flex h-[30%] w-[100%] flex-col justify-center p-[10px] pl-2">
 							<div>
 								<p className='truncate'>{product.productName}</p>
-								<p>{numberWithCommas(product.price)}원</p>
+								<p>{formattedPrice(product.price)}원</p>
 							</div>
 						</div>
 					</div>

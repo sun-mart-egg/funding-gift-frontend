@@ -7,6 +7,7 @@ import ImageComingSoon from '/imgs/image_coming_soon.png'
 import NoSearchResult from '/imgs/no_search_result.png'
 
 import getProducts from '../../services/Products/getProducts.js';
+import { formattedPrice, formattedReviewCnt } from '../../@common/formattedNumber.js';
 
 function ProductComponent({ categoryId, keyword, sort }) {
   const observer = useRef();
@@ -53,14 +54,6 @@ function ProductComponent({ categoryId, keyword, sort }) {
     return null;
   };
 
-  const numberWithCommas = (number) => {
-    return number.toLocaleString();
-  };
-
-  const formatReviewNum = (num) => {
-    return num >= 1000 ? "999+" : num;
-  };
-  
   return (
     <div className="mt-4 flex min-h-[63%] w-[95.5%] flex-grow flex-wrap justify-center overflow-y-auto bg-white font-cusfont2">
       {products.map((product, index) => (
@@ -79,11 +72,11 @@ function ProductComponent({ categoryId, keyword, sort }) {
           <div className="m-[1px] flex h-[30%] w-[100%] flex-col justify-center p-[10px] pl-2">
             <div>
               <p className='truncate'>{product.productName}</p>
-              <p>{numberWithCommas(product.price)}원</p>
+              <p>{formattedPrice(product.price)}원</p>
               <p className="flex items-center">
                 <img src={Star} alt="" className="h-[12px] w-[12px]" />
                 <span className="ml-1">
-                  {formatReviewNum(product.reviewAvg)}({product.reviewCnt})
+                  {formattedReviewCnt(product.reviewAvg)}({product.reviewCnt})
                 </span>
               </p>
             </div>

@@ -17,6 +17,7 @@ import getReviews from "../../services/Products/getReviews.js";
 import deleteReviews from "../../services/Products/deleteReviews.js";
 import addWishlists from "../../services/Products/addWishlists.js";
 import deleteWishlists from "../../services/Products/deleteWishlists.js";
+import { formattedPrice } from "../../@common/formattedNumber.js";
 
 function ProductDetailPage() {
   const { productId } = useParams(); // 상품번호 params
@@ -50,11 +51,6 @@ function ProductDetailPage() {
       resetFormData(); // useFormDataStore의 상태 초기화
       navigate("/make-funding-detail", { state: sendData });
     }
-  };
-
-  // 188000 -> 188,000 으로 변경하는 함수
-  const numberWithCommas = (number) => {
-    return number.toLocaleString();
   };
 
   // 상품 상세정보 관련 쿼리
@@ -265,7 +261,7 @@ function ProductDetailPage() {
 
                   {/* 가격 정보 */}
                   <div className="text-base-bold">
-                    {numberWithCommas(product.price)}원
+                    {formattedPrice(product.price)}원
                   </div>
 
                   {/* 상품 정보 */}
