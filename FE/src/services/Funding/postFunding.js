@@ -26,8 +26,6 @@ const postFunding = async (formData, token) => {
     ...formData,
     startDate: formatDate(toKoreanTimeZone(formData.startDate)),
     endDate: formatDate(toKoreanTimeZone(formData.endDate)),
-    name: "신시은",
-    phoneNumber: "010-4948-7118",
   };
 
   //콘솔에 변형된 한국 시간 출력

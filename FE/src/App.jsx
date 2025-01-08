@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import MainLayout from "./components/UI/MainLayout.jsx";
 import SubLayout from "./components/UI/SubLayout.jsx";
@@ -26,7 +26,7 @@ import AddressListPage from "./components/Funding/pages/AddressListPage.jsx";
 import FriendFundingDetail from "./components/Funding/pages/FriendFundingDetail.jsx";
 import ParticipateFundingFinish from "./components/Funding/pages/ParticipateFundingFinish.jsx";
 import Paypage from "./components/Funding/pages/Paypage.jsx";
-import MakeFundingDetail from "./components/Funding/pages/MakeFundingDetail.jsx";
+import MakeFundingDetail from "./pages/Funding/MakeFunding/MakeFundingDetail.jsx";
 import MakeFundingFinish from "./components/Funding/pages/MakeFundingFinish.jsx";
 import Home from "./components/Home/Home.jsx";
 import MyFundingDetail from "./components/Funding/pages/MyFundingDetail.jsx";
@@ -45,7 +45,6 @@ function App() {
           <Route element={<MainLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/my-funding" element={<MyFunding />} />
-
             <Route path="/product" element={<ProductPage />} />
             <Route path="/funding" element={<FundingMain />} />
           </Route>
@@ -71,8 +70,14 @@ function App() {
             />
             <Route path="/my-page" element={<MyPage />} />
             <Route path="/alarm" element={<Alarm />} />
-            <Route path="/make-funding-detail" element={<MakeFundingDetail />} />
-            <Route path="/make-funding-finish" element={<MakeFundingFinish />} />
+            <Route
+              path="/make-funding-detail"
+              element={<MakeFundingDetail />}
+            />
+            <Route
+              path="/make-funding-finish"
+              element={<MakeFundingFinish />}
+            />
             <Route
               path="/participate-funding-finish"
               element={<ParticipateFundingFinish />}
@@ -83,7 +88,10 @@ function App() {
             <Route path="/new-address" element={<NewAddressPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/friends" element={<FriendPage />} />
-            <Route path="/participate/:fundingId" element={<ParticipatePage />} />
+            <Route
+              path="/participate/:fundingId"
+              element={<ParticipatePage />}
+            />
             <Route path="/pay" element={<Paypage />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/brand/:brandId" element={<BrandStore />} />

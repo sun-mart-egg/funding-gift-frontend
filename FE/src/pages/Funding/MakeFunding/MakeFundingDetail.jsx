@@ -4,21 +4,21 @@ import { useQuery } from "@tanstack/react-query";
 import "react-datepicker/dist/react-datepicker.css";
 
 //store
-import { useStore } from "../../Store/MakeStore";
-import useFormDataStore from "../../Store/FormDataStore";
-import useUserStore from "../../Store/UserStore";
+import { useStore } from "../../../components/Store/MakeStore";
+import useFormDataStore from "../../../components/Store/FormDataStore";
 
 //api
 import { getAnniversaryList } from "../../../services/Funding/getAnniversaryList";
 import { postFunding } from "../../../services/Funding/postFunding";
 import getProductDetail from "../../../services/Products/getProductDetail";
+import { getUserInfo } from "../../../services/Consumer/getUserInfo";
 
 //page
-import FundingStep0 from "../../../pages/Funding/MakeFunding/FundingStep0";
-import FundingStep1 from "../../../pages/Funding/MakeFunding/FundingStep1";
-import FundingStep2 from "../../../pages/Funding/MakeFunding/FundingStep2";
-import FundingStep3 from "../../../pages/Funding/MakeFunding/FundingStep3";
-import FundingStep4 from "../../../pages/Funding/MakeFunding/FundingStep4";
+import FundingStep0 from "./FundingStep0";
+import FundingStep1 from "./FundingStep1";
+import FundingStep2 from "./FundingStep2";
+import FundingStep3 from "./FundingStep3";
+import FundingStep4 from "./FundingStep4";
 
 function MakeFundingDetail() {
   const [accessToken, setAccessToken] = useState(""); //토큰
@@ -26,12 +26,13 @@ function MakeFundingDetail() {
   const location = useLocation(); // useLocation 훅 사용
   const ref = useRef(null); // DatePicker에 대한 ref를 생성합니다.
 
-  const { formData, updateFormData } = useFormDataStore();
   const [anniversaryCategory, setAnniversaryCategory] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
 
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  //zustand 상태
+  const { formData, updateFormData } = useFormDataStore();
   const {
     contentIndex, //현재 페이지
     setContentIndex, //현재 페이지 설정
@@ -39,9 +40,6 @@ function MakeFundingDetail() {
     selectedAddress, //주소
     selectedAccount, //계좌
   } = useStore();
-
-  //사용자 이름, 핸드폰 번호
-  const { name, phoneNumber } = useUserStore();
 
   // 상품 ID
   const productId = location?.state?.params;
@@ -59,6 +57,30 @@ function MakeFundingDetail() {
     },
     enabled: !!productId,
   });
+
+  // product 상태가 변경될 때마다 실행되는
+  useEffect(() => {
+    if (product) {
+      updateFormData("targetPrice", product.price);
+      updateFormData("productId", product.productId);
+      updateFormData("productOptionId", location.state.option);
+    }
+  }, [product]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("access-token");
+
+    if (token) {
+      setAccessToken(token);
+      getUserInfo(token).then((data) => {
+        if (data) {
+          console.log(data.data.name);
+          updateFormData("name", data.data.name);
+          updateFormData("phoneNumber", data.data.phoneNumber);
+        }
+      });
+    }
+  }, []);
 
   // 기념일 카테고리 변경 처리
   const handleCategoryChange = (event) => {
@@ -88,14 +110,6 @@ function MakeFundingDetail() {
     </select>
   );
 
-  //처음 화면 렌더링 되었을 때
-  useEffect(() => {
-    if (name) {
-      console.log("이름 : ", name);
-      updateFormData("name", name);
-    }
-  }, []);
-
   //커스텀된 datapicker 버튼
   const CustomInput = forwardRef(({ value, onClick }, ref) => (
     <button
@@ -107,21 +121,8 @@ function MakeFundingDetail() {
     </button>
   ));
 
-  // product 상태가 변경될 때마다 실행되는
-  useEffect(() => {
-    if (product) {
-      console.log("product : " + product);
-      console.log("option : " + location.state.option);
-      updateFormData("targetPrice", product.price);
-      updateFormData("productId", product.productId);
-      updateFormData("productOptionId", location.state.option);
-    }
-  }, [product]);
-
   useEffect(() => {
     const token = localStorage.getItem("access-token");
-    setAccessToken(token);
-    console.log(location.state);
 
     getAnniversaryList(token, setAnniversaryCategory);
 
