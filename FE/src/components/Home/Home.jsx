@@ -72,52 +72,7 @@ function Home() {
     }
   }, [messaging]);
 
-  // const lastProductElementRef = useCallback(
-  //   (node) => {
-  //     if (loading) return;
-  //     if (observer.current) observer.current.disconnect();
-  //     observer.current = new IntersectionObserver((entries) => {
-  //       if (entries[0].isIntersecting && hasMore) {
-  //         setCurrentPage((prevPage) => prevPage + 1);
-  //       }
-  //     });
-  //     if (node) observer.current.observe(node);
-  //   },
-  //   [loading, hasMore],
-  // );
-
-  // const loadProducts = async (page) => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await fetch(
-  //       import.meta.env.VITE_BASE_URL +
-  //         `/api/products/rank?page=${page}&size=10`,
-  //     );
-  //     const json = await response.json();
-  //     if (json.code === 200 && json.data) {
-  //       setProducts((prevProducts) => {
-  //         const newData = json.data.data.filter(
-  //           (newItem) =>
-  //             !prevProducts.some(
-  //               (prevItem) => prevItem.productId === newItem.productId,
-  //             ),
-  //         );
-  //         return [...prevProducts, ...newData];
-  //       });
-  //       setHasMore(json.data.hasNext === true);
-  //     } else {
-  //       console.error("Error fetching products:", json.msg);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching products:", error);
-  //   }
-  //   setLoading(false);
-  // };
-
-  // useEffect(() => {
-  //   loadProducts(currentPage);
-  // }, [currentPage]);
-
+  // 메인 화면 배너
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBanner((prevIndex) => (prevIndex + 1) % bannerImages.length);
