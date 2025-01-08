@@ -3,10 +3,25 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken } from 'firebase/messaging';
+import { useMutation } from "@tanstack/react-query";
+import postFCMToken from "../../services/Login/postFCMToken";
 
 function LoginCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  // fcm-token 저장 mutate
+  const saveFCMTokenMutate = useMutation({
+    mutationFn: (token) => postFCMToken(token),
+    onSuccess: (res) => {
+      console.log("fcm-token 저장 성공");
+      console.log(res);
+    },
+    onError: (err) => {
+      console.log("fcm-token 저장 실패");
+      console.error(err);
+    },
+  });
 
   useEffect(() => {
     async function getTokens() {
@@ -48,27 +63,8 @@ function LoginCallback() {
         
         // 위에서 요청한 fcm 토큰을 localStorage에도 저장
         localStorage.setItem("fcm-token", token)
-        const postData = {
-          fcmToken: token
-        };
-
-        try {
-          console.log("토큰 저장 요청");
-          
-          const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/fcm-tokens`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`
-            },
-            body: JSON.stringify(postData)
-          });
-
-          const responseData = await response.json();
-          console.log(responseData);
-        } catch (error) {
-          console.error('POST 요청 중 에러 발생:', error);
-        }
+        // 서버에도 저장하라는 api 요청 mutate
+        saveFCMTokenMutate.mutate(token);
       };
 
       // 토큰값이 null 이 아닌 경우

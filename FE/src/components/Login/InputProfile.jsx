@@ -1,8 +1,9 @@
 import SignupLogo from "/imgs/signupLogo.png";
 import useUserStore from "../Store/UserStore";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import putMyInfo from "../../services/Login/putMyInfo";
 
 function InputProfile() {
   const updateUserStore = useUserStore((state) => state.updateUserStore);
@@ -19,7 +20,22 @@ function InputProfile() {
   const [birthErr, setBirthErr] = useState("");
   const [emailErr, setEmailErr] = useState("");
   const [phoneNumErr, setPhoneNumErr] = useState("");
-  const [totalErr, setTotalErr] = useState("")
+  const [totalErr, setTotalErr] = useState("");
+
+  const editMyInfoMutate = useMutation({
+    mutationFn: ({ name, email, phoneNumber, birthyear, birthday, gender }) =>
+      putMyInfo(name, email, phoneNumber, birthyear, birthday, gender),
+    onSuccess: (res) => {
+      console.log("정보 수정 성공");
+      console.log(res);
+      navigate("/signup");
+    },
+    onError: (err) => {
+      console.log("정보 수정 실패");
+      console.error(err);
+      setTotalErr("모든 정보를 올바르게 입력해주세요.");
+    },
+  });
 
   // 이름 input에 입력하는 값을 store의 name에 저장
   const handleName = (event) => {
@@ -51,12 +67,12 @@ function InputProfile() {
     const inputBirthday = event.target.value;
     setMyBirthday(inputBirthday);
     // 생년월일 8자리에서 연도와 생일을 추출
-    const birthyear = inputBirthday.toString().slice(0, 4)
-    const birthday = inputBirthday.toString().slice(4)
-    
+    const birthyear = inputBirthday.toString().slice(0, 4);
+    const birthday = inputBirthday.toString().slice(4);
+
     // store에 저장
-    updateUserStore("birthyear", birthyear)
-    updateUserStore("birthday", birthday)
+    updateUserStore("birthyear", birthyear);
+    updateUserStore("birthday", birthday);
     if (!/^\d{0,8}$/.test(inputBirthday) || inputBirthday.length !== 8) {
       setBirthErr("생년월일을 올바르게 입력해주세요.");
     } else {
@@ -87,39 +103,18 @@ function InputProfile() {
     }
   };
 
+  // 서비스 최초 가입 시, 정보 수정을 서버에 요청하는 mutate
   const handleNextSignupPage = () => {
-    // if (nameErr === "" && genderErr === "" && birthErr === "" && emailErr === "" && phoneNumErr === "" &&
-    // myName && myGender && myBirthDay && myEmail && myPhoneNumber) {
     const birthyear = myBirthDay.substring(0, 4);
     const birthday = myBirthDay.substring(4);
-    axios
-      .put(
-        import.meta.env.VITE_BASE_URL + "/api/consumers",
-        {
-          "name": myName,
-          "email": myEmail,
-          "phoneNumber": myPhoneNumber,
-          "birthyear": birthyear,
-          "birthday": birthday,
-          "gender": myGender,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access-token")}`,
-          },
-        },
-      )
-      .then((res) => {
-        console.log(res);
-        console.log("정보 수정 성공");
-        navigate("/signup");
-      })
-      .catch((err) => {
-        console.error(err);
-        console.log("정보 수정 실패");
-        setTotalErr("모든 정보를 올바르게 입력해주세요.")
-      });
-    // }
+    editMyInfoMutate.mutate({
+      name: myName,
+      email: myEmail,
+      phoneNumber: myPhoneNumber,
+      birthyear: birthyear,
+      birthday: birthday,
+      gender: myGender,
+    });
   };
 
   return (
@@ -150,8 +145,8 @@ function InputProfile() {
         </div>
       </div>
 
-      {nameErr && <p className="text-red-500 signup-font">{nameErr}</p>}
-      {genderErr && <p className="text-red-500 signup-font">{genderErr}</p>}
+      {nameErr && <p className="signup-font text-red-500">{nameErr}</p>}
+      {genderErr && <p className="signup-font text-red-500">{genderErr}</p>}
 
       <input
         type="number"
@@ -161,7 +156,7 @@ function InputProfile() {
         onChange={handleBirthday}
         required
       />
-      {birthErr && <p className="text-red-500 signup-font">{birthErr}</p>}
+      {birthErr && <p className="signup-font text-red-500">{birthErr}</p>}
 
       <input
         type="text"
@@ -171,7 +166,7 @@ function InputProfile() {
         onChange={handleEmail}
         required
       />
-      {emailErr && <p className="text-red-500 signup-font">{emailErr}</p>}
+      {emailErr && <p className="signup-font text-red-500">{emailErr}</p>}
 
       <input
         type="number"
@@ -181,7 +176,7 @@ function InputProfile() {
         onChange={handlePhoneNumber}
         required
       />
-      {phoneNumErr && <p className="text-red-500 signup-font">{phoneNumErr}</p>}
+      {phoneNumErr && <p className="signup-font text-red-500">{phoneNumErr}</p>}
 
       <button
         className="common-btn h-full max-h-[50px] w-full max-w-[284px]"
@@ -189,7 +184,7 @@ function InputProfile() {
       >
         다음
       </button>
-      {totalErr && <p className="text-red-500 signup-font">{totalErr}</p>}
+      {totalErr && <p className="signup-font text-red-500">{totalErr}</p>}
     </div>
   );
 }

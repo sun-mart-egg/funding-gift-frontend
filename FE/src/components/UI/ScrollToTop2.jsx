@@ -1,5 +1,3 @@
-import React from 'react';
-
 import UpArrow from '/imgs/up-arrow.png'
 
 function ScrollToTopButton2() {
