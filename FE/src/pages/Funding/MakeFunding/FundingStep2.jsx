@@ -1,5 +1,5 @@
-// FundingStep2.jsx
 import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function FundingStep2({
   formData,
@@ -9,14 +9,15 @@ function FundingStep2({
   renderCategoryDropdown,
   showDatePicker,
   setShowDatePicker,
-  refDatePicker, // ref를 부모에서 넘겨받음
-  handleDateChange,
+  refDatePicker,
+  handleDateChange, // 배열 형태의 dates를 받아서 formData에 반영하는 함수
   getFormattedDate,
   CustomInput,
 }) {
   return (
     <div className="text-md flex flex-col justify-center">
       <div id="card-content">
+        {/* 기념일 선택 섹션 */}
         <div id="anniversaryDate" className="mb-6">
           <div className="flex-col justify-between">
             <p>기념일</p>
@@ -43,27 +44,30 @@ function FundingStep2({
           </div>
         </div>
 
+        {/* 펀딩 기간 선택 섹션 */}
         <div id="funding-date" className="mb-6">
           <div className="flex justify-between">
             <p>펀딩 기간</p>
             <DatePicker
               ref={refDatePicker}
-              selected={
-                formData.startDate ? new Date(formData.startDate) : null
-              }
-              onChange={handleDateChange}
-              onClickOutside={() => setShowDatePicker(false)}
+              // 달력 열고 닫기는 부모 상태 showDatePicker로 제어
               open={showDatePicker}
+              onClickOutside={() => setShowDatePicker(false)}
+              // 날짜 범위 선택 모드
               selectsRange={true}
+              // 시작/종료 날짜
               startDate={
                 formData.startDate ? new Date(formData.startDate) : null
               }
               endDate={formData.endDate ? new Date(formData.endDate) : null}
+              // 날짜가 바뀔 때마다 handleDateChange로 formData에 반영
+              onChange={handleDateChange}
               dateFormat="yyyy/MM/dd"
               customInput={<CustomInput />}
               className="p-2"
             />
           </div>
+
           <div className="mt-2 flex w-full justify-between rounded-md border border-gray-400">
             <p className="w-[80%] p-2 text-xs">
               {formData.startDate && formData.endDate
@@ -75,6 +79,7 @@ function FundingStep2({
           </div>
         </div>
 
+        {/* 최소금액 입력 */}
         <div className="mb-6">
           <p>최소금액</p>
           <input

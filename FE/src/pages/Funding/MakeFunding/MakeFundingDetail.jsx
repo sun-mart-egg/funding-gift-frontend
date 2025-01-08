@@ -1,148 +1,48 @@
-import { useState, useRef, forwardRef, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // useNavigate 사용
-import { useQuery } from "@tanstack/react-query";
-import "react-datepicker/dist/react-datepicker.css";
+// MakeFundingDetail.jsx
+import { useState, useRef, forwardRef } from "react";
+import { useNavigate } from "react-router-dom";
+
+//hook
+import InitFundingDetail from "../../../hooks/Funding/InitFundingDetail";
+
+//api
+import { postFunding } from "../../../services/Funding/postFunding";
 
 //store
 import { useStore } from "../../../components/Store/MakeStore";
 import useFormDataStore from "../../../components/Store/FormDataStore";
 
-//api
-import { getAnniversaryList } from "../../../services/Funding/getAnniversaryList";
-import { postFunding } from "../../../services/Funding/postFunding";
-import getProductDetail from "../../../services/Products/getProductDetail";
-import { getUserInfo } from "../../../services/Consumer/getUserInfo";
-
-//page
+// 단계 컴포넌트들
 import FundingStep0 from "./FundingStep0";
 import FundingStep1 from "./FundingStep1";
 import FundingStep2 from "./FundingStep2";
 import FundingStep3 from "./FundingStep3";
 import FundingStep4 from "./FundingStep4";
 
-//component
+// 모달
 import ErrorModal from "../../../components/UI/ErrorModal";
 
 function MakeFundingDetail() {
-  const [accessToken, setAccessToken] = useState(""); //토큰
-  const navigate = useNavigate(); // useNavigate 훅 사용
-  const location = useLocation(); // useLocation 훅 사용
+  //커스텀 훅
+  const {
+    product,
+    accessToken,
+    anniversaryCategory,
+    selectedAccount,
+    selectedAddress,
+    selectedAnniversary,
+  } = InitFundingDetail();
   const ref = useRef(null); // DatePicker에 대한 ref를 생성합니다.
 
-  const [anniversaryCategory, setAnniversaryCategory] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  //상태들
   const [errorMsg, setErrorMsg] = useState(""); // 에러 메시지 상태 추가
-
-  const [showDatePicker, setShowDatePicker] = useState(false);
-
-  //zustand 상태
   const { formData, updateFormData } = useFormDataStore();
-  const {
-    contentIndex, //현재 페이지
-    setContentIndex, //현재 페이지 설정
-    selectedAnniversary, //기념일
-    selectedAddress, //주소
-    selectedAccount, //계좌
-  } = useStore();
+  const { contentIndex, setContentIndex } = useStore();
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
-  // 상품 ID
-  const productId = location?.state?.params;
-
-  //react-Query 이용해서 getProductDetail 호출 해서 product에 정보 return
-  const { data: product = null } = useQuery({
-    queryKey: ["products", productId],
-    queryFn: async () => {
-      const response = await getProductDetail(productId);
-      return response.data;
-    },
-    staleTime: 1000 * 10,
-    onError: (err) => {
-      console.error("product 상세정보 호출 실패", err);
-    },
-    enabled: !!productId,
-  });
-
-  // product 상태가 변경될 때마다 실행되는
-  useEffect(() => {
-    if (product) {
-      updateFormData("targetPrice", product.price);
-      updateFormData("productId", product.productId);
-      updateFormData("productOptionId", location.state.option);
-    }
-  }, [product]);
-
-  useEffect(() => {
-    const token = localStorage.getItem("access-token");
-
-    if (token) {
-      setAccessToken(token);
-      getUserInfo(token).then((data) => {
-        if (data) {
-          updateFormData("name", data.data.name);
-          updateFormData("phoneNumber", data.data.phoneNumber);
-        }
-      });
-    }
-  }, []);
-
-  // 기념일 카테고리 변경 처리
-  const handleCategoryChange = (event) => {
-    const newCategory = event.target.value;
-    setSelectedCategory(newCategory);
-    updateFormData("anniversaryCategoryId", newCategory); // Zustand 스토어 업데이트
-  };
-
-  const handleAnniversaryChange = (e) => {
-    const newAnniversaryDate = e.target.value;
-    updateFormData("anniversaryDate", newAnniversaryDate); // Zustand 상태 업데이트
-  };
-
-  // 드롭다운 렌더링 함수
-  const renderCategoryDropdown = () => (
-    <select
-      value={selectedCategory}
-      onChange={handleCategoryChange}
-      className="mt-2 h-8 w-full rounded-md border border-gray-400 p-2 text-xs"
-    >
-      <option value="">기념일을 선택하세요</option>
-      {anniversaryCategory.map((category, index) => (
-        <option key={index} value={category.anniversaryCategoryId}>
-          {category.anniversaryCategoryName}
-        </option>
-      ))}
-    </select>
-  );
-
-  //커스텀된 datapicker 버튼
-  const CustomInput = forwardRef(({ value, onClick }, ref) => (
-    <button
-      onClick={() => setShowDatePicker(true)}
-      ref={ref}
-      className="calendar-button common-btn h-6 bg-gray-500 text-xs"
-    >
-      선택
-    </button>
-  ));
-
-  useEffect(() => {
-    const token = localStorage.getItem("access-token");
-
-    getAnniversaryList(token, setAnniversaryCategory);
-
-    if (selectedAnniversary) {
-      updateFormData("anniversaryDate", selectedAnniversary.anniversaryDate);
-    }
-    if (selectedAccount) {
-      updateFormData("accountBank", selectedAccount.accountBank);
-      updateFormData("accountNo", selectedAccount.accountNo);
-    }
-    if (selectedAddress) {
-      updateFormData("phoneNumber", selectedAddress.phoneNumber);
-      updateFormData("defaultAddr", selectedAddress.defaultAddr);
-      updateFormData("detailAddr", selectedAddress.detailAddr);
-      updateFormData("zipCode", selectedAddress.zipCode);
-    }
-  }, [selectedAnniversary, selectedAccount, updateFormData]);
+  //단계 전환 로직
+  const navigate = useNavigate();
 
   // 다음 컨텐츠를 보여주는 함수
   const handleNext = async () => {
@@ -177,6 +77,47 @@ function MakeFundingDetail() {
     }
   };
 
+  // 기념일 카테고리 변경 처리
+  const handleCategoryChange = (event) => {
+    const newCategory = event.target.value;
+    setSelectedCategory(newCategory);
+    updateFormData("anniversaryCategoryId", newCategory); // Zustand 스토어 업데이트
+  };
+
+  const handleAnniversaryChange = (e) => {
+    const newAnniversaryDate = e.target.value;
+    updateFormData("anniversaryDate", newAnniversaryDate); // Zustand 상태 업데이트
+  };
+
+  // 드롭다운 렌더링 함수
+  const renderCategoryDropdown = () => (
+    <select
+      value={selectedCategory}
+      onChange={handleCategoryChange}
+      className="mt-2 h-8 w-full rounded-md border border-gray-400 p-2 text-xs"
+    >
+      <option value="">기념일을 선택하세요</option>
+      {anniversaryCategory.map((category, index) => (
+        <option key={index} value={category.anniversaryCategoryId}>
+          {category.anniversaryCategoryName}
+        </option>
+      ))}
+    </select>
+  );
+
+  //커스텀된 datapicker 버튼
+  // 부모 컴포넌트 or FundingStep2
+  const CustomInput = forwardRef(({ value, onClick }, ref) => (
+    <button
+      onClick={() => setShowDatePicker(true)} // 버튼 누르면 showDatePicker = true
+      ref={ref}
+      className="calendar-button common-btn h-6 bg-gray-500 text-xs"
+    >
+      선택
+    </button>
+  ));
+  CustomInput.displayName = "CustomInput"; // ESLint react/display-name 방지
+
   // 폼 데이터를 처리하는 함수
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -194,17 +135,16 @@ function MakeFundingDetail() {
   };
 
   // 날짜 범위 변경 핸들러
+  // MakeFundingDetail.jsx (일부)
   const handleDateChange = (dates) => {
-    const [start, end] = dates;
-    if (start instanceof Date) {
-      const startInKorean = toKoreanTimeZone(start);
-      updateFormData("startDate", startInKorean);
+    const [start, end] = dates; // start, end는 Date 객체 또는 null
+    if (start) {
+      updateFormData("startDate", toKoreanTimeZone(start));
     } else {
       updateFormData("startDate", null);
     }
-    if (end instanceof Date) {
-      const endInKorean = toKoreanTimeZone(end);
-      updateFormData("endDate", endInKorean);
+    if (end) {
+      updateFormData("endDate", toKoreanTimeZone(end));
     } else {
       updateFormData("endDate", null);
     }

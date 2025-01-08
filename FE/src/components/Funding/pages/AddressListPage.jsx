@@ -13,6 +13,7 @@ function AddressListPage() {
   useEffect(() => {
     const token = localStorage.getItem("access-token");
     if (token) {
+      console.log("주소불러옴");
       getAddressList(token, setAddressList);
     }
   }, [addressList]);
