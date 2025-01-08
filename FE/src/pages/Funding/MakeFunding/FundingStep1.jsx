@@ -1,6 +1,6 @@
 // FundingStep1.jsx
 
-function FundingStep1({ formData, handleInputChange }) {
+function FundingStep1({ formData, handleInputChange, errorMsg }) {
   return (
     <div className="text-md flex flex-col justify-center">
       <div id="card-content">
@@ -37,6 +37,7 @@ function FundingStep1({ formData, handleInputChange }) {
             className="mt-2 w-full rounded-md border border-gray-400 p-2 text-xs placeholder:text-xs"
           />
         </div>
+        {errorMsg && <p>{errorMsg}</p>}
       </div>
     </div>
   );

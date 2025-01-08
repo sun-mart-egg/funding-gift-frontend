@@ -20,6 +20,9 @@ import FundingStep2 from "./FundingStep2";
 import FundingStep3 from "./FundingStep3";
 import FundingStep4 from "./FundingStep4";
 
+//component
+import ErrorModal from "../../../components/UI/ErrorModal";
+
 function MakeFundingDetail() {
   const [accessToken, setAccessToken] = useState(""); //토큰
   const navigate = useNavigate(); // useNavigate 훅 사용
@@ -28,6 +31,7 @@ function MakeFundingDetail() {
 
   const [anniversaryCategory, setAnniversaryCategory] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [errorMsg, setErrorMsg] = useState(""); // 에러 메시지 상태 추가
 
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -74,7 +78,6 @@ function MakeFundingDetail() {
       setAccessToken(token);
       getUserInfo(token).then((data) => {
         if (data) {
-          console.log(data.data.name);
           updateFormData("name", data.data.name);
           updateFormData("phoneNumber", data.data.phoneNumber);
         }
@@ -143,11 +146,17 @@ function MakeFundingDetail() {
 
   // 다음 컨텐츠를 보여주는 함수
   const handleNext = async () => {
+    if (contentIndex === 1) {
+      if (!formData.title || !formData.content) {
+        setErrorMsg("펀딩 제목과 펀딩 소개를 모두 입력해 주세요");
+        return;
+      }
+    }
     //4페이지 이하일 경우 index를 하나 높인다
     if (contentIndex < 4) {
       setContentIndex(contentIndex + 1);
     }
-    //4페이지일 경우 펀딩을 생성하고 펀딩 생성 완료 페이지로 이동한다. 실패시 에러 메시지 콘ㅌ솔 출력
+    //4페이지일 경우 펀딩을 생성하고 펀딩 생성 완료 페이지로 이동한다. 실패시 에러 메시지 콘솔 출력
     else {
       try {
         const result = await postFunding(formData, accessToken);
@@ -178,6 +187,10 @@ function MakeFundingDetail() {
           ? checked
           : value;
     updateFormData(name, updatedValue);
+  };
+
+  const closeModal = () => {
+    setErrorMsg("");
   };
 
   // 날짜 범위 변경 핸들러
@@ -236,6 +249,7 @@ function MakeFundingDetail() {
           <FundingStep1
             formData={formData}
             handleInputChange={handleInputChange}
+            errorMsg={errorMsg}
           ></FundingStep1>
         );
       case 2:
@@ -283,6 +297,7 @@ function MakeFundingDetail() {
         background: "linear-gradient(to bottom, #E5EEFF, #FFFFFF)", // 세로 그라디언트 정의
       }}
     >
+      <ErrorModal message={errorMsg} onClose={closeModal} />
       <div
         id="makeCard"
         className="mt-20 flex w-[75%] flex-col items-center justify-start rounded-xl bg-white p-4 shadow-md"
