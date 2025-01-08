@@ -107,7 +107,8 @@ function MakeFundingDetail() {
 
   //커스텀된 datapicker 버튼
   // 부모 컴포넌트 or FundingStep2
-  const CustomInput = forwardRef(({ value, onClick }, ref) => (
+  // eslint-disable-next-line no-empty-pattern
+  const CustomInput = forwardRef(({}, ref) => (
     <button
       onClick={() => setShowDatePicker(true)} // 버튼 누르면 showDatePicker = true
       ref={ref}
@@ -177,7 +178,7 @@ function MakeFundingDetail() {
 
   // 현재 보여줄 컨텐츠를 결정하는 함수
   const renderContent = () => {
-    if (!product) {
+    if (!formData.productId) {
       // product가 로드되지 않았을 때 표시할 내용
       return <div>상품 정보를 불러오는 중...</div>;
     }

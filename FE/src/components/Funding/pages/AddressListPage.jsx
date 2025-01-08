@@ -1,6 +1,6 @@
 import AddressList from "../component/AddressList";
 import { useStore } from "../../Store/MakeStore";
-import { useNavigate } from "react-router-dom"; // useNavigate 사용
+import { useNavigate, useLocation } from "react-router-dom"; // useNavigate 사용
 import { getAddressList } from "../api/AddressAPI";
 import { useEffect, useState } from "react";
 
@@ -9,22 +9,26 @@ function AddressListPage() {
   const setContentIndex = useStore((state) => state.setContentIndex);
 
   const [addressList, setAddressList] = useState([]);
+  const location = useLocation();
 
+  //처음 화면시작 시 주소 불러와서 list에 추가
   useEffect(() => {
     const token = localStorage.getItem("access-token");
     if (token) {
-      console.log("주소불러옴");
       getAddressList(token, setAddressList);
     }
-  }, [addressList]);
+  }, []);
 
+  //디버깅 : 주소 목록이 바뀔 때 마다 list console 출력
   useEffect(() => {
     console.log(addressList);
   }, [addressList]);
 
   const handleSelectButtonClick = () => {
     setContentIndex(3); // 컨텐츠 인덱스를 3으로 설정
-    navigate("/make-funding-detail"); // 라우트 경로는 실제 경로에 맞게 조정해야 합니다.
+    navigate("/make-funding-detail", {
+      state: { ...location.state },
+    });
   };
 
   if (!addressList) return <div>주소 목록 로딩 중</div>;
