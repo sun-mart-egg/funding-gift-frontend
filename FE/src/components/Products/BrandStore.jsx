@@ -1,9 +1,5 @@
-import React from "react";
-
-import Footer from "../UI/Footer";
-
 import SearchBar from "../UI/SearchBar";
-import ScrollToTopButton from "../UI/ScrollToTop2";
+import ScrollToTopButton from "../UI/ScrollToTop";
 
 
 function BrandStore() {
