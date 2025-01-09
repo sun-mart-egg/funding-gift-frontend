@@ -37,11 +37,6 @@ function ProductDetailPage() {
     setOptionToggleVisible(false); // 토글 닫기
   };
 
-  // const sendData = {
-  //   params: productId,
-  //   option: selectedOption,
-  // };
-
   const handleClick = () => {
     if (selectedOption === null) {
       alert("옵션을 선택해주세요!");

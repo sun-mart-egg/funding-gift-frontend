@@ -44,11 +44,73 @@ function MakeFundingDetail() {
   //단계 전환 로직
   const navigate = useNavigate();
 
+  function setToZeroHours(date) {
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+
   // 다음 컨텐츠를 보여주는 함수
   const handleNext = async () => {
     if (contentIndex === 1) {
       if (!formData.title || !formData.content) {
         setErrorMsg("펀딩 제목과 펀딩 소개를 모두 입력해 주세요");
+        return;
+      }
+    }
+    if (contentIndex === 2) {
+      if (!formData.anniversaryCategoryId || !formData.anniversaryDate) {
+        setErrorMsg("기념일과 기념일 날짜를 선택해 주세요");
+        return;
+      }
+
+      if (!formData.startDate || !formData.endDate) {
+        setErrorMsg("펀딩 기간을 선택해 주세요");
+        return;
+      }
+
+      if (!formData.minPrice) {
+        setErrorMsg("최소 금액을 입력해 주세요");
+        return;
+      }
+
+      const now = setToZeroHours(new Date()); // 오늘(시분초=0)
+      const start = setToZeroHours(new Date(formData.startDate));
+      const end = setToZeroHours(new Date(formData.endDate));
+      const anniv = setToZeroHours(new Date(formData.anniversaryDate));
+
+      //시작일이 현재 날짜 보다 과거면 예외처리
+      if (start < now) {
+        setErrorMsg("시작일이 현재 날짜보다 과거일 수 없습니다.");
+        return;
+      }
+
+      //기념일이 시작일보다 과거면 예외처리
+      if (anniv < start) {
+        setErrorMsg("기념일이 펀딩 시작일보다 과거일 수 없습니다.");
+        return;
+      }
+
+      //종료일이 기념일보다 과거면 예외
+      if (end < anniv) {
+        setErrorMsg("펀딩 종료일이 기념일보다 과거일 수 없습니다.");
+        return;
+      }
+
+      //시작일과 종료일이 7일을 넘으면 예외
+      const diffTime = end - start;
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+      if (diffDays > 7) {
+        setErrorMsg("펀딩 기간은 최대 7일까지 가능합니다.");
+        return;
+      }
+    }
+    if (contentIndex === 3) {
+      if (!selectedAddress) {
+        setErrorMsg("주소를 선택해 주세요");
+        return;
+      }
+      if (!selectedAccount) {
+        setErrorMsg("계좌를 선택해 주세요");
         return;
       }
     }
@@ -140,9 +202,10 @@ function MakeFundingDetail() {
   const handleDateChange = (dates) => {
     const [start, end] = dates; // start, end는 Date 객체 또는 null
     if (start) {
-      updateFormData("startDate", toKoreanTimeZone(start));
-    } else {
-      updateFormData("startDate", null);
+      updateFormData(
+        "startDate",
+        start ? toKoreanTimeZone(start) : updateFormData("startDate", null),
+      );
     }
     if (end) {
       updateFormData("endDate", toKoreanTimeZone(end));

@@ -8,9 +8,6 @@ import useFormDataStore from "../../components/Store/FormDataStore";
 import { useStore } from "../../components/Store/MakeStore";
 
 export default function InitFundingDetail() {
-  //라우팅 파라미터 읽어오기
-  // const location = useLocation();
-
   //zustand
   const { formData, updateFormData } = useFormDataStore();
   const { selectedAnniversary, selectedAddress, selectedAccount } = useStore();
@@ -19,10 +16,6 @@ export default function InitFundingDetail() {
   const [accessToken, setAccessToken] = useState("");
   const [product, setProduct] = useState(null);
   const [anniversaryCategory, setAnniversaryCategory] = useState([]);
-
-  //라우터에서 전달받는 상품 ID & 옵션
-  // const paramsProductId = location?.state?.params;
-  // const productOption = location?.state?.option;
 
   //초기 마운트 되었을 때
   //1. 사용자 정보
