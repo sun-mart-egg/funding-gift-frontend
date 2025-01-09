@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import egg from "/imgs/egg3.jpg";
 import ProgressBar from "../component/ProgressBar";
