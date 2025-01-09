@@ -8,7 +8,7 @@ import getCategories from "../../services/Products/getCategories.js";
 import SearchBar from "../../components/UI/SearchBar.jsx";
 import ProductComponent from "../../components/Products/ProductComponent.jsx";
 import ScrollToTopButton from "../../components/UI/ScrollToTop.jsx";
-import ProductCategoriesBar from "../../components/Products/ProductCaregoriesBar.jsx";
+import ProductCategoriesBar from "../../components/Products/ProductCategoriesBar.jsx";
 import ToggleList from "../../components/Products/ToggleList.jsx";
 
 // 이미지 호출
@@ -21,7 +21,6 @@ function ProductPage() {
   // 카테고리 목록 호출 쿼리
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
-    staleTime: 1000 * 10,
     queryFn: async () => {
       const categories = await getCategories();
       return [

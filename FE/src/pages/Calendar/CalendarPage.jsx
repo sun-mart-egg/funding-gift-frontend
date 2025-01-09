@@ -20,7 +20,6 @@ const CalendarPage = () => {
     queryKey: ["events", curYear, curMonth],
     queryFn: () => getEventsList(curYear, curMonth),
     enabled: Boolean(curYear && curMonth),
-    staleTime: 1000 * 30,
     select: (data) => data.map((item) => ({
       title: item.title,
       date: item.anniversaryDate,
