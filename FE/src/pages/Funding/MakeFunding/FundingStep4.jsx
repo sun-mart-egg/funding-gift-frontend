@@ -4,7 +4,7 @@ function FundingStep4({ product, formData, getFormattedDate }) {
   console.log(formData);
 
   if (!product) {
-    return <div>상품 정보를 불러오는 중...</div>;
+    return <div>상품 정보 불러오는 중...</div>;
   }
 
   return (

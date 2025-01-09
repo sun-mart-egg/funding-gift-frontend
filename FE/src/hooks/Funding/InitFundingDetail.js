@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 
 import { getUserInfo } from "../../services/Consumer/getUserInfo";
 import { getAnniversaryList } from "../../services/Funding/getAnniversaryList";
@@ -10,10 +9,10 @@ import { useStore } from "../../components/Store/MakeStore";
 
 export default function InitFundingDetail() {
   //라우팅 파라미터 읽어오기
-  const location = useLocation();
+  // const location = useLocation();
 
   //zustand
-  const { updateFormData } = useFormDataStore();
+  const { formData, updateFormData } = useFormDataStore();
   const { selectedAnniversary, selectedAddress, selectedAccount } = useStore();
 
   //로컬 상태
@@ -22,8 +21,8 @@ export default function InitFundingDetail() {
   const [anniversaryCategory, setAnniversaryCategory] = useState([]);
 
   //라우터에서 전달받는 상품 ID & 옵션
-  const productId = location?.state?.params;
-  const productOption = location?.state?.option;
+  // const paramsProductId = location?.state?.params;
+  // const productOption = location?.state?.option;
 
   //초기 마운트 되었을 때
   //1. 사용자 정보
@@ -51,16 +50,19 @@ export default function InitFundingDetail() {
     }
 
     //상품 정보 가져오기
-    if (productId) {
-      getProductDetail(productId).then((data) => {
+    if (formData.productId) {
+      getProductDetail(formData.productId).then((data) => {
         setProduct(data.data);
-
+        console.log("product 세팅 됨");
         updateFormData("targetPrice", data.data.price);
         updateFormData("productId", data.data.productId);
-        updateFormData("productOptionId", productOption);
       });
     }
   }, []);
+
+  useEffect(() => {
+    console.log(formData);
+  }, [formData]);
 
   //선택된 계좌번호, 기념일, 주소가 바뀔때 마다 formData update
   useEffect(() => {

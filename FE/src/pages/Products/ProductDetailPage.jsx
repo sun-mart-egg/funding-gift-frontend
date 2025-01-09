@@ -25,6 +25,7 @@ function ProductDetailPage() {
   const resetStore = useStore((state) => state.reset);
   const resetProductData = useProductStore((state) => state.resetProductData);
   const resetFormData = useFormDataStore((state) => state.resetFormData);
+  const updateFormData = useFormDataStore((state) => state.updateFormData);
   const [selectedOption, setSelectedOption] = useState(null);
 
   // 옵션 토글 가시성 상태
@@ -36,10 +37,10 @@ function ProductDetailPage() {
     setOptionToggleVisible(false); // 토글 닫기
   };
 
-  const sendData = {
-    params: productId,
-    option: selectedOption,
-  };
+  // const sendData = {
+  //   params: productId,
+  //   option: selectedOption,
+  // };
 
   const handleClick = () => {
     if (selectedOption === null) {
@@ -48,7 +49,9 @@ function ProductDetailPage() {
       resetStore(); // useStore의 상태 초기화
       resetProductData(); // useProductStore의 상태 초기화
       resetFormData(); // useFormDataStore의 상태 초기화
-      navigate("/make-funding-detail", { state: sendData });
+      updateFormData("productId", productId);
+      updateFormData("productOptionId", selectedOption);
+      navigate("/make-funding-detail");
     }
   };
 
