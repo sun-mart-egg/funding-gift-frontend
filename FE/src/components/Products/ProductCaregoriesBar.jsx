@@ -1,4 +1,4 @@
-const ProductCategoriesBar = ({ categories, isSelected, onSelect }) => {
+const ProductCategoriesBar = ({ categories, isSelected, onSelect}) => {
   return (
     <div className="flex w-[90.5%] justify-center space-x-1">
       {categories.map((category) => (

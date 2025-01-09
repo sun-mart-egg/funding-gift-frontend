@@ -7,7 +7,6 @@ import NoWishlist from '/imgs/no_wishlist.png'
 
 import getWishlists from '../../services/Products/getWishLists';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { formattedPrice } from '../../@common/formattedNumber';
 
 
 function Wishlist() {
@@ -15,6 +14,7 @@ function Wishlist() {
 	const consumerId = localStorage.getItem("consumer-id")
 
 	// 위시리스트 관련 쿼리 ( + 무한 스크롤 기능 )
+	// 수정 필요
 	const { data = { pages: [] }, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery({
 		queryKey: ["wishes", consumerId],
 		queryFn: async ({ pageParam = 0 }) => {
@@ -26,12 +26,17 @@ function Wishlist() {
 		getNextPageParam: (lastPage, allPages) => {
 			return lastPage.hasNext ? allPages.length : undefined;
 		},
+		// select: (data) => {
+		// 	return data.pages.flatMap(page => page.data);
+		// },
 	});
 
-	// 위시리스트 목록 평탄화
+	// 현재 페이지의 위시리스트만 가져오도록 설정
+	// 수정 필요
 	const wishes = data.pages.flatMap(page => page.data);
 
 	// 스크롤 위치 저장 관련 로직
+	// 수정 필요
 	const lastProductElementRef = useCallback(node => {
 		if (isLoading || !hasNextPage) return;
 		if (observer.current) observer.current.disconnect();
@@ -62,6 +67,11 @@ function Wishlist() {
 		return null;
 	};
 
+	// 숫자 천 단위로 끊어주는 함수
+	const numberWithCommas = (number) => {
+		return number.toLocaleString();
+	};
+
 	return (
 		<div className="sub-layer mt-[80px] justify-start min-h-screen overflow-hidden font-cusFont2 bg-white">
 			<p className="font-cusFont5 text-4xl">나의 위시리스트</p>
@@ -82,7 +92,7 @@ function Wishlist() {
 						<div className="m-[1px] flex h-[30%] w-[100%] flex-col justify-center p-[10px] pl-2">
 							<div>
 								<p className='truncate'>{product.productName}</p>
-								<p>{formattedPrice(product.price)}원</p>
+								<p>{numberWithCommas(product.price)}원</p>
 							</div>
 						</div>
 					</div>

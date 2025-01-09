@@ -22,6 +22,7 @@ const FriendPage = () => {
   const { data: friends = [], refetch } = useQuery({
     queryKey: ["friends"],
     queryFn: getFriendsList,
+    staleTime: 1000 * 30,
     onError: (error) => (
       console.error("친구목록 요청 실패", error)
     )

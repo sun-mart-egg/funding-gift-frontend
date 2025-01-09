@@ -1,21 +1,5 @@
 import axios from "axios";
 
-async function getAddressList(token, setData) {
-  try {
-    const response = await axios.get(
-      `${import.meta.env.VITE_BASE_URL}/api/addresses`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-    setData(response.data.data);
-  } catch (error) {
-    console.error("주소 목록 정보를 불러올 수 없습니다. ", error);
-  }
-}
-
 async function deleteAddress(token, addressId) {
   try {
     const response = await axios.delete(
@@ -73,4 +57,4 @@ async function createAddress(
     console.error("주소 생성 중 오류 발생:", error);
   }
 }
-export { getAddressList, deleteAddress, createAddress };
+export { deleteAddress, createAddress };

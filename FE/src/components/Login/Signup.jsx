@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import DaumPostcodeEmbed from "react-daum-postcode";
 import useUserStore from "../Store/UserStore.jsx";
-import { useMutation } from "@tanstack/react-query";
-import postAddress from "../../services/Login/postAddress.js";
+import axios from "axios";
 
 function Signup() {
   // 주소 데이터를 관리할 store
@@ -23,20 +22,6 @@ function Signup() {
   const [isNotInputAdr, setIsNotinputAdr] = useState("")
   const navigate = useNavigate()
 
-  // 주소 추가 mutate
-  const addMyAddressMutate = useMutation({
-    mutationFn: ({name, defaultAddr, detailAddr, zipCode, isDefault}) => postAddress(name, defaultAddr, detailAddr, zipCode, isDefault),
-    onSuccess: (res) => {
-      console.log("주소 저장 성공");
-      console.log(res)
-      navigate("/signupFin");
-    },
-    onError: (err) => {
-      console.log("주소 저장 실패")
-      console.error(err);
-    },
-  });
-
   // 우편번호와 주소를 store에 저장
   const handleAddress = (data) => {
     updateUserStore("zipCode", data.zonecode)
@@ -51,13 +36,26 @@ function Signup() {
 
   const sendMyAddrData = () => {
     if (zipCode && defaultAddr && detailAddr) {
-      addMyAddressMutate.mutate({
-        name: "기본 주소",
-        defaultAddr,
-        detailAddr,
-        zipCode,
-        isDefault: true,
-      });
+      axios.post(import.meta.env.VITE_BASE_URL + "/api/addresses", {
+        "name": "기본 주소",
+        "defaultAddr": defaultAddr,
+        "detailAddr": detailAddr,
+        "zipCode": zipCode,
+        "isDefault": true
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access-token")}`,
+        },
+      })
+        .then(() => {
+          console.log("주소 저장 성공")
+          navigate("/signupFin")
+          
+        })
+        .catch((err) => {
+          console.error(err)
+          console.log("주소 저장 실패")
+        })
     }
     else {
       setIsNotinputAdr("주소를 입력해주세요.")

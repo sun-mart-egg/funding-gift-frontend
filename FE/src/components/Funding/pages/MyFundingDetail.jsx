@@ -1,7 +1,7 @@
 import FundingDetailInfo from "../component/FundingDetailInfo";
 import CongratulateList from "../component/CongratulateList";
 import BottomSheet from "../component/BottomSheet";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchDetailFunding } from "../api/FundingAPI";
 import { useParams } from "react-router-dom";
 import { deleteFunding } from "../api/FundingAPI";

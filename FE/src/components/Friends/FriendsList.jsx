@@ -1,3 +1,4 @@
+import React from "react";
 import fish from "/imgs/fish.PNG";
 import star from "/imgs/star.png";
 import graystar from "/imgs/graystar.png";
