@@ -26,6 +26,7 @@ function ProductDetailPage() {
   const resetStore = useStore((state) => state.reset);
   const resetProductData = useProductStore((state) => state.resetProductData);
   const resetFormData = useFormDataStore((state) => state.resetFormData);
+  const updateFormData = useFormDataStore((state) => state.updateFormData)
   const [selectedOption, setSelectedOption] = useState(null);
 
   // 옵션 토글 가시성 상태
@@ -37,19 +38,16 @@ function ProductDetailPage() {
     setOptionToggleVisible(false); // 토글 닫기
   };
 
-  const sendData = {
-    params: productId,
-    option: selectedOption,
-  };
-
-  const handleClick = () => {
+  const handleMakeFunding = () => {
     if (selectedOption === null) {
       alert("옵션을 선택해주세요!");
     } else {
       resetStore(); // useStore의 상태 초기화
       resetProductData(); // useProductStore의 상태 초기화
       resetFormData(); // useFormDataStore의 상태 초기화
-      navigate("/make-funding-detail", { state: sendData });
+      updateFormData("productId", productId)
+      updateFormData("productOptionId", selectedOption)
+      navigate("/make-funding-detail");
     }
   };
 
@@ -301,7 +299,7 @@ function ProductDetailPage() {
 
                 <button
                   className="h-[80%] w-[50%] rounded-lg bg-cusColor3 px-4 py-2 text-base font-bold text-white hover:bg-red-400"
-                  onClick={handleClick}
+                  onClick={handleMakeFunding}
                 >
                   펀딩 만들기
                 </button>
