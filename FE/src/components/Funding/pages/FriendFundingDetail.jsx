@@ -1,10 +1,8 @@
 import FundingDetailInfo from "../component/FundingDetailInfo";
 import CongratulateList from "../component/CongratulateList";
 import BottomSheet from "../component/BottomSheet";
-import React, { useEffect, useState } from "react";
-import { Route } from "react-router";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaLongArrowAltRight } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { fetchDetailFunding } from "../api/FundingAPI";
 import { getFundingAttendee } from "../api/AttendanceAPI";
