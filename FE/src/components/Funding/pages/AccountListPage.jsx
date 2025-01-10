@@ -1,4 +1,3 @@
-import React from "react";
 import AccounList from "../component/AccounList";
 import { useStore } from "../../Store/MakeStore";
 import { useNavigate } from "react-router-dom";
