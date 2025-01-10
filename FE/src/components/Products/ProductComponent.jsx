@@ -6,7 +6,7 @@ import Star from '/imgs/star.png';
 import ImageComingSoon from '/imgs/image_coming_soon.png'
 import NoSearchResult from '/imgs/no_search_result.png'
 
-import getProducts from '../../services/Products/getProducts.js';
+import { getProducts } from "../../services/Products/products.js"
 import { formattedPrice, formattedReviewCnt } from '../../@common/formattedNumber.js';
 
 function ProductComponent({ categoryId, keyword, sort }) {

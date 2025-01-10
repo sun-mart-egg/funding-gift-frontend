@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 // API 호출
-import getCategories from "../../services/Products/getCategories.js";
+import { getCategories } from "../../services/Products/products.js";
 
 // 컴포넌트 호출
 import SearchBar from "../../components/UI/SearchBar.jsx";

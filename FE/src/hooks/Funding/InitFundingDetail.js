@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { getUserInfo } from "../../services/Consumer/getUserInfo";
 import { getAnniversaryList } from "../../services/Funding/getAnniversaryList";
-import getProductDetail from "../../services/Products/getProductDetail";
+import { getProductDetail } from "../../services/Products/products"
 
 import useFormDataStore from "../../components/Store/FormDataStore";
 import { useStore } from "../../components/Store/MakeStore";

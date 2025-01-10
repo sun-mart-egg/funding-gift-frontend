@@ -10,7 +10,7 @@ import useProductStore from "../../components/Store/ProductStore.jsx";
 import { useStore } from "../../components/Store/MakeStore.jsx";
 import useFormDataStore from "../../components/Store/FormDataStore.jsx";
 
-import getProductDetail from "../../services/Products/getProductDetail.js";
+import { getProductDetail } from "../../services/Products/products.js"
 import { getReviews, deleteReviews} from "../../services/Products/reviews.js"
 import { addWishlists, deleteWishlists} from "../../services/Products/wishlists.js"
 import { formattedPrice } from "../../@common/formattedNumber.js";
