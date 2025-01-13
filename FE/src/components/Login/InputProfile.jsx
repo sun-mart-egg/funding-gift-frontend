@@ -3,7 +3,7 @@ import useUserStore from "../Store/UserStore";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import putMyInfo from "../../services/Login/putMyInfo";
+import { putConsumers } from "../../services/Consumer/consumers"
 
 function InputProfile() {
   const updateUserStore = useUserStore((state) => state.updateUserStore);
@@ -24,7 +24,7 @@ function InputProfile() {
 
   const editMyInfoMutate = useMutation({
     mutationFn: ({ name, email, phoneNumber, birthyear, birthday, gender }) =>
-      putMyInfo(name, email, phoneNumber, birthyear, birthday, gender),
+      putConsumers(name, email, phoneNumber, birthyear, birthday, gender),
     onSuccess: (res) => {
       console.log("정보 수정 성공");
       console.log(res);

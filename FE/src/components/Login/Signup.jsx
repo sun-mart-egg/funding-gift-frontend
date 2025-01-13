@@ -5,7 +5,7 @@ import { useState } from "react";
 import DaumPostcodeEmbed from "react-daum-postcode";
 import useUserStore from "../Store/UserStore.jsx";
 import { useMutation } from "@tanstack/react-query";
-import postAddress from "../../services/Login/postAddress.js";
+import { postAddress } from "../../services/Address/addresses.js";
 
 function Signup() {
   // 주소 데이터를 관리할 store

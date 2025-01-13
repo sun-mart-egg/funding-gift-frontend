@@ -1,38 +1,41 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // API 호출
-import getFriendsList from "../../services/Friends/getFriendsList.js";
-import getKAKAO from "../../services/Friends/getKAKAO.js";
-import putFavorite from "../../services/Friends/putFavorite.js";
+import { getFriendsList, getKAKAO, putFavorite} from "../../services/Friends/friends.js";
 
 // 컴포넌트 호출
 import FriendsList from "../../components/Friends/FriendsList.jsx";
 import FriendsSearchBar from "../../components/Friends/FriendsSearchBar.jsx";
 
 const FriendPage = () => {
-  const [isSearch, setIsSearch] = useState(false); // 검색창 on/off 위한 상태변수
-  const [isFilter, setIsFilter] = useState(false); // 필터창 on/off 위한 상태변수
   const [userInput, setUserInput] = useState(""); // 친구이름 검색
   const [filterOption, setsFilterOption] = useState("all"); // 전체, 친한친구 목록 출력
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // 친구목록 쿼리
   const { data: friends = [], refetch } = useQuery({
     queryKey: ["friends"],
     queryFn: getFriendsList,
-    onError: (error) => (
-      console.error("친구목록 요청 실패", error)
+    onError: (err) => (
+      console.error(err)
     )
   });
 
-  const searchState = () => {
-    setIsSearch((prevSearch) => !prevSearch);
-  };
-  const filterState = () => {
-    setIsFilter((prevFilter) => !prevFilter);
-  };
+  // 친한친구 수정 mutate
+  // 요청에 성공하는 경우, 쿼리키가 friends인 쿼리에 대해
+  // 데이터가 오래되었으니 즉시 새로운 데이터를 가져오라고 알린다
+  const editFavoriteMutate = useMutation({
+    mutationFn: (consumerId) => putFavorite(consumerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["friends"] })
+    },
+    onError: (err) => {
+      console.error(err);
+    },
+  });
 
   // 친구 이름 검색 입력에 대한 함수
   const handleInput = (event) => {
@@ -56,7 +59,7 @@ const FriendPage = () => {
   };
 
   // KAKAO 친구목록과 동기화
-  const syncKAKAO = async () => {
+  const handleSynkKAKAO = async () => {
     try {
       await getKAKAO();
       await refetch();
@@ -67,31 +70,22 @@ const FriendPage = () => {
 
   // 친한친구 수정
   const handleFavorite = async (consumerId) => {
-    try {
-      await putFavorite(consumerId);
-      await refetch();
-    } catch (err) {
-      console.error("친한친구 설정 실패", err);
-    }
+    await editFavoriteMutate.mutate(consumerId);
   };
 
   // 전체, 친한친구 필터링을 위한 핸들러 함수
   const handleFilterOption = (option) => {
     setsFilterOption(option)
-  }
+  };
 
   return (
-    <div className="sub-layer justify-start">
+    <div className="sub-layer">
         <FriendsSearchBar
-          isSearch={isSearch}
-          searchState={searchState}
-          filterState={filterState}
-          isFilter={isFilter}
-          handleInput={handleInput}
           userInput={userInput}
-          handleKAKAO={syncKAKAO}
-          handleFilterOption={handleFilterOption}
           filterOption={filterOption}
+          handleInput={handleInput}
+          handleKAKAO={handleSynkKAKAO}
+          handleFilterOption={handleFilterOption}
         />
         <FriendsList
           friends={filteredFriends()}
