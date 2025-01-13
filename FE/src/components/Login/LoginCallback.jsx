@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken } from 'firebase/messaging';
 import { useMutation } from "@tanstack/react-query";
-import postFCMToken from "../../services/Login/postFCMToken";
+import { postFCMToken } from "../../services/Login/tokens"
 
 function LoginCallback() {
   const [searchParams] = useSearchParams();
