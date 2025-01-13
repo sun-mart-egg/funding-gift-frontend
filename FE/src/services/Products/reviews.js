@@ -1,6 +1,7 @@
 import axiosInstance from "../../@common/axiosInstance";
 
-const getReviews = async (productId, productOptionId = null, page, size, sort) => {
+// 상품 별 리뷰 목록 조회
+export const getReviews = async (productId, productOptionId = null, page, size, sort) => {
   const params = {
     "product-id": productId,
     page,
@@ -18,4 +19,12 @@ const getReviews = async (productId, productOptionId = null, page, size, sort) =
   return response.data;
 }
 
-export default getReviews;
+// 리뷰 삭제
+export const deleteReviews = async (reviewId) => {
+  const response = await axiosInstance.delete(`/api/reviews/${reviewId}`, {
+    params: {
+      "review-id": reviewId
+    },
+  });
+  console.log("후기 삭제 성공", response);
+}

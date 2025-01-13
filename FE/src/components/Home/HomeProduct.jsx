@@ -4,7 +4,7 @@ import { useInfiniteQuery } from "@tanstack/react-query"
 
 import Star from '/imgs/star.png';
 import ImageComingSoon from '/imgs/image_coming_soon.png'
-import getRecommendProducts from '../../services/Products/getRecommendProducts';
+import { getRecommendProducts } from '../../services/Products/products';
 import { formattedPrice, formattedReviewCnt } from '../../@common/formattedNumber';
 
 function ProductComponent({ categoryId, keyword, sort }) {

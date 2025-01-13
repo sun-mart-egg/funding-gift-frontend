@@ -5,7 +5,7 @@ import ScrollToTop from "../UI/ScrollToTop2";
 import ImageComingSoon from '/imgs/image_coming_soon.png'
 import NoWishlist from '/imgs/no_wishlist.png'
 
-import getWishlists from '../../services/Products/getWishLists';
+import { getWishlists } from "../../services/Products/wishlists"
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { formattedPrice } from '../../@common/formattedNumber';
 

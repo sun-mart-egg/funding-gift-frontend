@@ -10,11 +10,9 @@ import useProductStore from "../../components/Store/ProductStore.jsx";
 import { useStore } from "../../components/Store/MakeStore.jsx";
 import useFormDataStore from "../../components/Store/FormDataStore.jsx";
 
-import getProductDetail from "../../services/Products/getProductDetail.js";
-import getReviews from "../../services/Products/getReviews.js";
-import deleteReviews from "../../services/Products/deleteReviews.js";
-import addWishlists from "../../services/Products/addWishlists.js";
-import deleteWishlists from "../../services/Products/deleteWishlists.js";
+import { getProductDetail } from "../../services/Products/products.js"
+import { getReviews, deleteReviews} from "../../services/Products/reviews.js"
+import { addWishlists, deleteWishlists} from "../../services/Products/wishlists.js"
 import { formattedPrice } from "../../@common/formattedNumber.js";
 import ReviewList from "../../components/Products/ReviewList.jsx";
 import ProductDetailInfo from "../../components/Products/ProductDetailInfo.jsx";
