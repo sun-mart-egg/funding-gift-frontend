@@ -3,18 +3,25 @@ import searchIcon from "/imgs/searchIcon.png";
 import searchIconTrue from "/imgs/searchIconTrue.png";
 import filterIcon from "/imgs/filterIcon.png";
 import filterIconTrue from "/imgs/filterIconTrue.png";
+import { useState } from "react";
 
 const FriendsSearchBar = ({
-  isSearch,
-  searchState,
-  filterState,
-  isFilter,
   handleInput,
   userInput,
   handleKAKAO,
   handleFilterOption,
   filterOption
 }) => {
+  const [isSearch, setIsSearch] = useState(false); // 검색창 on/off 위한 상태변수
+  const [isFilter, setIsFilter] = useState(false); // 필터창 on/off 위한 상태변수
+
+  const searchState = () => {
+    setIsSearch((prevSearch) => !prevSearch);
+  };
+  const filterState = () => {
+    setIsFilter((prevFilter) => !prevFilter);
+  };
+
   return (
     <div className="absolute top-[60px] flex w-full flex-row justify-between">
       <div className="flex flex-row items-center p-3 ">
