@@ -3,9 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query"
 
 // API 호출
-import getFriendsList from "../../services/Friends/getFriendsList.js";
-import getKAKAO from "../../services/Friends/getKAKAO.js";
-import putFavorite from "../../services/Friends/putFavorite.js";
+import { getFriendsList, getKAKAO, putFavorite} from "../../services/Friends/friends.js"
 
 // 컴포넌트 호출
 import FriendsList from "../../components/Friends/FriendsList.jsx";
@@ -56,7 +54,7 @@ const FriendPage = () => {
   };
 
   // KAKAO 친구목록과 동기화
-  const syncKAKAO = async () => {
+  const handleSynkKAKAO = async () => {
     try {
       await getKAKAO();
       await refetch();
@@ -81,7 +79,7 @@ const FriendPage = () => {
   }
 
   return (
-    <div className="sub-layer justify-start">
+    <div className="sub-layer">
         <FriendsSearchBar
           isSearch={isSearch}
           searchState={searchState}
@@ -89,7 +87,7 @@ const FriendPage = () => {
           isFilter={isFilter}
           handleInput={handleInput}
           userInput={userInput}
-          handleKAKAO={syncKAKAO}
+          handleKAKAO={handleSynkKAKAO}
           handleFilterOption={handleFilterOption}
           filterOption={filterOption}
         />
