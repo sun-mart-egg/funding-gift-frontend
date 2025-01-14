@@ -2,103 +2,69 @@ import { BsPeopleFill } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
 import SearchBar from "../../UI/SearchBar";
 import CardList from "../component/CardList";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { fetchMyFundings } from "../api/FundingAPI";
-import { getMyAttendance } from "../api/AttendanceAPI";
+
+import { useQuery } from "@tanstack/react-query"
+import { getConsumers } from "../../../services/Consumer/consumers";
+import { getMyFundings, getMyAttendance } from "../../../services/Funding/fundings";
 
 function MyFunding() {
   const navigate = useNavigate();
-  const [buttonSelected, setButtonSelected] = useState(true);
-  const [myFundings, setMyFundings] = useState([]); // API로부터 받은 데이터를 저장할 상태
-  const [friendFundings, setFriendFundings] = useState([]); // API로부터 받은 데이터를 저장할 상태
+  const [buttonSelected, setButtonSelected] = useState("myFunding");
 
-  const [isLoading, setIsLoading] = useState(true);
+  // 소비자 정보 호출 쿼리
+  const { data: userInfo = [] } = useQuery({
+    queryKey: ["소비자 정보"],
+    queryFn: getConsumers,
+    onError: (err) => {
+      console.log("소비자 정보 요청 실패")
+      console.error(err)
+    }
+  })
 
-  const [userInfo, setUserInfo] = useState({
-    name: "",
-    img: null,
-    // 추가 정보가 있다면 여기에 포함할 수 있습니다.
+  // 내가 만든 펀딩 호출 쿼리
+  // 무한 스크롤 적용 예정
+  const { data: myFundings = [] } = useQuery({
+    queryKey: ["내 펀딩"],
+    queryFn: getMyFundings,
+    onError: (err) => {
+      console.error(err)
+    },
   });
 
-  //사용자 정보 받아오기
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await axios.get(
-          import.meta.env.VITE_BASE_URL + "/api/consumers",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("access-token")}`,
-            },
-          },
-        );
-
-        // 응답 데이터 콘솔에 출력
-        console.log("Received user info:", response.data.data.profileImageUrl);
-
-        // API 응답으로부터 받은 데이터로 userInfo 상태 업데이트
-        setUserInfo({
-          ...userInfo,
-          name: response.data.data.name,
-          img: response.data.data.profileImageUrl,
-        });
-      } catch (error) {
-        console.error("Failed to fetch user info:", error);
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
-
-  //내 펀딩 조회 api
-  useEffect(() => {
-    const token = localStorage.getItem("access-token");
-    if (!token) {
-      console.log("토큰이 존재하지 않습니다.");
-      setIsLoading(false);
-      navigate("/login-page");
-      return;
+  // 내가 참여한 펀딩 호출 쿼리
+  // 무한 스크롤 적용 예정
+  const { data: myAttendance = [] } = useQuery({
+    queryKey: ["내가 참여한 펀딩"],
+    queryFn: getMyAttendance,
+    onError: (err) => {
+      console.error(err)
     }
-    fetchMyFundings(token, setMyFundings, setIsLoading);
-  }, []);
+  })
 
-  //버튼 클릭 시 api 불러오는거 연결
+  // 버튼 클릭에 따른 펀딩 목록 및 UI 변경
   const handleClickButton = (e) => {
-    const token = localStorage.getItem("access-token");
     const buttonName = e.target.name;
-    setButtonSelected(buttonName === "myFunding");
-    if (!token) {
-      console.log("토큰이 존재하지 않습니다.");
-      setIsLoading(false);
-      navigate("/login-page");
-      return;
-    }
-    //내가 만든 펀딩 정보 불러오기
-    if (buttonName === "myFunding") {
-      fetchMyFundings(token, setMyFundings, setIsLoading);
-    }
-    //내가 참여한 펀딩 정보 불러오기
-    if (buttonName === "friendsFunding") {
-      getMyAttendance(token, setFriendFundings);
-    }
+    setButtonSelected(buttonName);
   };
 
+  // 펀딩 생성 버튼
   const handleCreateFundingClick = () => {
     navigate("/make-funding-main");
   };
 
   return (
     <div className="main-layer ">
+      {/* 내 프로필 정보 */}
       <div
         id="profileSection"
         className=" flex w-full justify-between p-2 px-6"
       >
         <div id="leftSection" className="flex items-center space-x-4">
           <img
-            src={userInfo.img}
+            src={userInfo.profileImageUrl}
             alt="프로필"
             className="h-[60px] w-[60px] rounded-full  border-gray-300"
           />
@@ -124,12 +90,14 @@ function MyFunding() {
           </button>
         </div>
       </div>
+
+      {/* 펀딩 목록 헤더 */}
       <div id="buttonSection" className="flex w-full justify-between  ">
         <button
           onClick={handleClickButton}
           name="myFunding"
           className={
-            buttonSelected
+            buttonSelected === "myFunding"
               ? ` w-3/6 bg-cusColor3 p-4 text-xs text-white `
               : `w-3/6 border-b border-t border-cusColor3 p-4 text-xs`
           }
@@ -140,19 +108,19 @@ function MyFunding() {
           onClick={handleClickButton}
           name="friendsFunding"
           className={
-            !buttonSelected
+            buttonSelected === "friendsFunding"
               ? `w-3/6 bg-cusColor3 p-4 text-xs text-white `
               : `w-3/6 border-b border-t border-cusColor3 p-4 text-xs`
           }
         >
-          내가 참여한 펀딩 ({friendFundings.length})
+          내가 참여한 펀딩 ({myAttendance.length})
         </button>
       </div>
 
+      {/* 나의 펀딩, 참여 펀딩 목록 */}
       <div id="mainSection" className=" flex-center w-full flex-col p-4">
         <SearchBar />
-
-        {buttonSelected ? (
+        {buttonSelected === "myFunding" ? ( // buttonSelected에 따라 조건부 렌더링
           myFundings.length === 0 ? (
             <div className="m-1 flex flex-col items-center justify-start p-10 font-cusFont3 text-[20px]">
               아직 만들어진 펀딩이 없습니다.{" "}
@@ -161,12 +129,20 @@ function MyFunding() {
             <CardList data={myFundings} basePath="/my-funding-detail" />
           )
         ) : (
-          <CardList data={friendFundings} basePath="/friend-funding-detail" />
+          myAttendance.length === 0 ? (
+            <div className="m-1 flex flex-col items-center justify-start p-10 font-cusFont3 text-[20px]">
+              아직 참여한 펀딩이 없습니다.{" "}
+            </div>
+          ) : (
+            <CardList data={myAttendance} basePath="/friend-funding-detail" />
+          )
         )}
       </div>
+
+      {/* 펀딩 생성 버튼 */}
       <button
         onClick={handleCreateFundingClick}
-        className="hover:bg-cusColor3-dark fixed bottom-24 right-4 flex h-12 w-12 flex-col items-center justify-center rounded-full bg-cusColor3 text-white shadow-lg"
+        className="fixed bottom-24 right-4 flex h-12 w-12 flex-col items-center justify-center rounded-full bg-cusColor3 text-white shadow-lg"
       >
         <AiOutlinePlus size="20" />
       </button>
