@@ -9,7 +9,7 @@ import BannerImage2 from "/imgs/banner_image2.png";
 import BannerImage3 from "/imgs/banner_image3.png";
 
 import HomeProduct from "./HomeProduct";
-import ScrollToTop from "../UI/ScrollToTop";
+import ScrollUpButton from "../UI/ScrollUpButton";
 
 import { initializeApp } from "firebase/app";
 import { getMessaging, onMessage } from "firebase/messaging";
@@ -133,7 +133,9 @@ function Home() {
           <HomeProduct />
         </div>
       </div>
-      <ScrollToTop className="bottom-[25px]" />
+
+      {/* 화면 제일 상단으로 */}
+      <ScrollUpButton bottom={85}/>
     </div>
   );
 }
