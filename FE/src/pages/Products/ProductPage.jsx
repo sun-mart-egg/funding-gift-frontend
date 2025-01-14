@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 // API 호출
@@ -44,7 +44,6 @@ function ProductPage() {
     const categoryMap = [" ", "1", "2", "3", "4", "5", "6"];
     setCategoryId(categoryMap[categoryIndex]);
   };
-  useEffect(() => {}, [categoryId, sort]);
 
   return (
     <div className="main-layer font-cusFont2">
