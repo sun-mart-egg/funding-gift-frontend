@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FiSearch } from "react-icons/fi";
 
 function SearchBar({ setKeyword, onSubmit }) {
