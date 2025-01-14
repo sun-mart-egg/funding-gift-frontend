@@ -33,7 +33,7 @@ import MyFundingDetail from "./components/Funding/pages/MyFundingDetail.jsx";
 import FundingMain from "./components/Funding/pages/FundingMain.jsx";
 import StoryPage from "./components/Funding/pages/StoryPage.jsx";
 import MyPage from "./components/Funding/pages/MyPage.jsx";
-import NewAddressPage from "./components/Funding/pages/NewAddressPage.jsx";
+import AddressFormPage from "./components/Funding/pages/AddressFormPage.jsx";
 import Alarm from "./components/Home/Alarm.jsx";
 
 function App() {
@@ -86,7 +86,7 @@ function App() {
             <Route path="/product/:productId" element={<ProductDetail />} />
             <Route path="/address-list" element={<AddressListPage />} />
             <Route path="/account-list" element={<AccountListPage />} />
-            <Route path="/new-address" element={<NewAddressPage />} />
+            <Route path="/address-form" element={<AddressFormPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/friends" element={<FriendPage />} />
             <Route

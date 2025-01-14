@@ -1,5 +1,6 @@
-import React from "react";
-import { deleteAddress } from "../api/AddressAPI";
+import { deleteAddress } from "../../../services/Address/addresses";
+import { useNavigate } from "react-router-dom"; // useNavigate 사용
+
 function AddressCard({
   name,
 
@@ -12,7 +13,9 @@ function AddressCard({
   onSelect,
   id,
 }) {
-  const handelDelete = (event) => {
+  const navigate = useNavigate();
+
+  const handelDelete = () => {
     deleteAddress(localStorage.getItem("access-token"), id);
   };
 
@@ -50,7 +53,12 @@ function AddressCard({
       </div>
 
       <div id="buttonSection" className="flex">
-        <button className="mx-2  flex w-[45pt] justify-center rounded-md bg-[#9B9B9B] text-white">
+        <button
+          onClick={() =>
+            navigate("/address-form", { state: { addressId: id } })
+          }
+          className="mx-2  flex w-[45pt] justify-center rounded-md bg-[#9B9B9B] text-white"
+        >
           수정
         </button>
         <button

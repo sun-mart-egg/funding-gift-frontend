@@ -1,9 +1,12 @@
-import React from "react";
 import { useEffect, useState } from "react";
 import DaumPostcodeEmbed from "react-daum-postcode";
-import { createAddress } from "../api/AddressAPI";
-import { useNavigate } from "react-router";
-function NewAddressPage() {
+import {
+  postAddress,
+  getAddressList,
+} from "../../../services/Address/addresses";
+import { useNavigate, useLocation } from "react-router";
+
+function AddressFormPage() {
   // 상세주소 검색창 on/off 상태변수
   const [isOpen, setIsOpen] = useState(false);
   const [zipCode, setZipcode] = useState("");
@@ -11,7 +14,36 @@ function NewAddressPage() {
   const [detailAddress, setDetailAddress] = useState("");
   const [addressName, setAddressName] = useState("");
   const [isDefault, setIsDefault] = useState(false);
+
   const navigate = useNavigate();
+  const location = useLocation();
+
+  //수정 모드, 추가 모드 설정
+  const addressId = location?.state?.addressId || null;
+  const isEditMode = !!addressId;
+
+  // //수정 모드일때 기존 주소 정보 불러오기
+  // // 1) 수정 모드일 때, 기존 주소 정보 불러오기
+  // useEffect(() => {
+  //   if (isEditMode) {
+  //     // addressId가 존재하면 서버에서 해당 주소 정보를 가져와 폼에 세팅
+  //     getAddressList(localStorage.getItem("access-token"), addressId)
+  //       .then((res) => {
+  //         const { name, defaultAddr, detailAddr, zipCode, isDefault } =
+  //           res.data;
+  //         // 서버 응답 구조에 맞춰 조정
+  //         setAddressName(name);
+  //         setZipcode(zipCode);
+  //         setDefaultAddress(defaultAddr);
+  //         setDetailAddress(detailAddr);
+  //         setIsDefault(isDefault);
+  //       })
+  //       .catch((err) => {
+  //         console.error("주소 정보 불러오기 실패:", err);
+  //         // 적절히 에러 핸들링
+  //       });
+  //   }
+  // }, [isEditMode, addressId]);
 
   const handleAddress = (data) => {
     setZipcode(data.zonecode);
@@ -27,20 +59,13 @@ function NewAddressPage() {
     setDetailAddress(event.target.value);
   };
 
-  const handleIsDefault = (event) => {
+  const handleIsDefault = () => {
     setIsDefault((prevIsDefault) => !prevIsDefault);
     console.log(isDefault);
   };
 
-  const handleCreate = (event) => {
-    createAddress(
-      addressName,
-      defaultAddress,
-      detailAddress,
-      zipCode,
-      isDefault,
-      localStorage.getItem("access-token"),
-    );
+  const handleCreate = () => {
+    postAddress(addressName, defaultAddress, detailAddress, zipCode, isDefault);
     navigate("/address-list");
   };
   return (
@@ -116,4 +141,4 @@ function NewAddressPage() {
   );
 }
 
-export default NewAddressPage;
+export default AddressFormPage;
