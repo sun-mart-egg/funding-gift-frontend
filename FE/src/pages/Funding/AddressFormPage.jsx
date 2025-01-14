@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import DaumPostcodeEmbed from "react-daum-postcode";
-import {
-  postAddress,
-  getAddressList,
-} from "../../../services/Address/addresses";
+import { postAddress, getAddressList } from "../../services/Address/addresses";
 import { useNavigate, useLocation } from "react-router";
 
 function AddressFormPage() {
