@@ -8,7 +8,14 @@ export const getConsumers = async () => {
 };
 
 // 소비자 내 정보 수정
-export const putConsumers = async (name, email, phoneNumber, birthyear, birthday, gender) => {
+export const putConsumers = async (
+  name,
+  email,
+  phoneNumber,
+  birthyear,
+  birthday,
+  gender,
+) => {
   const response = await axiosInstance.put("/api/consumers", {
     name,
     email,
@@ -32,16 +39,18 @@ export const postConsumerLogout = async () => {
 export const getConsumersId = async (consumerId) => {
   const response = await axiosInstance.get(`/api/consumers/${consumerId}`, {
     params: {
-      "consumer-id": consumerId
+      "consumer-id": consumerId,
     },
   });
-  console.log("소비자 ID 조회 완료");
-  return response;
+  console.log("소비자 ID 조회 완료", response);
+  return response.data.data;
 };
 
 // 진행 중인 펀딩 확인
 export const getInprogressFunding = async () => {
-  const response = await axiosInstance.get("/api/consumers/in-progress-funding");
+  const response = await axiosInstance.get(
+    "/api/consumers/in-progress-funding",
+  );
   console.log("진행 중 펀딩 조회 완료");
   return response.data.data;
 };

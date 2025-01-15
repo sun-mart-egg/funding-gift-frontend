@@ -3,7 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // API 호출
-import { getFriendsList, getKAKAO, putFavorite} from "../../services/Friends/friends.js";
+import {
+  getFriendsList,
+  getKAKAO,
+  putFavorite,
+} from "../../services/Friends/friends.js";
 
 // 컴포넌트 호출
 import FriendsList from "../../components/Friends/FriendsList.jsx";
@@ -19,9 +23,7 @@ const FriendPage = () => {
   const { data: friends = [], refetch } = useQuery({
     queryKey: ["friends"],
     queryFn: getFriendsList,
-    onError: (err) => (
-      console.error(err)
-    )
+    onError: (err) => console.error(err),
   });
 
   // 친한친구 수정 mutate
@@ -30,7 +32,7 @@ const FriendPage = () => {
   const editFavoriteMutate = useMutation({
     mutationFn: (consumerId) => putFavorite(consumerId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["friends"] })
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
     },
     onError: (err) => {
       console.error(err);
@@ -75,23 +77,23 @@ const FriendPage = () => {
 
   // 전체, 친한친구 필터링을 위한 핸들러 함수
   const handleFilterOption = (option) => {
-    setsFilterOption(option)
+    setsFilterOption(option);
   };
 
   return (
     <div className="sub-layer">
-        <FriendsSearchBar
-          userInput={userInput}
-          filterOption={filterOption}
-          handleInput={handleInput}
-          handleKAKAO={handleSynkKAKAO}
-          handleFilterOption={handleFilterOption}
-        />
-        <FriendsList
-          friends={filteredFriends()}
-          handleFavorite={handleFavorite}
-          navigate={navigate}
-        />
+      <FriendsSearchBar
+        userInput={userInput}
+        filterOption={filterOption}
+        handleInput={handleInput}
+        handleKAKAO={handleSynkKAKAO}
+        handleFilterOption={handleFilterOption}
+      />
+      <FriendsList
+        friends={filteredFriends()}
+        handleFavorite={handleFavorite}
+        navigate={navigate}
+      />
     </div>
   );
 };
