@@ -6,8 +6,10 @@ import FundingList from "../component/FundingList";
 import ScrollToTopButton from "../../UI/ScrollToTop";
 
 //API
-import { getStoryList } from "../../../services/Funding/getStoryList";
-import { getFundingFeed } from "../api/FundingAPI";
+import {
+  getStoryList,
+  getFundingFeed,
+} from "../../../services/Funding/fundingMain.js";
 import { getConsumers } from "../../../services/Consumer/consumers";
 
 function FundingMain() {
@@ -19,31 +21,29 @@ function FundingMain() {
     // 추가 정보가 있다면 여기에 포함할 수 있습니다.
   });
 
-  //친구가 만든 펀딩 받아올 배열
-  const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
-    console.log("업데이트 된 스토리 목록");
-  }, [storyList]);
-
-  //스토리 리스트 불러오는 api
-  useEffect(() => {
-    const token = localStorage.getItem("access-token"); // 토큰을 localStorage에서 가져옵니다.
-
     //스토리 리스트 불러오기
     getStoryList().then((storyListData) => {
       setStoryList(Array.isArray(storyListData) ? storyListData : []);
     });
+
+    //사용자 정보 불러오기
     getConsumers().then((data) => {
       if (data) {
         setUserInfo({
           ...userInfo,
-          name: data.data.name,
-          img: data.data.profileImageUrl,
+          name: data.name,
+          img: data.profileImageUrl,
         });
       }
     });
-    getFundingFeed(token, setFeedData);
+
+    //펀딩 피드 정보 불러오기
+    getFundingFeed().then((data) => {
+      if (data) {
+        setFeedData(data);
+      }
+    });
   }, []);
 
   return (
