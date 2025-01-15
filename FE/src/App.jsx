@@ -17,7 +17,7 @@ import ParticipatePage from "./components/Funding/pages/ParticipatePage.jsx";
 import FriendFunding from "./components/Funding/pages/FriendFunding.jsx";
 import MyFunding from "./components/Funding/pages/MyFunding";
 import AccountListPage from "./pages/Funding/AccountListPage.jsx";
-import MakeFundingMain from "./pages/Funding/MakeFundingMain.jsx";
+import MakeFundingMain from "./pages/Funding/MakeFunding/MakeFundingMain.jsx";
 import ProductPage from "./pages/Products/ProductPage.jsx";
 import ProductDetail from "./pages/Products/ProductDetailPage.jsx";
 import BrandStore from "./components/Products/BrandStore";
@@ -30,7 +30,7 @@ import MakeFundingDetail from "./pages/Funding/MakeFunding/MakeFundingDetail.jsx
 import MakeFundingFinish from "./pages/Funding/MakeFunding/MakeFundingFinish.jsx";
 import Home from "./components/Home/Home.jsx";
 import MyFundingDetail from "./components/Funding/pages/MyFundingDetail.jsx";
-import FundingMain from "./components/Funding/pages/FundingMain.jsx";
+import FundingMain from "./pages/Funding/FundingMain.jsx";
 import StoryPage from "./components/Funding/pages/StoryPage.jsx";
 import MyPage from "./components/Funding/pages/MyPage.jsx";
 import AddressFormPage from "./pages/Funding/AddressFormPage.jsx";

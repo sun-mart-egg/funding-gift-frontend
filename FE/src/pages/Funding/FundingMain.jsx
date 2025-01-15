@@ -2,17 +2,17 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 //Component
-import StoryList from "../component/StoryList";
-import FundingList from "../component/FundingList";
-import ScrollToTopButton from "../../UI/ScrollToTop";
-import StoryProfile from "../component/StoryProfile.jsx";
+import StoryList from "../../components/Funding/component/StoryList";
+import FundingList from "../../components/Funding/component/FundingList";
+import ScrollToTopButton from "../../components/UI/ScrollToTop.jsx";
+import StoryProfile from "../../components/Funding/component/StoryProfile.jsx";
 
 //API
 import {
   getStoryList,
   getFundingFeed,
-} from "../../../services/Funding/fundingMain.js";
-import { getConsumers } from "../../../services/Consumer/consumers";
+} from "../../services/Funding/fundingMain.js";
+import { getConsumers } from "../../services/Consumer/consumers";
 
 function FundingMain() {
   const [storyList, setStoryList] = useState([]); // 친구목록 받아올 배열

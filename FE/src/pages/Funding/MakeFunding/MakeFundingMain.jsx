@@ -1,6 +1,6 @@
 import { FaHeart } from "react-icons/fa6";
 import { FaCartShopping } from "react-icons/fa6";
-import backgroundURL from "../../../public/imgs/background.PNG";
+import backgroundURL from "../../../../public/imgs/background.PNG";
 import { useNavigate } from "react-router-dom";
 
 function MakeFundingMain() {
