@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 // API 호출
@@ -7,7 +7,7 @@ import { getCategories } from "../../services/Products/products.js";
 // 컴포넌트 호출
 import SearchBar from "../../components/UI/SearchBar.jsx";
 import ProductComponent from "../../components/Products/ProductComponent.jsx";
-import ScrollToTopButton from "../../components/UI/ScrollToTop.jsx";
+import ScrollUpButton from "../../components/UI/ScrollUpButton.jsx";
 import ProductCategoriesBar from "../../components/Products/ProductCategoriesBar.jsx";
 import ToggleList from "../../components/Products/ToggleList.jsx";
 
@@ -44,7 +44,6 @@ function ProductPage() {
     const categoryMap = [" ", "1", "2", "3", "4", "5", "6"];
     setCategoryId(categoryMap[categoryIndex]);
   };
-  useEffect(() => {}, [categoryId, sort]);
 
   return (
     <div className="main-layer font-cusFont2">
@@ -69,7 +68,8 @@ function ProductPage() {
       {/* 물품 목록 */}
       <ProductComponent categoryId={categoryId} keyword={keyword} sort={sort} />
 
-      <ScrollToTopButton />
+      {/* 화면 제일 상단으로 */}
+      <ScrollUpButton bottom={85}/>
     </div>
   );
 }

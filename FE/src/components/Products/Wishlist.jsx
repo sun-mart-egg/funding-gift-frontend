@@ -1,7 +1,7 @@
 import { useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
-import ScrollToTop from "../UI/ScrollToTop2";
+import ScrollUpButton from '../UI/ScrollUpButton';
 import ImageComingSoon from '/imgs/image_coming_soon.png'
 import NoWishlist from '/imgs/no_wishlist.png'
 
@@ -91,7 +91,8 @@ function Wishlist() {
 				{renderNoResultsMessage()} {/* 검색 결과가 없을 때 메시지 표시 */}
 			</div>
 
-			<ScrollToTop />
+			{/* 화면 제일 상단으로 */}
+			<ScrollUpButton bottom={25}/>
 		</div>
 	);
 }

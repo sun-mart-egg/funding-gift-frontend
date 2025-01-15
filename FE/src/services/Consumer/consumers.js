@@ -3,8 +3,8 @@ import axiosInstance from "../../@common/axiosInstance";
 // 소비자 내 정보 조회
 export const getConsumers = async () => {
   const response = await axiosInstance.get("/api/consumers");
-  console.log("사옹자 정보 조회 데이터 성공 : ", response.data);
-  return response.data;
+  console.log("사옹자 정보 조회 데이터 성공 : ", response.data.data);
+  return response.data.data;
 };
 
 // 소비자 내 정보 수정
@@ -44,4 +44,11 @@ export const getInprogressFunding = async () => {
   const response = await axiosInstance.get("/api/consumers/in-progress-funding");
   console.log("진행 중 펀딩 조회 완료");
   return response.data.data;
+};
+
+// 회원탈퇴
+export const postSignOut = async () => {
+  const response = await axiosInstance.post("/api/consumers/withdraw");
+  console.log("회원 탈퇴 완료");
+  return response;
 };
