@@ -1,5 +1,5 @@
-import AccounList from "../component/AccounList";
-import { useStore } from "../../Store/MakeStore";
+import AccounList from "../../components/Funding/component/AccounList";
+import { useStore } from "../../components/Store/MakeStore";
 import { useNavigate } from "react-router-dom";
 
 function AccountListPage() {

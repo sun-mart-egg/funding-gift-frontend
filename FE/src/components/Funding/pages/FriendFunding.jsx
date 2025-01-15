@@ -1,18 +1,14 @@
-import { BsPeopleFill } from "react-icons/bs";
-import { IoMdSettings } from "react-icons/io";
 import SearchBar from "../../UI/SearchBar";
 import CardList from "../component/CardList";
 import { useState, useEffect } from "react";
-import { AiOutlinePlus } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { fetchFriendFunding } from "../api/FundingAPI";
-import { getFriendInfo } from "../api/UserAPI";
+import { getConsumersId } from "../../../services/Consumer/consumers";
 import { useParams } from "react-router-dom";
 
 function FriendFunding() {
   const { consumerId } = useParams(); // URL 파라미터에서 consumer-id 값을 추출합니다.
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
 
   const [friendFunding, setFriendFunding] = useState([]);
 
@@ -37,21 +33,13 @@ function FriendFunding() {
     const token = localStorage.getItem("access-token");
 
     if (fetchData) {
-      const fetchFriends = async () => {
-        try {
-          const friendsData = await getFriendInfo(token, consumerId);
-          setFriendInfo({
-            name: friendsData.data.name,
-            img: friendsData.data.profileImageUrl,
-          });
-        } catch (error) {
-          console.error("친구 정보 불러오기 실패:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
+      getConsumersId(consumerId).then((data) => {
+        setFriendInfo({
+          name: data.name,
+          img: data.profileImageUrl,
+        });
+      });
 
-      fetchFriends();
       fetchFriendFunding(consumerId, token, setFriendFunding);
       setFetchData(false);
     }
@@ -60,10 +48,6 @@ function FriendFunding() {
   useEffect(() => {
     console.log("가져온 펀딩 입니다. " + friendFunding);
   }, [friendFunding]);
-
-  const handleCreateFundingClick = () => {
-    navigate("/make-funding-main");
-  };
 
   return (
     <div className="main-layer ">

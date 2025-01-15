@@ -16,8 +16,8 @@ import ParticipatePage from "./components/Funding/pages/ParticipatePage.jsx";
 
 import FriendFunding from "./components/Funding/pages/FriendFunding.jsx";
 import MyFunding from "./components/Funding/pages/MyFunding";
-import AccountListPage from "./components/Funding/pages/AccountListPage.jsx";
-import MakeFundingMain from "./pages/Funding/MakeFundingMain.jsx";
+import AccountListPage from "./pages/Funding/AccountListPage.jsx";
+import MakeFundingMain from "./pages/Funding/MakeFundingStep/MakeFundingMain.jsx";
 import ProductPage from "./pages/Products/ProductPage.jsx";
 import ProductDetail from "./pages/Products/ProductDetailPage.jsx";
 import BrandStore from "./components/Products/BrandStore";
@@ -26,14 +26,14 @@ import AddressListPage from "./pages/Funding/AddressListPage.jsx";
 import FriendFundingDetail from "./components/Funding/pages/FriendFundingDetail.jsx";
 import ParticipateFundingFinish from "./components/Funding/pages/ParticipateFundingFinish.jsx";
 import Paypage from "./components/Funding/pages/Paypage.jsx";
-import MakeFundingDetail from "./pages/Funding/MakeFunding/MakeFundingDetail.jsx";
-import MakeFundingFinish from "./pages/Funding/MakeFunding/MakeFundingFinish.jsx";
+import MakeFundingDetail from "./pages/Funding/MakeFundingStep/MakeFundingDetail.jsx";
+import MakeFundingFinish from "./pages/Funding/MakeFundingStep/MakeFundingFinish.jsx";
 import Home from "./components/Home/Home.jsx";
 import MyFundingDetail from "./components/Funding/pages/MyFundingDetail.jsx";
-import FundingMain from "./components/Funding/pages/FundingMain.jsx";
+import FundingMain from "./pages/Funding/FundingMain.jsx";
 import StoryPage from "./components/Funding/pages/StoryPage.jsx";
 import MyPage from "./components/Funding/pages/MyPage.jsx";
-import NewAddressPage from "./components/Funding/pages/NewAddressPage.jsx";
+import AddressFormPage from "./pages/Funding/AddressFormPage.jsx";
 import Alarm from "./components/Home/Alarm.jsx";
 
 function App() {
@@ -86,7 +86,7 @@ function App() {
             <Route path="/product/:productId" element={<ProductDetail />} />
             <Route path="/address-list" element={<AddressListPage />} />
             <Route path="/account-list" element={<AccountListPage />} />
-            <Route path="/new-address" element={<NewAddressPage />} />
+            <Route path="/address-form" element={<AddressFormPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/friends" element={<FriendPage />} />
             <Route

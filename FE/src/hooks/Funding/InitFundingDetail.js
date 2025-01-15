@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { getUserInfo } from "../../services/Consumer/getUserInfo";
+import { getConsumers } from "../../services/Consumer/consumers";
 import { getAnniversaryList } from "../../services/Funding/getAnniversaryList";
-import { getProductDetail } from "../../services/Products/products"
+import { getProductDetail } from "../../services/Products/products";
 
 import useFormDataStore from "../../components/Store/FormDataStore";
 import { useStore } from "../../components/Store/MakeStore";
@@ -31,10 +31,10 @@ export default function InitFundingDetail() {
       setAccessToken(token);
 
       //사용자 정보 가져오기
-      getUserInfo(token).then((data) => {
+      getConsumers().then((data) => {
         if (data) {
-          updateFormData("name", data.data.name);
-          updateFormData("phoneNumber", data.data.phoneNumber);
+          updateFormData("name", data.name);
+          updateFormData("phoneNumber", data.phoneNumber);
         }
       });
 
