@@ -4,6 +4,7 @@ import axiosInstance from "../../@common/axiosInstance";
 export const getAddressList = async () => {
   const response = await axiosInstance.get("/api/addresses");
   console.log("주소 리스트 데이터 조회 성공");
+  console.log(response.data.data);
   return response.data.data;
 };
 

@@ -15,7 +15,7 @@ import InputProfile from "./components/Login/InputProfile.jsx";
 import ParticipatePage from "./components/Funding/pages/ParticipatePage.jsx";
 
 import FriendFunding from "./components/Funding/pages/FriendFunding.jsx";
-import MyFunding from "./components/Funding/pages/MyFunding";
+import MyFunding from "./pages/Funding/MyFunding.jsx";
 import AccountListPage from "./pages/Funding/AccountListPage.jsx";
 import MakeFundingMain from "./pages/Funding/MakeFundingStep/MakeFundingMain.jsx";
 import ProductPage from "./pages/Products/ProductPage.jsx";
@@ -32,7 +32,7 @@ import Home from "./components/Home/Home.jsx";
 import MyFundingDetail from "./components/Funding/pages/MyFundingDetail.jsx";
 import FundingMain from "./pages/Funding/FundingMain.jsx";
 import StoryPage from "./components/Funding/pages/StoryPage.jsx";
-import MyPage from "./components/Funding/pages/MyPage.jsx";
+import MyPage from "./pages/Funding/MyPage.jsx";
 import AddressFormPage from "./pages/Funding/AddressFormPage.jsx";
 import Alarm from "./components/Home/Alarm.jsx";
 
