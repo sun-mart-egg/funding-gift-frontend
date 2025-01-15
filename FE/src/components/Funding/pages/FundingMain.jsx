@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 //Component
 import StoryList from "../component/StoryList";
 import FundingList from "../component/FundingList";
 import ScrollToTopButton from "../../UI/ScrollToTop";
+import StoryProfile from "../component/StoryProfile.jsx";
 
 //API
 import {
@@ -18,8 +20,15 @@ function FundingMain() {
   const [userInfo, setUserInfo] = useState({
     name: "",
     img: null,
+    id: null,
     // 추가 정보가 있다면 여기에 포함할 수 있습니다.
   });
+  const navigate = useNavigate();
+
+  //상세 스토리 navigate
+  const handleStoryClick = (consumerId) => {
+    navigate(`/story/${consumerId}`);
+  };
 
   useEffect(() => {
     //스토리 리스트 불러오기
@@ -34,6 +43,7 @@ function FundingMain() {
           ...userInfo,
           name: data.name,
           img: data.profileImageUrl,
+          id: data.id,
         });
       }
     });
@@ -49,16 +59,13 @@ function FundingMain() {
   return (
     <div className="sub-layer relative">
       <div className="story absolute inset-x-0 top-14 flex justify-start border-b border-gray-400 font-cusFont3 text-xs">
-        <div className="MyStory flex-none flex-col items-center justify-center p-4">
-          <img
-            src={userInfo.img}
-            alt={userInfo.name}
-            className="h-14 w-14 rounded-full" // 너비와 높이를 24로 설정
-          />
-          <p className="text-center">{userInfo.name}</p>
-        </div>
+        <StoryProfile
+          onClick={() => handleStoryClick(userInfo.id)}
+          name={userInfo.name}
+          img={userInfo.img}
+        />
         <div className="friendStory  flex overflow-x-auto">
-          <StoryList listData={storyList} />
+          <StoryList onClick={handleStoryClick} listData={storyList} />
         </div>
       </div>
 
