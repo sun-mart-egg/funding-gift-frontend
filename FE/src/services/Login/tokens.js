@@ -13,7 +13,9 @@ export const postFCMToken = async (fcmToken) => {
 // fcm-token 삭제
 export const deleteFCMToken = async (fcmToken) => {
   const response = await axiosInstance.delete("/api/fcm-tokens", {
-    fcmToken,
+    data: {
+      fcmToken,
+    },
   });
 
   console.log("fcm-token 삭제 완료");
