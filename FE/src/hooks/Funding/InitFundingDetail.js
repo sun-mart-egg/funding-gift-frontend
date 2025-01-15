@@ -33,8 +33,8 @@ export default function InitFundingDetail() {
       //사용자 정보 가져오기
       getConsumers().then((data) => {
         if (data) {
-          updateFormData("name", data.data.name);
-          updateFormData("phoneNumber", data.data.phoneNumber);
+          updateFormData("name", data.name);
+          updateFormData("phoneNumber", data.phoneNumber);
         }
       });
 
