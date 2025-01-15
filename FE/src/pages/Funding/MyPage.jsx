@@ -4,9 +4,9 @@ import { AiFillCamera } from "react-icons/ai";
 import { useNavigate } from "react-router";
 import { useMutation, useQuery } from "@tanstack/react-query"
 
-import { getConsumers, getInprogressFunding, postConsumerLogout } from "../../../services/Consumer/consumers";
-import { getAddressList } from "../../../services/Address/addresses";
-import { deleteFCMToken } from "../../../services/Login/tokens";
+import { getConsumers, getInprogressFunding, postConsumerLogout } from "../../services/Consumer/consumers";
+import { getAddressList } from "../../services/Address/addresses";
+import { deleteFCMToken } from "../../services/Login/tokens";
 
 function MyPage() {
   const myFCMToken = localStorage.getItem("fcm-token")
@@ -91,6 +91,7 @@ function MyPage() {
   const checkMyFunding = () => {
     if (isInprogress === true) {
       window.alert("진행 중 펀딩이 있습니다")
+      console.log(isInprogress)
     } else {
       signOut()
     }

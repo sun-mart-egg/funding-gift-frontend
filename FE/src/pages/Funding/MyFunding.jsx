@@ -1,14 +1,14 @@
 import { BsPeopleFill } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
-import SearchBar from "../../UI/SearchBar";
-import CardList from "../component/CardList";
+import SearchBar from "../../components/UI/SearchBar";
+import CardList from "../../components/Funding/component/CardList";
 import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 
 import { useQuery } from "@tanstack/react-query"
-import { getConsumers } from "../../../services/Consumer/consumers";
-import { getMyFundings, getMyAttendance } from "../../../services/Funding/fundings";
+import { getConsumers } from "../../services/Consumer/consumers";
+import { getMyFundings, getMyAttendance } from "../../services/Funding/fundings";
 
 function MyFunding() {
   const navigate = useNavigate();
