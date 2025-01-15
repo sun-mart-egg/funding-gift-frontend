@@ -1,140 +1,103 @@
-import { useState, useEffect } from "react";
-import egg from "/imgs/egg3.jpg";
+import { useState } from "react";
 import { IoLogOut } from "react-icons/io5";
 import { AiFillCamera } from "react-icons/ai";
-import axios from "axios";
 import { useNavigate } from "react-router";
+import { useMutation, useQuery } from "@tanstack/react-query"
+
+import { getConsumers, getInprogressFunding, postConsumerLogout } from "../../../services/Consumer/consumers";
+import { getAddressList } from "../../../services/Address/addresses";
+import { deleteFCMToken } from "../../../services/Login/tokens";
 
 function MyPage() {
+  const myFCMToken = localStorage.getItem("fcm-token")
   const navigate = useNavigate();
-  // 상태: 사용자가 현재 수정 모드에 있는지 추적
+  // 소비자 정보 수정 상태 ON / OFF
   const [isEditMode, setIsEditMode] = useState(false);
-  // 상태: 사용자 정보 (여기서는 이름만 사용)
-  const [userInfo, setUserInfo] = useState({
-    name: "",
-    anniversaryDate: "",
-    defaultAddr: "",
-    detailAddr: "",
-    zipCode: "",
-    accountBank: "하나은행",
-    accountNo: "1231231231231",
-    img: { egg },
-    // 추가 정보가 있다면 여기에 포함할 수 있습니다.
-  });
 
-  // 페이지 렌더링 시 사용자 정보 받아오기
-  useEffect(() => {
-    getMyData()
-    }, [])
-
-  // 이름, 생년월일, 주소 받기위한 다중 axios 요청
-  const getMyData = () => {
-    const profileData = axios.get(import.meta.env.VITE_BASE_URL + "/api/consumers",
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access-token")}`,
-        },
-      })
-    
-    const addressData = axios.get(import.meta.env.VITE_BASE_URL + "/api/addresses", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access-token")}`,
-      },
-    })
-    
-    Promise.all([profileData, addressData])
-    .then(axios.spread((res1, res2) => {
-      setUserInfo({
-        ...userInfo,
-        name: res1.data.data.name,
-        anniversaryDate: `${res1.data.data.birthyear}-${(res1.data.data.birthday).slice(0, 2)}-${(res1.data.data.birthday).slice(2)}`,
-        img: res1.data.data.profileImageUrl,
-        zipCode: res2.data.data[0].zipCode,
-        defaultAddr: res2.data.data[0].defaultAddr,
-        detailAddr: res2.data.data[0].detailAddr
-      })
-    }))
-    .catch((err) => {
-      console.error(err)
-      console.log("둘 중 하나 조회 안됌")
-    })
-  }
-    
   // 수정 버튼 클릭 시 호출될 함수
   const handleEditClick = () => {
     setIsEditMode(!isEditMode);
   };
 
+  // 소비자 정보 쿼리
+  const { data: userInfo = [] } = useQuery({
+    queryKey: ["소비자 정보"],
+    queryFn: getConsumers,
+    onError: (err) => {
+      console.error("소비자 정보 요청 실패", err)
+    },
+  });
+
+  // 소비자 주소 정보 목록 호출 쿼리
+  const { data: addressInfo = [], isLoading } = useQuery({
+    queryKey: ["소비자 주소 정보"],
+    queryFn: getAddressList,
+    onError: (err) => {
+      console.error("주소 정보 요청 실패", err)
+    },
+  });
+
+  // 진행 중 펀딩 확인 쿼리
+  const { data: isInprogress } = useQuery({
+    queryKey: ["진행 중 펀딩"],
+    queryFn: getInprogressFunding,
+    onError: (err) => {
+      console.error("진행 중 펀딩 확인 실패", err)
+    },
+  });
+
+  // 로그아웃 요청 mutate
+  const logOutMutate = useMutation({
+    mutationFn: postConsumerLogout,
+    onSuccess: () => {
+      console.log("로그아웃 되었습니다.")
+      window.alert("로그아웃!")
+    },
+    onError: (err) => {
+      console.error("로그아웃 실패", err)
+    },
+  });
+
+  // fcm-token 삭제 요청 mutate
+  const deleteTokenMutate = useMutation({
+    mutationFn: () => deleteFCMToken(myFCMToken),
+    onSuccess: () => {
+      console.log("fcm-token 삭제 완료")
+    },
+    onError: (err) => {
+      console.error("fcm-token 삭제 실패", err)
+    },
+  });
+
   // 사용자 이름 변경 시 호출될 함수
-  const handleNameChange = (event) => {
-    setUserInfo({ ...userInfo, name: event.target.value });
+  // 수정 필요
+  const handleNameChange = () => {
+    // setUserInfo({ ...userInfo, name: event.target.value });
   };
 
-  // 로그아웃과 fcm토큰 삭제를 한번에?
-  const totalLogOut = () => {
-
-    // 로그아웃 axios 요청
-    const logOut = axios
-      .post(import.meta.env.VITE_BASE_URL + "/api/consumers/logout", null, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access-token")}`,
-        },
-      })
-
-    // fcm 토큰 지우기
-    const deleteFCM =
-      axios.delete(import.meta.env.VITE_BASE_URL + "/api/fcm-tokens", {
-        data: {
-          "fcmToken": localStorage.getItem("fcm-token")
-        },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access-token")}`,
-        }
-      })
-
-
-    Promise.all([logOut, deleteFCM])
-      // 두 요청이 성공했을 경우
-      .then(axios.spread((res1, res2) => {
-        console.log(res1) // 로그아웃 성공했을 때 res
-        console.log(res2) // fcm-token 삭제 성공했을 때 res
-
-        localStorage.clear() // 로컬 스토리지 초기화
-        navigate("/") // 로그아웃 성공했으면 메인으로 날라감
-      }))
-      .catch((err) => {
-        console.error(err)
-        console.log("둘 중 하나는 실패했다.")
-      })
+  // 로그아웃 요청
+  // 로그아웃 요청 성공 -> FCM토큰 삭제 성공 -> 로컬스토리지 클리어 and 홈 화면으로 이동
+  const handleLogOut = async () => {
+    await Promise.all([
+      logOutMutate.mutateAsync(),
+      deleteTokenMutate.mutateAsync(myFCMToken),
+    ])
+    localStorage.clear();
+    navigate("/")
   };
-
-
 
   // 진행중인 펀딩이 있는지 확인하고
   // 펀딩이 있는 경우 회원탈퇴 못해요 ^^
   const checkMyFunding = () => {
-    axios.get(import.meta.env.VITE_BASE_URL + "/api/consumers/in-progress-funding", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access-token")}`,
-      },
-    })
-      .then((res) => {
-        if (res.data.data) {
-          alert("너 진행중인 펀딩 있어")
-        }
-        else {
-          signOut()
-        }
-      })
-      .catch((err) => {
-        console.error(err)
-        console.log("진행중인 펀딩 확인 에러")
-      })
-  }
+    if (isInprogress === true) {
+      window.alert("진행 중 펀딩이 있습니다")
+    } else {
+      signOut()
+    }
+  };
 
   // 회원탈퇴 관련 ( 카카오과의 연결을 끊음 )
-  const BYE_BYE_URL =
-    "https://j10d201.p.ssafy.io/oauth2/authorization/kakao?redirect_uri=https://j10d201.p.ssafy.io&mode=unlink";
+  const BYE_BYE_URL = import.meta.env.VITE_KAKAO_SIGN_OUT;
 
   const signOut = () => {
     localStorage.clear();
@@ -151,7 +114,7 @@ function MyPage() {
           <div className="absolute flex items-center w-full px-6 head top-20">
             <div className="relative mr-4 ">
               <img
-                src={userInfo.img}
+                src={userInfo.profileImageUrl}
                 alt=""
                 className=" h-[80px] w-[80px] rounded-full"
               />
@@ -180,7 +143,7 @@ function MyPage() {
               </div>
               <div className="sub-content">
                 <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
-                  {userInfo.anniversaryDate}
+                {userInfo.birthyear}-{String(userInfo.birthday).slice(0, 2)}-{String(userInfo.birthday).slice(2)}
                 </p>
               </div>
             </div>
@@ -192,7 +155,7 @@ function MyPage() {
                 </button>
               </div>
               <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
-                {userInfo.defaultAddr} {userInfo.detailAddr} {userInfo.zipCode}
+              {addressInfo[0].defaultAddr} {addressInfo[0].detailAddr} / {addressInfo[0].zipCode}
               </p>
             </div>
             <div className="account">
@@ -227,11 +190,11 @@ function MyPage() {
           </div>
         </>
       ) : (
+        // 수정 모드 비활성화
         <>
-          {/* head 입니다. */}
           <div className="absolute flex items-center w-full px-6 head top-20">
             <img
-              src={userInfo.img}
+              src={userInfo.profileImageUrl}
               alt=""
               className=" mr-4 h-[80px] w-[80px] rounded-full"
             />
@@ -241,7 +204,7 @@ function MyPage() {
               </p>
               <button
                 className="flex flex-col items-center justify-center"
-                onClick={totalLogOut}
+                onClick={handleLogOut}
               >
                 <IoLogOut className="text-[25px]" />
                 <p className="text-[10px]">로그아웃</p>
@@ -249,14 +212,13 @@ function MyPage() {
             </div>
           </div>
 
-          {/* Content 입니다. */}
           <div className="absolute w-full px-6 content top-52">
             <div className="birthday">
               <div className="sub-title">
                 <p>생일</p>
               </div>
               <p className="mr-1 w-full rounded-md bg-[#EFEFEF] p-3 px-2 font-cusFont3 text-[14px]">
-                {userInfo.anniversaryDate}
+                {userInfo.birthyear}-{String(userInfo.birthday).slice(0, 2)}-{String(userInfo.birthday).slice(2)}
               </p>
             </div>
             <div className="pt-6 address">
@@ -264,7 +226,13 @@ function MyPage() {
                 <p>기본 주소</p>
               </div>
               <p className="mr-1 w-full rounded-md bg-[#EFEFEF] p-3 px-2 font-cusFont3 text-[14px]">
-                {userInfo.defaultAddr} {userInfo.detailAddr} / {userInfo.zipCode}
+                {isLoading ? (
+                  "로딩 중..."
+                ) : addressInfo.length > 0 ? (
+                  `${addressInfo[0].defaultAddr} ${addressInfo[0].detailAddr} / ${addressInfo[0].zipCode}`
+                ) : (
+                  "주소 정보가 없습니다."
+                ) }
               </p>
             </div>
             <div className="pt-6 account">
@@ -273,7 +241,8 @@ function MyPage() {
               </div>
 
               <p className="mr-1 w-full rounded-md  bg-[#EFEFEF]  p-3 px-2 font-cusFont3 text-[14px] ">
-                {userInfo.accountBank} {userInfo.accountNo}
+                {/* {userInfo.accountBank} {userInfo.accountNo} */}
+                ⚠ 계좌 정보를 추가해야 합니다. ⚠
               </p>
             </div>
           </div>
