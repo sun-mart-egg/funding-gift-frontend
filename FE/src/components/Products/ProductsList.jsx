@@ -9,7 +9,7 @@ import NoSearchResult from '/imgs/no_search_result.png'
 import { getProducts } from "../../services/Products/products.js"
 import { formattedPrice, formattedReviewCnt } from '../../@common/formattedNumber.js';
 
-function ProductComponent({ categoryId, keyword, sort }) {
+function ProductsList({ categoryId, keyword, sort }) {
   const observer = useRef();
 
   // 상품 목록 호출 쿼리 + 무한 스크롤
@@ -89,4 +89,4 @@ function ProductComponent({ categoryId, keyword, sort }) {
   );
 }
 
-export default ProductComponent;
+export default ProductsList;
