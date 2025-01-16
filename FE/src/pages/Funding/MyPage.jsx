@@ -2,14 +2,19 @@ import { useState } from "react";
 import { IoLogOut } from "react-icons/io5";
 import { AiFillCamera } from "react-icons/ai";
 import { useNavigate } from "react-router";
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { getConsumers, getInprogressFunding, postConsumerLogout } from "../../services/Consumer/consumers";
+import {
+  getConsumers,
+  getInprogressFunding,
+  postConsumerLogout,
+  putConsumers,
+} from "../../services/Consumer/consumers";
 import { getAddressList } from "../../services/Address/addresses";
 import { deleteFCMToken } from "../../services/Login/tokens";
 
 function MyPage() {
-  const myFCMToken = localStorage.getItem("fcm-token")
+  const myFCMToken = localStorage.getItem("fcm-token");
   const navigate = useNavigate();
   // 소비자 정보 수정 상태 ON / OFF
   const [isEditMode, setIsEditMode] = useState(false);
@@ -24,7 +29,7 @@ function MyPage() {
     queryKey: ["소비자 정보"],
     queryFn: getConsumers,
     onError: (err) => {
-      console.error("소비자 정보 요청 실패", err)
+      console.error("소비자 정보 요청 실패", err);
     },
   });
 
@@ -33,7 +38,7 @@ function MyPage() {
     queryKey: ["소비자 주소 정보"],
     queryFn: getAddressList,
     onError: (err) => {
-      console.error("주소 정보 요청 실패", err)
+      console.error("주소 정보 요청 실패", err);
     },
   });
 
@@ -42,7 +47,7 @@ function MyPage() {
     queryKey: ["진행 중 펀딩"],
     queryFn: getInprogressFunding,
     onError: (err) => {
-      console.error("진행 중 펀딩 확인 실패", err)
+      console.error("진행 중 펀딩 확인 실패", err);
     },
   });
 
@@ -50,11 +55,11 @@ function MyPage() {
   const logOutMutate = useMutation({
     mutationFn: postConsumerLogout,
     onSuccess: () => {
-      console.log("로그아웃 되었습니다.")
-      window.alert("로그아웃!")
+      console.log("로그아웃 되었습니다.");
+      window.alert("로그아웃!");
     },
     onError: (err) => {
-      console.error("로그아웃 실패", err)
+      console.error("로그아웃 실패", err);
     },
   });
 
@@ -62,10 +67,22 @@ function MyPage() {
   const deleteTokenMutate = useMutation({
     mutationFn: () => deleteFCMToken(myFCMToken),
     onSuccess: () => {
-      console.log("fcm-token 삭제 완료")
+      console.log("fcm-token 삭제 완료");
     },
     onError: (err) => {
-      console.error("fcm-token 삭제 실패", err)
+      console.error("fcm-token 삭제 실패", err);
+    },
+  });
+
+  // 소비자 정보 수정 요청 mutate
+  const editConsumerInfo = useMutation({
+    mutationFn: ({ name, email, phoneNumber, birthyear, birthday, gender }) =>
+      putConsumers(name, email, phoneNumber, birthyear, birthday, gender),
+    onSuccess: () => {
+      console.log("정보 수정 완료");
+    },
+    onError: (err) => {
+      console.error("정보 수정 실패", err);
     },
   });
 
@@ -81,19 +98,19 @@ function MyPage() {
     await Promise.all([
       logOutMutate.mutateAsync(),
       deleteTokenMutate.mutateAsync(myFCMToken),
-    ])
+    ]);
     localStorage.clear();
-    navigate("/")
+    navigate("/");
   };
 
   // 진행중인 펀딩이 있는지 확인하고
   // 펀딩이 있는 경우 회원탈퇴 못해요 ^^
   const checkMyFunding = () => {
     if (isInprogress === true) {
-      window.alert("진행 중 펀딩이 있습니다")
-      console.log(isInprogress)
+      window.alert("진행 중 펀딩이 있습니다");
+      console.log(isInprogress);
     } else {
-      signOut()
+      signOut();
     }
   };
 
@@ -104,7 +121,7 @@ function MyPage() {
     localStorage.clear();
     window.location.replace(BYE_BYE_URL);
     console.log("카카오측과의 연결을 끊었습니다.");
-    navigate("/")
+    navigate("/");
   };
 
   return (
@@ -112,7 +129,7 @@ function MyPage() {
       {isEditMode ? (
         // 수정 모드 활성화 시 보여줄 UI
         <>
-          <div className="absolute flex items-center w-full px-6 head top-20">
+          <div className="head absolute top-20 flex w-full items-center px-6">
             <div className="relative mr-4 ">
               <img
                 src={userInfo.profileImageUrl}
@@ -134,7 +151,7 @@ function MyPage() {
               />
             </div>
           </div>
-          <div className="absolute w-full px-6 content top-52 font-cusFont3">
+          <div className="content absolute top-52 w-full px-6 font-cusFont3">
             <div className="birthday">
               <div className="sub-title">
                 <p>생일</p>{" "}
@@ -144,30 +161,33 @@ function MyPage() {
               </div>
               <div className="sub-content">
                 <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
-                {userInfo.birthyear}-{String(userInfo.birthday).slice(0, 2)}-{String(userInfo.birthday).slice(2)}
+                  {userInfo.birthyear}-{String(userInfo.birthday).slice(0, 2)}-
+                  {String(userInfo.birthday).slice(2)}
                 </p>
               </div>
             </div>
             <div className="address">
-              <div className="pt-6 sub-title ">
+              <div className="sub-title pt-6 ">
                 <p>기본 주소</p>{" "}
                 <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
                   기본 주소 선택
                 </button>
               </div>
               <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
-              {addressInfo[0].defaultAddr} {addressInfo[0].detailAddr} / {addressInfo[0].zipCode}
+                {addressInfo[0].defaultAddr} {addressInfo[0].detailAddr} /{" "}
+                {addressInfo[0].zipCode}
               </p>
             </div>
             <div className="account">
-              <div className="pt-6 sub-title">
+              <div className="sub-title pt-6">
                 <p>기본 계좌</p>{" "}
                 <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
                   기본 계좌 선택
                 </button>
               </div>
               <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
-                {userInfo.accountBank} {userInfo.accountNo}
+                {/* {userInfo.accountBank} {userInfo.accountNo} */}⚠ 계좌
+                정보를 추가해야 합니다. ⚠
               </p>
             </div>
           </div>
@@ -179,7 +199,7 @@ function MyPage() {
           </button>
           <div
             id="buttonSection"
-            className="absolute bottom-0 flex flex-col items-center justify-around w-full pb-5"
+            className="absolute bottom-0 flex w-full flex-col items-center justify-around pb-5"
           >
             <button
               onClick={handleEditClick}
@@ -193,7 +213,7 @@ function MyPage() {
       ) : (
         // 수정 모드 비활성화
         <>
-          <div className="absolute flex items-center w-full px-6 head top-20">
+          <div className="head absolute top-20 flex w-full items-center px-6">
             <img
               src={userInfo.profileImageUrl}
               alt=""
@@ -213,43 +233,42 @@ function MyPage() {
             </div>
           </div>
 
-          <div className="absolute w-full px-6 content top-52">
+          <div className="content absolute top-52 w-full px-6">
             <div className="birthday">
               <div className="sub-title">
                 <p>생일</p>
               </div>
               <p className="mr-1 w-full rounded-md bg-[#EFEFEF] p-3 px-2 font-cusFont3 text-[14px]">
-                {userInfo.birthyear}-{String(userInfo.birthday).slice(0, 2)}-{String(userInfo.birthday).slice(2)}
+                {userInfo.birthyear}-{String(userInfo.birthday).slice(0, 2)}-
+                {String(userInfo.birthday).slice(2)}
               </p>
             </div>
-            <div className="pt-6 address">
+            <div className="address pt-6">
               <div className="sub-title">
                 <p>기본 주소</p>
               </div>
               <p className="mr-1 w-full rounded-md bg-[#EFEFEF] p-3 px-2 font-cusFont3 text-[14px]">
-                {isLoading ? (
-                  "로딩 중..."
-                ) : addressInfo.length > 0 ? (
-                  `${addressInfo[0].defaultAddr} ${addressInfo[0].detailAddr} / ${addressInfo[0].zipCode}`
-                ) : (
-                  "주소 정보가 없습니다."
-                ) }
+                {isLoading
+                  ? "로딩 중..."
+                  : addressInfo.length > 0
+                    ? `${addressInfo[0].defaultAddr} ${addressInfo[0].detailAddr} / ${addressInfo[0].zipCode}`
+                    : "주소 정보가 없습니다."}
               </p>
             </div>
-            <div className="pt-6 account">
+            <div className="account pt-6">
               <div className="sub-title">
                 <p>기본 계좌</p>
               </div>
 
               <p className="mr-1 w-full rounded-md  bg-[#EFEFEF]  p-3 px-2 font-cusFont3 text-[14px] ">
-                {/* {userInfo.accountBank} {userInfo.accountNo} */}
-                ⚠ 계좌 정보를 추가해야 합니다. ⚠
+                {/* {userInfo.accountBank} {userInfo.accountNo} */}⚠ 계좌
+                정보를 추가해야 합니다. ⚠
               </p>
             </div>
           </div>
           <div
             id="buttonSection"
-            className="absolute bottom-0 flex flex-col items-center justify-around w-full pb-5"
+            className="absolute bottom-0 flex w-full flex-col items-center justify-around pb-5"
           >
             <button
               onClick={handleEditClick}
