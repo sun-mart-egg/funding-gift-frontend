@@ -1,8 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
+//Image
 import egg from "/imgs/egg3.jpg";
+
+//Component
 import ProgressBar from "../component/ProgressBar";
-import { getStory } from "../api/StoryAPI"; // API 호출 함수를 임포트합니다.
+
+//API
+import { getStory } from "../../../services/Friends/story";
+// import { getStory } from "../api/StoryAPI"; // API 호출 함수를 임포트합니다.
+
+//ICON
 import { IoClose } from "react-icons/io5";
 import { HiMiniBackward } from "react-icons/hi2";
 import { HiMiniForward } from "react-icons/hi2";
@@ -36,8 +45,8 @@ function StoryPage() {
   }, [stories]);
 
   useEffect(() => {
-    const token = localStorage.getItem("access-token");
-    getStory(token, selectedItem).then((data) => {
+    // const token = localStorage.getItem("access-token");
+    getStory(selectedItem).then((data) => {
       if (data && data.length > 0) {
         setStories(data);
       } else {
