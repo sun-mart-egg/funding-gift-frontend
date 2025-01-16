@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 //Component
-import StoryList from "../../components/Funding/component/StoryList";
-import FundingList from "../../components/Funding/component/FundingList";
+import StoryList from "../../components/Funding/component/StoryList.jsx";
+import FundingList from "../../components/Funding/component/FundingList.jsx";
 import ScrollToTopButton from "../../components/UI/ScrollToTop.jsx";
 import StoryProfile from "../../components/Funding/component/StoryProfile.jsx";
 
@@ -12,9 +12,9 @@ import {
   getStoryList,
   getFundingFeed,
 } from "../../services/Funding/fundingMain.js";
-import { getConsumers } from "../../services/Consumer/consumers";
+import { getConsumers } from "../../services/Consumer/consumers.js";
 
-function FundingMain() {
+function StoryMain() {
   const [storyList, setStoryList] = useState([]); // 친구목록 받아올 배열
   const [feedData, setFeedData] = useState([]);
   const [userInfo, setUserInfo] = useState({
@@ -77,4 +77,4 @@ function FundingMain() {
   );
 }
 
-export default FundingMain;
+export default StoryMain;

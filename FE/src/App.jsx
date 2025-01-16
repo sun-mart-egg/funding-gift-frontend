@@ -30,8 +30,8 @@ import MakeFundingDetail from "./pages/Funding/MakeFundingStep/MakeFundingDetail
 import MakeFundingFinish from "./pages/Funding/MakeFundingStep/MakeFundingFinish.jsx";
 import Home from "./components/Home/Home.jsx";
 import MyFundingDetail from "./components/Funding/pages/MyFundingDetail.jsx";
-import FundingMain from "./pages/Funding/FundingMain.jsx";
-import StoryPage from "./components/Funding/pages/StoryPage.jsx";
+import StoryMain from "./pages/Story/StoryMain.jsx";
+import StoryPage from "./pages/Story/StoryPage.jsx";
 import MyPage from "./pages/Funding/MyPage.jsx";
 import AddressFormPage from "./pages/Funding/AddressFormPage.jsx";
 import Alarm from "./components/Home/Alarm.jsx";
@@ -47,7 +47,7 @@ function App() {
             <Route path="/my-funding" element={<MyFunding />} />
 
             <Route path="/product" element={<ProductPage />} />
-            <Route path="/funding" element={<FundingMain />} />
+            <Route path="/funding" element={<StoryMain />} />
           </Route>
 
           <Route element={<SubLayout />}>

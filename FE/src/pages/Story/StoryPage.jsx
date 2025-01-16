@@ -5,47 +5,61 @@ import { useNavigate, useParams } from "react-router-dom";
 import egg from "/imgs/egg3.jpg";
 
 //Component
-import ProgressBar from "../component/ProgressBar";
+import ProgressBar from "../../components/Funding/component/ProgressBar";
 
 //API
-import { getStory } from "../../../services/Friends/story";
+import { getStory } from "../../services/Friends/story";
 // import { getStory } from "../api/StoryAPI"; // API 호출 함수를 임포트합니다.
 
 //ICON
 import { IoClose } from "react-icons/io5";
 import { HiMiniBackward } from "react-icons/hi2";
 import { HiMiniForward } from "react-icons/hi2";
+
 function StoryPage() {
   const { selectedItem } = useParams(); // URL에서 selectedItem 값을 추출합니다.
-  const [stories, setStories] = useState([]);
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  const [stories, setStories] = useState([]); //사용자의 스토리들을 받아올 배열
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0); //현재 스토리 인덱스 저장
+  const currentStory = stories[currentStoryIndex]; //현재 스토리 변수
   const [progress, setProgress] = useState(0); // 프로그레스 상태 초기화
   const navigate = useNavigate();
 
+  //인덱스 업데이트
+  const updateStoryIndex = (index) => {
+    setCurrentStoryIndex(index);
+    setProgress(0);
+  };
+
+  //이전 스토리로 이동
   const goToPreviousStory = () => {
     if (currentStoryIndex > 0) {
-      setCurrentStoryIndex(currentStoryIndex - 1);
-      setProgress(0);
+      updateStoryIndex(currentStoryIndex - 1);
     } else {
       alert("첫 스토리 입니다.");
     }
   };
 
+  //다음 스토리로 이동
   const goToNextStory = () => {
     if (currentStoryIndex < stories.length - 1) {
-      setCurrentStoryIndex(currentStoryIndex + 1);
-      setProgress(0);
+      updateStoryIndex(currentStoryIndex + 1);
     } else {
       alert("마지막 스토리 입니다.");
     }
   };
 
-  useEffect(() => {
-    console.log("현재 stories 상태:", stories);
-  }, [stories]);
+  //시간이 다 되면 스토리 바꾸기 + 모든 스토리 확인했을 경우
+  const changeStory = () => {
+    if (currentStoryIndex >= stories.length - 1) {
+      alert("모든 스토리를 확인하셨습니다.");
+      navigate("/funding");
+    } else {
+      goToNextStory();
+    }
+  };
 
+  //스토리 가져와서 Stories list에 추가하기
   useEffect(() => {
-    // const token = localStorage.getItem("access-token");
     getStory(selectedItem).then((data) => {
       if (data && data.length > 0) {
         setStories(data);
@@ -56,6 +70,7 @@ function StoryPage() {
     });
   }, [selectedItem, navigate]);
 
+  //시간이 지나면 다음 스토리로 넘어가기
   useEffect(() => {
     if (stories.length > 0) {
       const progressInterval = setInterval(() => {
@@ -75,21 +90,14 @@ function StoryPage() {
     }
   }, [currentStoryIndex, stories.length]);
 
-  const changeStory = () => {
-    if (currentStoryIndex >= stories.length - 1) {
-      alert("모든 스토리를 확인하셨습니다.");
-      navigate("/funding");
-    } else {
-      setCurrentStoryIndex(currentStoryIndex + 1);
-      setProgress(0);
-    }
-  };
-
+  //스토리가 아직 로딩이 안되었을때 로딩중 출력
   if (stories.length === 0) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
   }
-
-  const currentStory = stories[currentStoryIndex];
 
   return (
     <div
