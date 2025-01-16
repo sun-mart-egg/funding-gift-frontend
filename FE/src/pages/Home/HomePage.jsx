@@ -1,5 +1,5 @@
 import { useState, useEffect, } from "react";
-import SearchBar from "../UI/SearchBar";
+import SearchBar from "../../components/UI/SearchBar";
 import { useNavigate } from "react-router-dom";
 
 import CatIcon from "/imgs/cat.PNG";
@@ -8,8 +8,8 @@ import BannerImage1 from "/imgs/banner_image1.png";
 import BannerImage2 from "/imgs/banner_image2.png";
 import BannerImage3 from "/imgs/banner_image3.png";
 
-import HomeProduct from "./HomeProduct";
-import ScrollUpButton from "../UI/ScrollUpButton";
+import HomeProductsList from "../../components/Home/HomeProductsList";
+import ScrollUpButton from "../../components/UI/ScrollUpButton";
 
 import { initializeApp } from "firebase/app";
 import { getMessaging, onMessage } from "firebase/messaging";
@@ -130,7 +130,7 @@ function Home() {
       <div className="ml-[5%] mt-[10px] w-[95%] text-left">
         <p className="mt-[10px] font-cusFont5 text-[30px]">추천 상품</p>
         <div>
-          <HomeProduct />
+          <HomeProductsList />
         </div>
       </div>
 

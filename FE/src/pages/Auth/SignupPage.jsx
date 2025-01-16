@@ -3,7 +3,7 @@ import SignupLogo from "/imgs/signupLogo.png";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import DaumPostcodeEmbed from "react-daum-postcode";
-import useUserStore from "../Store/UserStore.jsx";
+import useUserStore from "../../components/Store/UserStore.jsx";
 import { useMutation } from "@tanstack/react-query";
 import { postAddress } from "../../services/Address/addresses.js";
 

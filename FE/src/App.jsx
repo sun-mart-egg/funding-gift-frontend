@@ -7,11 +7,11 @@ import SubLayout from "./components/UI/SubLayout.jsx";
 import FriendPage from "./pages/Friends/FriendsPage.jsx";
 import CalendarPage from "./pages/Calendar/CalendarPage.jsx";
 
-import Login from "./components/Login/LoginPage.jsx";
-import LoginCallback from "./components/Login/LoginCallback.jsx";
-import Signup from "./components/Login/Signup.jsx";
-import SignupFinish from "./components/Login/SignupFinish.jsx";
-import InputProfile from "./components/Login/InputProfile.jsx";
+import Login from "./pages/Auth/LoginPage.jsx";
+import LoginCallback from "./components/Auth/LoginCallback.jsx";
+import SignupPage from "./pages/Auth/SignupPage.jsx";
+import SignupFinish from "./components/Auth/SignupFinish.jsx";
+import InputProfile from "./components/Auth/InputProfile.jsx";
 import ParticipatePage from "./components/Funding/pages/ParticipatePage.jsx";
 
 import FriendFunding from "./components/Funding/pages/FriendFunding.jsx";
@@ -20,7 +20,6 @@ import AccountListPage from "./pages/Funding/AccountListPage.jsx";
 import MakeFundingMain from "./pages/Funding/MakeFundingStep/MakeFundingMain.jsx";
 import ProductPage from "./pages/Products/ProductPage.jsx";
 import ProductDetail from "./pages/Products/ProductDetailPage.jsx";
-import BrandStore from "./components/Products/BrandStore";
 import Wishlist from "./components/Products/Wishlist";
 import AddressListPage from "./pages/Funding/AddressListPage.jsx";
 import FriendFundingDetail from "./components/Funding/pages/FriendFundingDetail.jsx";
@@ -28,13 +27,12 @@ import ParticipateFundingFinish from "./components/Funding/pages/ParticipateFund
 import Paypage from "./components/Funding/pages/Paypage.jsx";
 import MakeFundingDetail from "./pages/Funding/MakeFundingStep/MakeFundingDetail.jsx";
 import MakeFundingFinish from "./pages/Funding/MakeFundingStep/MakeFundingFinish.jsx";
-import Home from "./components/Home/Home.jsx";
+import HomePage from "./pages/Home/HomePage.jsx";
 import MyFundingDetail from "./components/Funding/pages/MyFundingDetail.jsx";
 import FundingMain from "./pages/Funding/FundingMain.jsx";
 import StoryPage from "./components/Funding/pages/StoryPage.jsx";
 import MyPage from "./pages/Funding/MyPage.jsx";
 import AddressFormPage from "./pages/Funding/AddressFormPage.jsx";
-import Alarm from "./components/Home/Alarm.jsx";
 
 function App() {
   const queryClient = new QueryClient();
@@ -43,7 +41,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<MainLayout />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/my-funding" element={<MyFunding />} />
 
             <Route path="/product" element={<ProductPage />} />
@@ -52,7 +50,7 @@ function App() {
 
           <Route element={<SubLayout />}>
             <Route path="/login-page" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/signup" element={<SignupPage />} />
             <Route path="/input-profile" element={<InputProfile />} />
             <Route path="/signupFin" element={<SignupFinish />} />
             <Route path="/make-funding-main" element={<MakeFundingMain />} />
@@ -70,7 +68,6 @@ function App() {
               element={<FriendFundingDetail />}
             />
             <Route path="/my-page" element={<MyPage />} />
-            <Route path="/alarm" element={<Alarm />} />
             <Route
               path="/make-funding-detail"
               element={<MakeFundingDetail />}
@@ -95,7 +92,6 @@ function App() {
             />
             <Route path="/pay" element={<Paypage />} />
             <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/brand/:brandId" element={<BrandStore />} />
           </Route>
 
           <Route path="/login-callback" element={<LoginCallback />} />

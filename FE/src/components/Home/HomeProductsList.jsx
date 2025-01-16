@@ -4,31 +4,30 @@ import { useInfiniteQuery } from "@tanstack/react-query"
 
 import Star from '/imgs/star.png';
 import ImageComingSoon from '/imgs/image_coming_soon.png'
-import NoSearchResult from '/imgs/no_search_result.png'
+import { getRecommendProducts } from '../../services/Products/products';
+import { formattedPrice, formattedReviewCnt } from '../../@common/formattedNumber';
 
-import { getProducts } from "../../services/Products/products.js"
-import { formattedPrice, formattedReviewCnt } from '../../@common/formattedNumber.js';
-
-function ProductComponent({ categoryId, keyword, sort }) {
+function HomeProductsListsList() {
   const observer = useRef();
 
-  // 상품 목록 호출 쿼리 + 무한 스크롤
-  const { data = { pages: [] }, fetchNextPage, hasNextPage, isLoading} = useInfiniteQuery({
-    queryKey: ["products", categoryId, keyword, sort],
+  // 추천상품 호출 + 무한 스크롤 쿼리
+  const { data = { pages: [] }, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery({
+    queryKey: ["products"],
     queryFn: async ({ pageParam = 0 }) => {
-      const response = await getProducts({categoryId, keyword, page:pageParam, size:10, sort});
-      console.log("상품목록 무한 스크롤 작동 확인 문구")
-      return response
+      const response = await getRecommendProducts(pageParam, 10);
+      console.log("추천상품 무한 스크롤 작동")
+      return response;
     },
-    getNextPageParam: (lastPage) => {
-      return lastPage.hasNext ? lastPage.page + 1 : undefined;
-    },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.hasNext ? allPages.length : undefined;
+    }
   });
 
-  // 상품 목록 데이터
+  // 상품 정보 데이터 평탄화 작업
+  // 기존 페이지의 상품 + 다음 페이지의 상품 데이터를 하나의 배열로 합쳐준다
   const products = data.pages.flatMap(page => page.data)
 
-  // 시점 고정
+  // 이전에 보고있던 위치에 스크롤을 멈춰줌
   const lastProductElementRef = useCallback(node => {
     if (isLoading || !hasNextPage) return;
     if (observer.current) observer.current.disconnect();
@@ -40,22 +39,8 @@ function ProductComponent({ categoryId, keyword, sort }) {
     if (node) observer.current.observe(node);
   }, [isLoading, hasNextPage]);
 
-  // 검색 결과에 없을 때
-  const renderNoResultsMessage = () => {
-    if (!isLoading && products.length === 0) {
-      return (
-        <div className='w-full h-full text-center flex flex-col items-center' style={{ backgroundColor: '#FFFBE8' }}>
-          <p className='text-4xl font-cusFont4 pt-[30px]'>검색 결과가 없습니다.</p>
-          <img src={NoSearchResult} className='w-[90%] h-auto'></img>
-        </div>
-
-      )
-    }
-    return null;
-  };
-
   return (
-    <div className="mt-4 flex min-h-[63%] w-[95.5%] flex-grow flex-wrap justify-center overflow-y-auto bg-white font-cusfont2">
+    <div className="flex min-h-[63%] w-[95.5%] flex-grow flex-wrap justify-center overflow-y-auto bg-white font-cusfont2">
       {products.map((product, index) => (
         <div
           key={`${product.productId}-${index}`}
@@ -84,9 +69,8 @@ function ProductComponent({ categoryId, keyword, sort }) {
         </div>
       ))}
       {isLoading && <p>Loading more products...</p>}
-      {renderNoResultsMessage()} {/* 검색 결과가 없을 때 메시지 표시 */}
     </div>
   );
 }
 
-export default ProductComponent;
+export default HomeProductsListsList;
