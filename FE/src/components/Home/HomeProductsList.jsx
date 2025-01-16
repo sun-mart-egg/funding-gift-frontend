@@ -7,7 +7,7 @@ import ImageComingSoon from '/imgs/image_coming_soon.png'
 import { getRecommendProducts } from '../../services/Products/products';
 import { formattedPrice, formattedReviewCnt } from '../../@common/formattedNumber';
 
-function ProductComponent({ categoryId, keyword, sort }) {
+function HomeProductsListsList() {
   const observer = useRef();
 
   // 추천상품 호출 + 무한 스크롤 쿼리
@@ -73,4 +73,4 @@ function ProductComponent({ categoryId, keyword, sort }) {
   );
 }
 
-export default ProductComponent;
+export default HomeProductsListsList;
