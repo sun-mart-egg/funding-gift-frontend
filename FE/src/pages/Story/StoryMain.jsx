@@ -8,10 +8,8 @@ import ScrollToTopButton from "../../components/UI/ScrollToTop.jsx";
 import StoryProfile from "../../components/Funding/component/StoryProfile.jsx";
 
 //API
-import {
-  getStoryList,
-  getFundingFeed,
-} from "../../services/Funding/fundingMain.js";
+
+import { getStoryList, getFundingFeed } from "../../services/Funding/story.js";
 import { getConsumers } from "../../services/Consumer/consumers.js";
 
 function StoryMain() {

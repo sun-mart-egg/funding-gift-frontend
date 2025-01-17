@@ -40,31 +40,6 @@ async function fetchMyFundings(token, setMyFundings, setIsLoading) {
   }
 }
 
-//친구 펀딩 조회 api
-async function fetchFriendFunding(friendId, token, setData) {
-  if (friendId !== "Unknown") {
-    try {
-      const params = new URLSearchParams({
-        "friend-consumer-id": friendId,
-        page: "0",
-        size: "100",
-        sort: "",
-      });
-      const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/api/fundings/friend-fundings?${params.toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      setData(response.data.data.data);
-    } catch (error) {
-      console.error("친구 펀딩을 불러오는데 실패했습니다.", error);
-    }
-  }
-}
-
 //펀딩 삭제 api
 
 async function deleteFunding(token, fundingId, navigate) {
@@ -91,9 +66,4 @@ async function deleteFunding(token, fundingId, navigate) {
   }
 }
 
-export {
-  fetchFriendFunding,
-  fetchMyFundings,
-  fetchDetailFunding,
-  deleteFunding,
-};
+export { fetchMyFundings, fetchDetailFunding, deleteFunding };

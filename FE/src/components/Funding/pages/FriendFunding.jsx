@@ -1,53 +1,37 @@
+import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+
+//Component
 import SearchBar from "../../UI/SearchBar";
 import CardList from "../component/CardList";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { fetchFriendFunding } from "../api/FundingAPI";
+
+//API
+import { getFriendFunding } from "../../../services/Funding/fundings";
 import { getConsumersId } from "../../../services/Consumer/consumers";
-import { useParams } from "react-router-dom";
 
 function FriendFunding() {
   const { consumerId } = useParams(); // URL 파라미터에서 consumer-id 값을 추출합니다.
-  const navigate = useNavigate();
-
   const [friendFunding, setFriendFunding] = useState([]);
-
   const [FriendInfo, setFriendInfo] = useState({
     name: "",
     img: null,
     // 추가 정보가 있다면 여기에 포함할 수 있습니다.
   });
-  const [fetchData, setFetchData] = useState(false); // 데이터를 불러올지 결정하는 상태
-
-  //사용자 정보 받아오기
-  useEffect(() => {
-    const token = localStorage.getItem("access-token");
-    if (consumerId && token) {
-      setFetchData(true); // consumerId와 token이 준비되면 데이터를 불러올 준비를 함
-    } else if (!token) {
-      navigate("/login-page");
-    }
-  }, [consumerId, navigate]);
 
   useEffect(() => {
-    const token = localStorage.getItem("access-token");
-
-    if (fetchData) {
-      getConsumersId(consumerId).then((data) => {
-        setFriendInfo({
-          name: data.name,
-          img: data.profileImageUrl,
-        });
+    //사용자 정보 받아오기
+    getConsumersId(consumerId).then((data) => {
+      setFriendInfo({
+        name: data.name,
+        img: data.profileImageUrl,
       });
+    });
 
-      fetchFriendFunding(consumerId, token, setFriendFunding);
-      setFetchData(false);
-    }
-  }, [fetchData, consumerId]);
-
-  useEffect(() => {
-    console.log("가져온 펀딩 입니다. " + friendFunding);
-  }, [friendFunding]);
+    //친구가 만든 펀딩 api 호출 후 state 저장
+    getFriendFunding(consumerId).then((data) => {
+      setFriendFunding(data);
+    });
+  }, [consumerId]);
 
   return (
     <div className="main-layer ">
