@@ -1,7 +1,7 @@
 import FundingDetailInfo from "../component/FundingDetailInfo";
 import CongratulateList from "../component/CongratulateList";
 import BottomSheet from "../component/BottomSheet";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchDetailFunding } from "../api/FundingAPI";
 import { useParams } from "react-router-dom";
 import { deleteFunding } from "../api/FundingAPI";
@@ -41,27 +41,6 @@ function MyFundingDetail() {
       name: "이민수",
       title: "시은아 생일 축하해3",
       detail: "메세지 내용 테스트임 4",
-      reply: null,
-    },
-    {
-      name: "박종혁",
-      title: "시은아 생일 축하해4",
-      detail:
-        " 메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5",
-      reply: null,
-    },
-    {
-      name: "박종혁",
-      title: "시은아 생일 축하해4",
-      detail:
-        " 메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5",
-      reply: null,
-    },
-    {
-      name: "박종혁",
-      title: "시은아 생일 축하해4",
-      detail:
-        " 메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5",
       reply: null,
     },
     {

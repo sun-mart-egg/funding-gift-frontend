@@ -9,15 +9,6 @@ import { getFundingAttendee } from "../api/AttendanceAPI";
 
 function FriendFundingDetail() {
   const navigate = useNavigate();
-  const data = {
-    frinedName: "신시은",
-    title: "EGG IS MY LIFE",
-    name: "계란 토스트",
-    price: 760000,
-    detail:
-      "친구들아 안녕. 곧 내 생일인데 고오급 계란 토스트가 너무 가지고 싶어. 많은 참여 부탁해",
-    progress: 70,
-  };
 
   const myParticipate = {
     date: "2024.3.19.12:00",
@@ -105,11 +96,14 @@ function FriendFundingDetail() {
           </div>
         )} */}
 
+        {/* 축하해준 사람 목록 */}
         <CongratulateList
           listData={attendeeList}
           onCardClick={handleItemClick}
         />
       </div>
+
+      {/* 펀딩 진행중일 경우 펀딩 참여하기 버튼 */}
       {fundingDetail.fundingStatus === "IN_PROGRESS" &&
         (myParticipate.price == null ? (
           <button
