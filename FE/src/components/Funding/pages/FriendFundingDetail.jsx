@@ -4,8 +4,8 @@ import BottomSheet from "../component/BottomSheet";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { fetchDetailFunding } from "../api/FundingAPI";
 import { getFundingAttendee } from "../api/AttendanceAPI";
+import { getDetailFunding } from "../../../services/Funding/fundings";
 
 function FriendFundingDetail() {
   const navigate = useNavigate();
@@ -28,7 +28,9 @@ function FriendFundingDetail() {
   useEffect(() => {
     const token = localStorage.getItem("access-token");
     if (token && fundingId) {
-      fetchDetailFunding(token, fundingId, setFundingDetail);
+      getDetailFunding(fundingId).then((response) => {
+        setFundingDetail(response);
+      });
       getFundingAttendee(token, fundingId, setAttendeeList);
     }
   }, [fundingId]);

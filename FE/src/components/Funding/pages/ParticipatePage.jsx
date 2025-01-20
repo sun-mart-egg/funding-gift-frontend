@@ -7,7 +7,6 @@ import FundingDetailInfo from "../component/FundingDetailInfo";
 
 //API
 import { getDetailFunding } from "../../../services/Funding/fundings";
-import { fetchDetailFunding } from "../api/FundingAPI";
 
 //Store
 import useAttendanceStore from "../../Store/AttendanceStore";
@@ -21,6 +20,7 @@ function ParticipatePage() {
   const updateUserStore = useAttendanceStore((state) => state.updateUserStore);
   // 메시지 제목에 대한 에러 상태 추가
   const [titleError, setTitleError] = useState("");
+
   useEffect(() => {
     if (fundingId) {
       getDetailFunding(fundingId)
@@ -28,7 +28,7 @@ function ParticipatePage() {
           setFundingDetail(data);
         })
         .catch((error) => {
-          console.error("Error fetching funding details:", error);
+          console.error("에러 발생", error);
         });
     }
     updateUserStore("fundingId", fundingId);

@@ -8,10 +8,10 @@ import CongratulateList from "../component/CongratulateList";
 import BottomSheet from "../component/BottomSheet";
 
 //API
-import { fetchDetailFunding } from "../api/FundingAPI";
 import { deleteFunding } from "../api/FundingAPI";
 import { getFundingAttendee } from "../api/AttendanceAPI";
 import { getAttendanceDetail } from "../api/AttendanceAPI";
+import { getDetailFunding } from "../../../services/Funding/fundings";
 
 function MyFundingDetail() {
   const navigate = useNavigate();
@@ -88,7 +88,9 @@ function MyFundingDetail() {
   useEffect(() => {
     const token = localStorage.getItem("access-token");
     if (token && fundingId) {
-      fetchDetailFunding(token, fundingId, setFundingDetail);
+      getDetailFunding(fundingId).then((response) => {
+        setFundingDetail(response);
+      });
       getFundingAttendee(token, fundingId, setAttendeeList);
     }
   }, [fundingId]);

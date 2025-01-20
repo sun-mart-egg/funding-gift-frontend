@@ -2,8 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import useAttendanceStore from "../../Store/AttendanceStore";
+
+//API
 import { createAttendance } from "../api/AttendanceAPI";
-import { fetchDetailFunding } from "../api/FundingAPI";
+import { getDetailFunding } from "../../../services/Funding/fundings";
+
 function Paypage() {
   const navigate = useNavigate(); // useNavigate 훅을 사용합니다.
   const [fundingDetail, setFundingDetail] = useState(null);
@@ -33,16 +36,10 @@ function Paypage() {
 
   useEffect(() => {
     console.log("펀딩 id " + fundingId);
-    const token = localStorage.getItem("access-token");
-    if (token && fundingId) {
-      console.log(`Fetching funding details for ID: ${fundingId}`);
-      fetchDetailFunding(token, fundingId, setFundingDetail)
-        .then(() => {
-          console.log("Funding details fetched successfully.");
-        })
-        .catch((error) => {
-          console.error("Error fetching funding details:", error);
-        });
+    if (fundingId) {
+      getDetailFunding(fundingId).then((response) => {
+        setFundingDetail(response);
+      });
     }
   }, [fundingId]);
 
