@@ -3,9 +3,7 @@ import { useNavigate } from "react-router-dom"; // useNavigate 사용
 
 function AddressCard({
   name,
-
   isDefault,
-
   defaultAddr,
   detailAddr,
   zipCode,
@@ -16,7 +14,7 @@ function AddressCard({
   const navigate = useNavigate();
 
   const handelDelete = () => {
-    deleteAddress(localStorage.getItem("access-token"), id);
+    deleteAddress(id);
   };
 
   return (

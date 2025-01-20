@@ -37,11 +37,7 @@ export const putAddress = async (addressId, name, defaultAddr, detailAddr, zipCo
 
 // 주소 삭제
 export const deleteAddress = async (addressId) => {
-  const response = await axiosInstance.delete(`/api/addresses/${addressId}`, {
-    params: {
-      "address-id": addressId
-    },
-  });
+  const response = await axiosInstance.delete(`/api/addresses/${addressId}`);
   console.log("주소 삭제 완료")
   return response;
 };

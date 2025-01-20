@@ -4,13 +4,14 @@ import axiosInstance from "../../@common/axiosInstance.js";
 export const getFriendsList = async() => {
   const response = await axiosInstance.get("/api/friends");
   console.log("친구목록 호출 완료")
+  console.log(response.data.data)
   return response.data.data;
 };
 
 // 내 카카오 친구목록 불러오기
-export const getKAKAO = async() => {
-  await axiosInstance.get("/api/friends/kakao");
-  console.log("카톡 친구목록 동기화 완료");
+export const getFriendsSync = async() => {
+  await axiosInstance.put("/api/friends/syn");
+  console.log("친구목록 동기화 완료");
 };
 
 // 친한친구 설정 변경

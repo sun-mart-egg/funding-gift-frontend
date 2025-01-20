@@ -8,7 +8,8 @@ import { useState } from "react";
 const FriendsSearchBar = ({
   handleInput,
   userInput,
-  handleKAKAO,
+  totalFriends,
+  handleSyncFriends,
   handleFilterOption,
   filterOption
 }) => {
@@ -24,10 +25,11 @@ const FriendsSearchBar = ({
 
   return (
     <div className="absolute top-[60px] flex w-full flex-row justify-between">
-      <div className="flex flex-row items-center p-3 ">
-        <button onClick={handleKAKAO}>
+      <div className="flex flex-row items-center p-3 gap-2 ">
+        <button onClick={handleSyncFriends}>
           <img src={refreshIcon} alt="동기화아이콘" />
         </button>
+        <p>{totalFriends}</p>
       </div>
 
       <div className="flex flex-row items-center p-2.5">

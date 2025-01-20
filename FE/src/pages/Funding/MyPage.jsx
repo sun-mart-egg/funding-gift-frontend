@@ -42,6 +42,9 @@ function MyPage() {
     },
   });
 
+  // 기본 주소지
+  const defaultAddress = addressInfo.find((address) => address.isDefault);
+
   // 진행 중 펀딩 확인 쿼리
   const { data: isInprogress } = useQuery({
     queryKey: ["진행 중 펀딩"],
@@ -173,10 +176,17 @@ function MyPage() {
                   기본 주소 선택
                 </button>
               </div>
-              <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
-                {addressInfo[0].defaultAddr} {addressInfo[0].detailAddr} /{" "}
-                {addressInfo[0].zipCode}
-              </p>
+              <select className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
+                {addressInfo.map((address) => (
+                  <option value="" key={address.id}>
+                    {address.defaultAddr} {address.detailAddr} /{" "}
+                    {address.zipCode}
+                  </option>
+                ))}
+              </select>
+              {/* <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
+                {defaultAddress.defaultAddr} {defaultAddress.detailAddr} / {defaultAddress.zipCode}
+              </p> */}
             </div>
             <div className="account">
               <div className="sub-title pt-6">
@@ -186,8 +196,8 @@ function MyPage() {
                 </button>
               </div>
               <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
-                {/* {userInfo.accountBank} {userInfo.accountNo} */}⚠ 계좌
-                정보를 추가해야 합니다. ⚠
+                {/* {userInfo.accountBank} {userInfo.accountNo} */}⚠ 계좌정보를
+                추가해야 합니다. ⚠
               </p>
             </div>
           </div>
@@ -250,8 +260,8 @@ function MyPage() {
               <p className="mr-1 w-full rounded-md bg-[#EFEFEF] p-3 px-2 font-cusFont3 text-[14px]">
                 {isLoading
                   ? "로딩 중..."
-                  : addressInfo.length > 0
-                    ? `${addressInfo[0].defaultAddr} ${addressInfo[0].detailAddr} / ${addressInfo[0].zipCode}`
+                  : defaultAddress
+                    ? `${defaultAddress.defaultAddr} ${defaultAddress.detailAddr} / ${defaultAddress.zipCode}`
                     : "주소 정보가 없습니다."}
               </p>
             </div>
@@ -261,8 +271,8 @@ function MyPage() {
               </div>
 
               <p className="mr-1 w-full rounded-md  bg-[#EFEFEF]  p-3 px-2 font-cusFont3 text-[14px] ">
-                {/* {userInfo.accountBank} {userInfo.accountNo} */}⚠ 계좌
-                정보를 추가해야 합니다. ⚠
+                {/* {userInfo.accountBank} {userInfo.accountNo} */}⚠ 계좌정보를
+                추가해야 합니다. ⚠
               </p>
             </div>
           </div>
