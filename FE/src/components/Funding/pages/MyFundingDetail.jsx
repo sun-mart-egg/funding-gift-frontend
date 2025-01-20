@@ -1,11 +1,15 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+//Component
 import FundingDetailInfo from "../component/FundingDetailInfo";
 import CongratulateList from "../component/CongratulateList";
 import BottomSheet from "../component/BottomSheet";
-import { useEffect, useState } from "react";
+
+//API
 import { fetchDetailFunding } from "../api/FundingAPI";
-import { useParams } from "react-router-dom";
 import { deleteFunding } from "../api/FundingAPI";
-import { useNavigate } from "react-router-dom";
 import { getFundingAttendee } from "../api/AttendanceAPI";
 import { getAttendanceDetail } from "../api/AttendanceAPI";
 
@@ -137,6 +141,7 @@ function MyFundingDetail() {
         id="page"
         className="absolute top-20 flex flex-col items-center justify-start pb-20"
       >
+        {/* 펀딩 정보 */}
         <FundingDetailInfo
           title={fundingDetail.title}
           name={fundingDetail.productName}
@@ -149,12 +154,14 @@ function MyFundingDetail() {
           fundingStatus={fundingDetail.fundingStatus}
         />
 
+        {/* 축하 받은 리스트  */}
         <CongratulateList
           listData={attendeeList}
           onCardClick={toggleBottomSheet}
         />
       </div>
 
+      {/* 메시지 보기 */}
       <BottomSheet
         fundingId={fundingId}
         isOpen={isBottomSheetOpen}

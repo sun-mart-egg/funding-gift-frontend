@@ -1,8 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import FundingDetailInfo from "../component/FundingDetailInfo";
-import { fetchDetailFunding } from "../api/FundingAPI";
 import { useParams } from "react-router-dom";
+
+//Component
+import FundingDetailInfo from "../component/FundingDetailInfo";
+
+//API
+import { getDetailFunding } from "../../../services/Funding/fundings";
+import { fetchDetailFunding } from "../api/FundingAPI";
+
+//Store
 import useAttendanceStore from "../../Store/AttendanceStore";
 
 function ParticipatePage() {
@@ -15,12 +22,10 @@ function ParticipatePage() {
   // 메시지 제목에 대한 에러 상태 추가
   const [titleError, setTitleError] = useState("");
   useEffect(() => {
-    const token = localStorage.getItem("access-token");
-    if (token && fundingId) {
-      console.log(`Fetching funding details for ID: ${fundingId}`);
-      fetchDetailFunding(token, fundingId, setFundingDetail)
-        .then(() => {
-          console.log("Funding details fetched successfully.");
+    if (fundingId) {
+      getDetailFunding(fundingId)
+        .then((data) => {
+          setFundingDetail(data);
         })
         .catch((error) => {
           console.error("Error fetching funding details:", error);
