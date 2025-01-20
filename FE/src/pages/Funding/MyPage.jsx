@@ -2,7 +2,7 @@ import { useState } from "react";
 import { IoLogOut } from "react-icons/io5";
 import { AiFillCamera } from "react-icons/ai";
 import { useNavigate } from "react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   getConsumers,
@@ -14,15 +14,11 @@ import { getAddressList } from "../../services/Address/addresses";
 import { deleteFCMToken } from "../../services/Login/tokens";
 
 function MyPage() {
+  const queryClient = useQueryClient();
   const myFCMToken = localStorage.getItem("fcm-token");
   const navigate = useNavigate();
   // 소비자 정보 수정 상태 ON / OFF
   const [isEditMode, setIsEditMode] = useState(false);
-
-  // 수정 버튼 클릭 시 호출될 함수
-  const handleEditClick = () => {
-    setIsEditMode(!isEditMode);
-  };
 
   // 소비자 정보 쿼리
   const { data: userInfo = [] } = useQuery({
@@ -44,6 +40,9 @@ function MyPage() {
 
   // 기본 주소지
   const defaultAddress = addressInfo.find((address) => address.isDefault);
+
+  // 소비자 정보 수정
+  const [editName, setEditName] = useState(userInfo.name);
 
   // 진행 중 펀딩 확인 쿼리
   const { data: isInprogress } = useQuery({
@@ -83,6 +82,7 @@ function MyPage() {
       putConsumers(name, email, phoneNumber, birthyear, birthday, gender),
     onSuccess: () => {
       console.log("정보 수정 완료");
+      queryClient.invalidateQueries({ queryKey: ["소비자 정보"] });
     },
     onError: (err) => {
       console.error("정보 수정 실패", err);
@@ -90,9 +90,27 @@ function MyPage() {
   });
 
   // 사용자 이름 변경 시 호출될 함수
-  // 수정 필요
-  const handleNameChange = () => {
-    // setUserInfo({ ...userInfo, name: event.target.value });
+  const handleNameChange = (e) => {
+    setEditName(e.target.value);
+  };
+
+  // 수정 버튼 클릭 시 호출될 함수
+  const handleEditClick = async () => {
+    // 수정모드 비활성화 상태 시
+    // 수정모드 활성화 상태로 변경
+    if (isEditMode === false) {
+      setIsEditMode(true)
+    }
+
+    // 수정모드 활성화 상태 시
+    // 소비자 정보 수정 요청
+    else {
+      editConsumerInfo.mutateAsync({
+        ...userInfo,
+        name: editName,
+      });
+      setIsEditMode(false)
+    }
   };
 
   // 로그아웃 요청
@@ -148,7 +166,7 @@ function MyPage() {
             <div className="flex w-[70%] justify-between">
               <input
                 type="text"
-                value={userInfo.name}
+                value={editName}
                 onChange={handleNameChange}
                 className="mr-1 w-full rounded-md border border-gray-400 px-2 font-cusFont5 text-[25px]"
               />
