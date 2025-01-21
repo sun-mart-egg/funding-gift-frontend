@@ -10,7 +10,7 @@ import {
   postConsumerLogout,
   putConsumers,
 } from "../../services/Consumer/consumers";
-import { getAddressList } from "../../services/Address/addresses";
+import { getAddressList, putAddress } from "../../services/Address/addresses";
 import { deleteFCMToken } from "../../services/Login/tokens";
 import { getCookie, removeAllCookie } from "../../@common/cookies";
 
@@ -40,7 +40,9 @@ function MyPage() {
   });
 
   // 기본 주소지
-  const defaultAddress = addressInfo.find((address) => address.isDefault);
+  const defaultAddress = addressInfo.find(
+    (address) => address.isDefault === true,
+  );
 
   // 소비자 정보 수정
   const [editName, setEditName] = useState(userInfo.name);
@@ -78,6 +80,7 @@ function MyPage() {
   });
 
   // 소비자 정보 수정 요청 mutate
+  // 현재는 이름 변경만 요청하고 있음
   const editConsumerInfo = useMutation({
     mutationFn: ({ name, email, phoneNumber, birthyear, birthday, gender }) =>
       putConsumers(name, email, phoneNumber, birthyear, birthday, gender),
@@ -87,6 +90,27 @@ function MyPage() {
     },
     onError: (err) => {
       console.error("정보 수정 실패", err);
+      window.alert(err.response.data.msg);
+      setEditName(userInfo.name);
+    },
+  });
+
+  // 소비자 주소 수정 요청 mutate
+  const editConsumerAddr = useMutation({
+    mutationFn: ({
+      addressId,
+      name,
+      defaultAddr,
+      detailAddr,
+      zipCode,
+      isDefault,
+    }) =>
+      putAddress(addressId, name, defaultAddr, detailAddr, zipCode, isDefault),
+    onSuccess: () => {
+      console.log("주소 수정 완료");
+    },
+    onError: (err) => {
+      console.error("주소 수정 실패", err);
     },
   });
 
@@ -100,7 +124,7 @@ function MyPage() {
     // 수정모드 비활성화 상태 시
     // 수정모드 활성화 상태로 변경
     if (isEditMode === false) {
-      setIsEditMode(true)
+      setIsEditMode(true);
     }
 
     // 수정모드 활성화 상태 시
@@ -110,12 +134,12 @@ function MyPage() {
         ...userInfo,
         name: editName,
       });
-      setIsEditMode(false)
+      setIsEditMode(false);
     }
   };
 
   // 로그아웃 요청
-  // 로그아웃 요청 성공 -> FCM토큰 삭제 성공 -> 로컬스토리지 클리어 and 홈 화면으로 이동
+  // 로그아웃 요청 -> fcm-token 삭제 요청 -> 쿠키에서 토큰 정보 삭제 -> 메인으로 이동
   const handleLogOut = async () => {
     await Promise.all([
       logOutMutate.mutateAsync(),
@@ -126,17 +150,17 @@ function MyPage() {
   };
 
   // 진행중인 펀딩이 있는지 확인하고
-  // 펀딩이 있는 경우 회원탈퇴 못해요 ^^
+  // 펀딩이 있는 경우 회원탈퇴 불가능
   const checkMyFunding = () => {
     if (isInprogress === true) {
       window.alert("진행 중 펀딩이 있습니다");
-      console.log(isInprogress);
     } else {
       signOut();
     }
   };
 
-  // 회원탈퇴 관련 ( 카카오과의 연결을 끊음 )
+  // 회원탈퇴 관련
+  // 쿠키에서 토큰 정보 삭제 -> 회원탈퇴 요청 -> 메인으로 이동
   const BYE_BYE_URL = import.meta.env.VITE_KAKAO_SIGN_OUT;
   const signOut = () => {
     removeAllCookie();
@@ -168,6 +192,7 @@ function MyPage() {
                 type="text"
                 value={editName}
                 onChange={handleNameChange}
+                placeholder={userInfo.name}
                 className="mr-1 w-full rounded-md border border-gray-400 px-2 font-cusFont5 text-[25px]"
               />
             </div>
@@ -175,7 +200,7 @@ function MyPage() {
           <div className="content absolute top-52 w-full px-6 font-cusFont3">
             <div className="birthday">
               <div className="sub-title">
-                <p>생일</p>{" "}
+                <p>생일</p>
                 <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
                   생일 선택
                 </button>
@@ -189,7 +214,7 @@ function MyPage() {
             </div>
             <div className="address">
               <div className="sub-title pt-6 ">
-                <p>기본 주소</p>{" "}
+                <p>기본 주소</p>
                 <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
                   기본 주소 선택
                 </button>
@@ -208,7 +233,7 @@ function MyPage() {
             </div>
             <div className="account">
               <div className="sub-title pt-6">
-                <p>기본 계좌</p>{" "}
+                <p>기본 계좌</p>
                 <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
                   기본 계좌 선택
                 </button>
@@ -280,7 +305,7 @@ function MyPage() {
                   ? "로딩 중..."
                   : defaultAddress
                     ? `${defaultAddress.defaultAddr} ${defaultAddress.detailAddr} / ${defaultAddress.zipCode}`
-                    : "주소 정보가 없습니다."}
+                    : "설정된 기본주소가 없습니다."}
               </p>
             </div>
             <div className="account pt-6">
