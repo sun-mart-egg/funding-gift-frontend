@@ -10,6 +10,7 @@ import FundActivated from "/imgs/footer_fund_activated.png";
 import Profile from "/imgs/footer_profile.png";
 import ProfileActivated from "/imgs/footer_profile_activated.png";
 import CatPaw from "/imgs/cat_paw.png";
+import { getCookie } from "../../@common/cookies";
 
 function Footer() {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ function Footer() {
   };
 
   useEffect(() => {
-    const path = currentPath === "/" ? "/" : currentPath.replace(/\/$/, "");
+    // const path = currentPath === "/" ? "/" : currentPath.replace(/\/$/, "");
 
     updateCatPawPosition();
     window.addEventListener("resize", updateCatPawPosition);
@@ -66,11 +67,11 @@ function Footer() {
     if (path === "/my-funding" || path === "/funding") {
 
       // 토큰이 있는 경우 내 프로필로 이동시킴
-      if (localStorage.getItem("access-token") && path === "/my-funding") {
+      if (getCookie("access-token") && path === "/my-funding") {
         navigate("/my-funding")
       }
 
-      else if (localStorage.getItem("access-token") && path === "/funding") {
+      else if (getCookie("access-token") && path === "/funding") {
         navigate("/funding")
       }
       // 토큰 없으면 로그인 하라고 보내버림

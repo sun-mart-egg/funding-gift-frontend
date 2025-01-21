@@ -12,10 +12,11 @@ import {
 } from "../../services/Consumer/consumers";
 import { getAddressList } from "../../services/Address/addresses";
 import { deleteFCMToken } from "../../services/Login/tokens";
+import { getCookie, removeAllCookie } from "../../@common/cookies";
 
 function MyPage() {
   const queryClient = useQueryClient();
-  const myFCMToken = localStorage.getItem("fcm-token");
+  const myFCMToken = getCookie("fcm-token");
   const navigate = useNavigate();
   // 소비자 정보 수정 상태 ON / OFF
   const [isEditMode, setIsEditMode] = useState(false);
@@ -120,7 +121,7 @@ function MyPage() {
       logOutMutate.mutateAsync(),
       deleteTokenMutate.mutateAsync(myFCMToken),
     ]);
-    localStorage.clear();
+    removeAllCookie();
     navigate("/");
   };
 
@@ -137,9 +138,8 @@ function MyPage() {
 
   // 회원탈퇴 관련 ( 카카오과의 연결을 끊음 )
   const BYE_BYE_URL = import.meta.env.VITE_KAKAO_SIGN_OUT;
-
   const signOut = () => {
-    localStorage.clear();
+    removeAllCookie();
     window.location.replace(BYE_BYE_URL);
     console.log("카카오측과의 연결을 끊었습니다.");
     navigate("/");
