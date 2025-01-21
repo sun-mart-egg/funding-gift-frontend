@@ -4,6 +4,7 @@ import { getCookie } from "./cookies";
 // axios 인스턴스 생성
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
+  withCredentials: true,
 });
 
 // axios 요청 마다 자동으로 headers에 access-token 추가
