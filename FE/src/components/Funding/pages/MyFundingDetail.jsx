@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { getCookie } from "../../../@common/cookies";
 
 //Component
 import FundingDetailInfo from "../component/FundingDetailInfo";
@@ -60,7 +61,7 @@ function MyFundingDetail() {
   const [attendanceDetail, setAttendanceDetail] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("access-token");
+    const token = getCookie("access-token");
 
     //펀딩 디테일 정보 불러오기
     getDetailFunding(fundingId).then((response) => {
@@ -84,7 +85,7 @@ function MyFundingDetail() {
     if (!isBottomSheetOpen) {
       setSelectedMessage(message);
       getAttendanceDetail(
-        localStorage.getItem("access-token"),
+        getCookie("access-token"),
         fundingId,
         message.attendanceId,
         setAttendanceDetail,
@@ -108,7 +109,7 @@ function MyFundingDetail() {
   };
 
   const handleDelete = async () => {
-    const token = localStorage.getItem("access-token");
+    const token = getCookie("access-token");
     if (token && fundingId) {
       deleteFunding(token, fundingId, navigate);
     }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getCookie } from "../../@common/cookies";
 
 import { getConsumers } from "../../services/Consumer/consumers";
 import { getAnniversaryList } from "../../services/Funding/getAnniversaryList";
@@ -24,7 +25,7 @@ export default function InitFundingDetail() {
 
   useEffect(() => {
     //토큰 가져오기
-    const token = localStorage.getItem("access-token");
+    const token = getCookie("access-token");
 
     //토큰이 있을 경우
     if (token) {

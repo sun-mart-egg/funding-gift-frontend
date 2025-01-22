@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import { getCookie } from "../../../@common/cookies";
 
 //Component
 import FundingDetailInfo from "../component/FundingDetailInfo";
@@ -29,7 +30,7 @@ function FriendFundingDetail() {
   const [attendeeList, setAttendeeList] = useState([]);
 
   useEffect(() => {
-    const token = localStorage.getItem("access-token");
+    const token = getCookie("access-token");
     if (token && fundingId) {
       getDetailFunding(fundingId).then((response) => {
         setFundingDetail(response);

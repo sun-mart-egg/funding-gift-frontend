@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import useAttendanceStore from "../../Store/AttendanceStore";
+import { getCookie } from "../../../@common/cookies";
 
 //API
 import { createAttendance } from "../api/AttendanceAPI";
@@ -50,7 +51,7 @@ function Paypage() {
   const handlePayment = async () => {
     try {
       const response = await createAttendance(
-        localStorage.getItem("access-token"),
+        getCookie("access-token"),
         fundingId,
         sendMessage,
         sendMessageTitle,
@@ -104,7 +105,7 @@ function Paypage() {
             {
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("access-token")}`,
+                Authorization: `Bearer ${getCookie("access-token")}`,
               },
             },
           );
