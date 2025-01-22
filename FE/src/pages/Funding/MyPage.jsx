@@ -227,9 +227,6 @@ function MyPage() {
                   </option>
                 ))}
               </select>
-              {/* <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
-                {defaultAddress.defaultAddr} {defaultAddress.detailAddr} / {defaultAddress.zipCode}
-              </p> */}
             </div>
             <div className="account">
               <div className="sub-title pt-6">
@@ -239,8 +236,7 @@ function MyPage() {
                 </button>
               </div>
               <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
-                {/* {userInfo.accountBank} {userInfo.accountNo} */}⚠ 계좌정보를
-                추가해야 합니다. ⚠
+                ⚠ 계좌정보를 추가해야 합니다. ⚠
               </p>
             </div>
           </div>
@@ -252,7 +248,7 @@ function MyPage() {
           </button>
           <div
             id="buttonSection"
-            className="absolute bottom-0 flex w-full flex-col items-center justify-around pb-5"
+            className="absolute bottom-0 flex w-full flex-row items-center justify-around p-5 gap-2"
           >
             <button
               onClick={handleEditClick}
@@ -260,6 +256,13 @@ function MyPage() {
               className="common-btn"
             >
               수정 완료
+            </button>
+            <button
+              onClick={() => setIsEditMode(false)}
+              style={{ width: "calc(75% )" }} // 버튼 너비 조정
+              className="common-btn"
+            >
+              취소
             </button>
           </div>
         </>
@@ -314,8 +317,7 @@ function MyPage() {
               </div>
 
               <p className="mr-1 w-full rounded-md  bg-[#EFEFEF]  p-3 px-2 font-cusFont3 text-[14px] ">
-                {/* {userInfo.accountBank} {userInfo.accountNo} */}⚠ 계좌정보를
-                추가해야 합니다. ⚠
+                ⚠ 계좌정보를 추가해야 합니다. ⚠
               </p>
             </div>
           </div>
