@@ -40,12 +40,11 @@ function MyPage() {
   });
 
   // 기본 주소지
-  const defaultAddress = addressInfo.find(
-    (address) => address.isDefault === true,
-  );
+  const defaultAddress = addressInfo.find((address) => address.isDefault === true);
 
   // 소비자 정보 수정
   const [editName, setEditName] = useState(userInfo.name);
+  const [editAddr, setEditAddr] = useState(defaultAddress?.id);
 
   // 진행 중 펀딩 확인 쿼리
   const { data: isInprogress } = useQuery({
@@ -106,17 +105,29 @@ function MyPage() {
       isDefault,
     }) =>
       putAddress(addressId, name, defaultAddr, detailAddr, zipCode, isDefault),
-    onSuccess: () => {
+    onSuccess: (res) => {
       console.log("주소 수정 완료");
+      console.log(res);
     },
     onError: (err) => {
       console.error("주소 수정 실패", err);
+      setEditAddr(defaultAddress?.id);
     },
   });
 
-  // 사용자 이름 변경 시 호출될 함수
+  // 소비자 이름 변경
   const handleNameChange = (e) => {
     setEditName(e.target.value);
+  };
+
+  // 소비자 주소 변경
+  const handleAddrChange = (e) => {
+    const selectAddrId = e.target.value;
+    setEditAddr(selectAddrId);
+    console.log(`선택한 주소 id: ${selectAddrId}`);
+
+    const selectAddr = addressInfo.find(address => address.id === selectAddrId);
+    console.log(selectAddr);
   };
 
   // 수정 버튼 클릭 시 호출될 함수
@@ -130,10 +141,33 @@ function MyPage() {
     // 수정모드 활성화 상태 시
     // 소비자 정보 수정 요청
     else {
-      editConsumerInfo.mutateAsync({
-        ...userInfo,
-        name: editName,
-      });
+      const newAddr = addressInfo.find(address => address.id === editAddr);
+      await Promise.all([
+        editConsumerInfo.mutateAsync({
+          ...userInfo,
+          name: editName,
+        }),
+
+        // 변경 전 주소에 대해 '주소 기본값' 해제
+        defaultAddress && editConsumerAddr.mutateAsync({
+          addressId: defaultAddress?.id,
+          name: defaultAddress?.name,
+          defaultAddr: defaultAddress?.defaultAddr,
+          detailAddr: defaultAddress?.detailAddr,
+          zipCode: defaultAddress?.zipCode,
+          isDefault: false,
+        }),
+
+        // 새로운 주소에 대해 '주소 기본값' 설정
+        editConsumerAddr.mutateAsync({
+          addressId: editAddr,
+          name: newAddr?.name,
+          defaultAddr: newAddr?.defaultAddr,
+          detailAddr: newAddr?.detailAddr,
+          zipCode: newAddr?.zipCode,
+          isDefault: true,
+        }),
+      ])
       setIsEditMode(false);
     }
   };
@@ -190,7 +224,7 @@ function MyPage() {
             <div className="flex w-[70%] justify-between">
               <input
                 type="text"
-                value={editName}
+                value={editName || ""}
                 onChange={handleNameChange}
                 placeholder={userInfo.name}
                 className="mr-1 w-full rounded-md border border-gray-400 px-2 font-cusFont5 text-[25px]"
@@ -219,9 +253,9 @@ function MyPage() {
                   기본 주소 선택
                 </button>
               </div>
-              <select className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
+              <select className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]" onChange={handleAddrChange}>
                 {addressInfo.map((address) => (
-                  <option value="" key={address.id}>
+                  <option value={address.id} key={address.id}>
                     {address.defaultAddr} {address.detailAddr} /{" "}
                     {address.zipCode}
                   </option>
