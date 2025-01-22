@@ -5,6 +5,7 @@ import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken } from 'firebase/messaging';
 import { useMutation } from "@tanstack/react-query";
 import { postFCMToken } from "../../services/Login/tokens"
+import { getCookie, setCookie } from "../../@common/cookies";
 
 function LoginCallback() {
   const [searchParams] = useSearchParams();
@@ -61,21 +62,21 @@ function LoginCallback() {
       // fcm 토큰 저장 -> 서버에.
       const saveToken = async (token) => {
         
-        // 위에서 요청한 fcm 토큰을 localStorage에도 저장
-        localStorage.setItem("fcm-token", token)
+        // 위에서 요청한 fcm 토큰을 Cookie에도 저장
+        setCookie("fcm-token", token);
         // 서버에도 저장하라는 api 요청 mutate
         saveFCMTokenMutate.mutate(token);
       };
 
       // 토큰값이 null 이 아닌 경우
-      // localStroage에 access-token, consumer-id를 설정
+      // Cookie에 access-token, consumer-id를 설정
       if (accessToken !== null) {
-        localStorage.setItem("access-token", accessToken);
-        localStorage.setItem("consumer-id", consumerId);
+        setCookie("access-token", accessToken);
+        setCookie("consumer-id", consumerId);
       }
 
-      // localStroage에서 access-token을 받아왔다면
-      if (localStorage.getItem("access-token")) {
+      // Cookie에서 access-token을 받아왔다면
+      if (getCookie("access-token")) {
         // nextPage의 값이 main이다 === 기존 회원
         // 메인 페이지로 돌려보낸다.
         if (nextPage === "main") {

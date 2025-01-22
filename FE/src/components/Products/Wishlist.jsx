@@ -8,11 +8,12 @@ import NoWishlist from '/imgs/no_wishlist.png'
 import { getWishlists } from "../../services/Products/wishlists"
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { formattedPrice } from '../../@common/formattedNumber';
+import { getCookie } from '../../@common/cookies';
 
 
 function Wishlist() {
 	const observer = useRef();
-	const consumerId = localStorage.getItem("consumer-id")
+	const consumerId = getCookie("consumer-id");
 
 	// 위시리스트 관련 쿼리 ( + 무한 스크롤 기능 )
 	const { data = { pages: [] }, fetchNextPage, hasNextPage, isLoading } = useInfiniteQuery({

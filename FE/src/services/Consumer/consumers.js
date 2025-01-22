@@ -37,11 +37,7 @@ export const postConsumerLogout = async () => {
 // 소비자 ID 조회
 // return값 확인 후 필요시 수정
 export const getConsumersId = async (consumerId) => {
-  const response = await axiosInstance.get(`/api/consumers/${consumerId}`, {
-    params: {
-      "consumer-id": consumerId,
-    },
-  });
+  const response = await axiosInstance.get(`/api/consumers/${consumerId}`);
   console.log("소비자 ID 조회 완료", response);
   return response.data.data;
 };
