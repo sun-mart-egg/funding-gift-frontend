@@ -1,15 +1,18 @@
-import FundingDetailInfo from "../component/FundingDetailInfo";
-import CongratulateList from "../component/CongratulateList";
-import BottomSheet from "../component/BottomSheet";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+
+//Component
+import FundingDetailInfo from "../component/FundingDetailInfo";
+import CongratulateList from "../component/CongratulateList";
+import BottomSheet from "../component/BottomSheet";
+
+//API
 import { getFundingAttendee } from "../api/AttendanceAPI";
 import { getDetailFunding } from "../../../services/Funding/fundings";
 
 function FriendFundingDetail() {
   const navigate = useNavigate();
-
   const myParticipate = {
     date: "2024.3.19.12:00",
     price: 100,
@@ -58,6 +61,7 @@ function FriendFundingDetail() {
         id="page"
         className="absolute top-20 flex flex-col items-center justify-start pb-20"
       >
+        {/* 펀딩정보 */}
         <FundingDetailInfo
           title={fundingDetail.title}
           name={fundingDetail.productName}
@@ -70,33 +74,10 @@ function FriendFundingDetail() {
           fundingStatus={fundingDetail.fundingStatus}
         />
 
-        {/* <div id="participateSection" className="m-2 w-full flex-col px-7">
-          <div id="subTitle" className="px-2 font-cusFont2 text-[18px]">
-            <p>내가 참여한 펀딩</p>
-          </div>
+        {/* 내가 참여한 펀딩 정보 */}
+        <div className="px-2 font-cusFont2 text-[18px]">
+          <p>내가 참여한 펀딩</p>
         </div>
-
-        {myParticipate.price === null ? (
-          <div className="flex-center my-4 flex w-full flex-col items-center justify-center">
-            <p>아직 펀딩에 참여하지 않았네요</p>
-            <p>펀딩에 참여하여 친구를 축하해 보세요!</p>
-          </div>
-        ) : (
-          <div className="itmes-center m-2 mx-7 flex w-[80%] cursor-pointer flex-col items-center justify-center rounded-md border border-gray-400 p-2 ">
-            <p className="pb-4 text-[18px]">
-              {data.frinedName}님의 펀딩에 참여했어요!
-            </p>
-            <p className="text-[12px]">{myParticipate.date}</p>
-            <p className="text-[12px]">{myParticipate.price}원</p>
-            <button
-              className="flex justify-center rounded p-2"
-              onClick={toggleBottomSheet}
-            >
-              자세히보기
-              <FaLongArrowAltRight className="m-auto text-cusColor3" />
-            </button>
-          </div>
-        )} */}
 
         {/* 축하해준 사람 목록 */}
         <CongratulateList
@@ -123,6 +104,7 @@ function FriendFundingDetail() {
           </button>
         ))}
 
+      {/* 메세지 바텀시트 */}
       <BottomSheet
         isOpen={isBottomSheetOpen}
         setIsOpen={setIsBottomSheetOpen}

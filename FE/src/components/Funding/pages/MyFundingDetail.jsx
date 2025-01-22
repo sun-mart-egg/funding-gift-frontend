@@ -29,12 +29,7 @@ function MyFundingDetail() {
       detail: "메세지 내용 테스트임 2",
       reply: "ㄳㄳ",
     },
-    {
-      name: "임수빈",
-      title: "시은아 생일 축하해1",
-      detail: "메세지 내용 테스트임 2",
-      reply: "ㄳㄳ",
-    },
+
     {
       name: "김대영",
       title: "시은아 생일 축하해2",
@@ -45,27 +40,6 @@ function MyFundingDetail() {
       name: "이민수",
       title: "시은아 생일 축하해3",
       detail: "메세지 내용 테스트임 4",
-      reply: null,
-    },
-    {
-      name: "박종혁",
-      title: "시은아 생일 축하해4",
-      detail:
-        " 메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5",
-      reply: null,
-    },
-    {
-      name: "박종혁",
-      title: "시은아 생일 축하해4",
-      detail:
-        " 메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5",
-      reply: null,
-    },
-    {
-      name: "박종혁",
-      title: "시은아 생일 축하해4",
-      detail:
-        " 메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5",
       reply: null,
     },
     {
@@ -87,12 +61,14 @@ function MyFundingDetail() {
 
   useEffect(() => {
     const token = localStorage.getItem("access-token");
-    if (token && fundingId) {
-      getDetailFunding(fundingId).then((response) => {
-        setFundingDetail(response);
-      });
-      getFundingAttendee(token, fundingId, setAttendeeList);
-    }
+
+    //펀딩 디테일 정보 불러오기
+    getDetailFunding(fundingId).then((response) => {
+      setFundingDetail(response);
+    });
+
+    //펀딩 참여자 목록 불러오기
+    getFundingAttendee(token, fundingId, setAttendeeList);
   }, [fundingId]);
 
   useEffect(() => {
