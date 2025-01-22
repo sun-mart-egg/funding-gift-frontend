@@ -7,7 +7,7 @@ export const setCookie = (name, value, option) => {
   return cookies.set(name, value, {
     ...option,
     path: "/",
-    sameSite: "strict",
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 3), // 토큰 유효기간 3시간
   });
 };
 
