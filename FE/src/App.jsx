@@ -33,24 +33,9 @@ import StoryMain from "./pages/Story/StoryMain.jsx";
 import StoryPage from "./pages/Story/StoryPage.jsx";
 import MyPage from "./pages/Funding/MyPage.jsx";
 import AddressFormPage from "./pages/Funding/AddressFormPage.jsx";
-import { useEffect } from "react";
-import { removeAllCookie } from "./@common/cookies.js";
 
 function App() {
   const queryClient = new QueryClient();
-
-  // 브라우저 종료 시
-  // 로그인 시 얻는 토큰 정보 클리어
-  useEffect(() => {
-    const handlePageClose = () => {
-      removeAllCookie();
-    };
-
-    window.addEventListener("beforeunload", handlePageClose);
-    return () => {
-      window.addEventListener("beforeunload", handlePageClose);
-    };
-  }, [])
 
   return (
     <QueryClientProvider client={queryClient}>
