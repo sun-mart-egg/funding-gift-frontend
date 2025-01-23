@@ -108,6 +108,7 @@ function MyPage() {
     onSuccess: (res) => {
       console.log("주소 수정 완료");
       console.log(res);
+      queryClient.invalidateQueries({ queryKey: ["소비자 주소 정보"] })
     },
     onError: (err) => {
       console.error("주소 수정 실패", err);
@@ -126,7 +127,7 @@ function MyPage() {
     setEditAddr(selectAddrId);
     console.log(`선택한 주소 id: ${selectAddrId}`);
 
-    const selectAddr = addressInfo.find(address => address.id === selectAddrId);
+    const selectAddr = addressInfo.find(address => address.id === Number(selectAddrId));
     console.log(selectAddr);
   };
 
@@ -141,7 +142,7 @@ function MyPage() {
     // 수정모드 활성화 상태 시
     // 소비자 정보 수정 요청
     else {
-      const newAddr = addressInfo.find(address => address.id === editAddr);
+      const newAddr = addressInfo.find(address => address.id === Number(editAddr));
       await Promise.all([
         editConsumerInfo.mutateAsync({
           ...userInfo,
