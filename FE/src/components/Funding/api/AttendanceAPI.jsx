@@ -15,6 +15,8 @@ async function createAttendance(
     fundingId: fundingId,
   };
 
+  console.log("body", requestBody);
+
   try {
     const response = await fetch(
       import.meta.env.VITE_BASE_URL + "/api/attendance",
