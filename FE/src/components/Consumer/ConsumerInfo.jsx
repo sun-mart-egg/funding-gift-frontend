@@ -1,8 +1,8 @@
 import { AiFillCamera } from "react-icons/ai";
 import { IoLogOut } from "react-icons/io5";
 
-const ConsumerInfo = (
-  {isEditMode,
+const ConsumerInfo = ({
+  isEditMode,
   userInfo,
   editName,
   defaultAddress,
@@ -12,8 +12,8 @@ const ConsumerInfo = (
   checkMyFunding,
   handleEditClick,
   setIsEditMode,
-  handleLogOut}
-) => {
+  handleLogOut,
+}) => {
   return (
     <div className="sub-layer font-cusFont3">
       {/* 소비자 사진, 이름 영역 */}
@@ -75,7 +75,9 @@ const ConsumerInfo = (
             )}
           </div>
           <div className="sub-content">
-            <p className={`mr-1 w-full rounded-md p-3 px-2 font-cusFont3 text-[14px] ${isEditMode ? "border border-gray-400" : "bg-[#EFEFEF]"}`}>
+            <p
+              className={`mr-1 w-full rounded-md p-3 px-2 font-cusFont3 text-[14px] ${isEditMode ? "border border-gray-400" : "bg-[#EFEFEF]"}`}
+            >
               {userInfo.birthyear}-{String(userInfo.birthday).slice(0, 2)}-
               {String(userInfo.birthday).slice(2)}
             </p>
@@ -118,11 +120,15 @@ const ConsumerInfo = (
         <div id="account">
           <div className="sub-title pt-6">
             <p>기본 계좌</p>
-            <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
-              기본 계좌 선택
-            </button>
+            {isEditMode && (
+              <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
+                기본 계좌 선택
+              </button>
+            )}
           </div>
-          <p className={`mr-1 w-full rounded-md p-3 px-2 font-cusFont3 text-[14px] ${isEditMode ? "border border-gray-400" : "bg-[#EFEFEF]"}`}>
+          <p
+            className={`mr-1 w-full rounded-md p-3 px-2 font-cusFont3 text-[14px] ${isEditMode ? "border border-gray-400" : "bg-[#EFEFEF]"}`}
+          >
             ⚠ 계좌정보를 추가해야 합니다. ⚠
           </p>
         </div>
