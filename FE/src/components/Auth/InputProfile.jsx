@@ -8,58 +8,76 @@ import { putConsumers } from "../../services/Consumer/consumers"
 function InputProfile() {
   const updateUserStore = useUserStore((state) => state.updateUserStore);
   const myName = useUserStore((state) => state.name);
-  const myGender = useUserStore((state) => state.gender);
-  const [myBirthDay, setMyBirthday] = useState("");
   const myEmail = useUserStore((state) => state.email);
   const myPhoneNumber = useUserStore((state) => state.phoneNumber);
+  const [myBirthDay, setMyBirthday] = useState("");
+  const myGender = useUserStore((state) => state.gender);
   const navigate = useNavigate();
 
-  // 데이터 유효성 검사를 위한 useState
-  const [nameErr, setNameErr] = useState("");
-  const [genderErr, setGenderErr] = useState("");
-  const [birthErr, setBirthErr] = useState("");
-  const [emailErr, setEmailErr] = useState("");
-  const [phoneNumErr, setPhoneNumErr] = useState("");
-  const [totalErr, setTotalErr] = useState("");
+  // 입력한 정보에 대한 유효성 검사를 위한 상태변수
+  const [profileErr, setProfileErr] = useState({
+    name: "",
+    email: "",
+    phoneNumber: "",
+    birth: "",
+    gender: "",
+  });
 
+  // 유효성 검사
+  const profileIsValid = {
+    name: (value) => {
+      return value.length >= 1 && value.length <= 10 ? "" : "이름은 1자 이상 10자 이하이어야 합니다."
+    },
+    email: (value) => {
+      const patternEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      return !patternEmail.test(value) || value > 50 ? "이메일을 올바르게 입력해주세요." : ""
+    },
+    phoneNumber: (value) => {
+      const patternPhoneNum = /^\d{10,11}$/;
+      return !patternPhoneNum.test(value) ? "연락처를 올바르게 입력해주세요." : ""
+    },
+    birth: (value) => {
+      return !/^\d{0,8}$/.test(value) || value.length !== 8 ? "생년월일을 올바르게 입력해주세요." : ""
+    },
+    gender: (value) => {
+      return value ? "" : "성별을 선택해주세요."
+    },
+  };
+
+  // 유효성 검사에 따른 에러 문구 업데이트
+  const handleProfileValid = (field, value) => {
+    setProfileErr((prev) => ({
+      ...prev,
+      [field]: profileIsValid[field](value)
+    }));
+  };
+
+  // 정보 수정 요청 mutate
+  // 성공 시, 회원가입 페이지로 이동
   const editMyInfoMutate = useMutation({
     mutationFn: ({ name, email, phoneNumber, birthyear, birthday, gender }) =>
       putConsumers(name, email, phoneNumber, birthyear, birthday, gender),
-    onSuccess: (res) => {
+    onSuccess: () => {
       console.log("정보 수정 성공");
-      console.log(res);
       navigate("/signup");
     },
     onError: (err) => {
-      console.log("정보 수정 실패");
-      console.error(err);
-      setTotalErr("모든 정보를 올바르게 입력해주세요.");
+      console.error("정보 수정 실패", err);
     },
   });
 
   // 이름 input에 입력하는 값을 store의 name에 저장
   const handleName = (event) => {
     const inputName = event.target.value;
+    handleProfileValid("name", inputName);
     updateUserStore("name", inputName);
-    if (inputName.length < 1 || inputName.length > 10) {
-      setNameErr("이름은 1자 이상 10자 이하이어야 합니다.");
-    } else {
-      setNameErr("");
-    }
   };
 
   // e-mail input에 입력하는 값을 store의 email에 저장
   const handleEmail = (event) => {
     const inputEmail = event.target.value;
+    handleProfileValid("email", inputEmail);
     updateUserStore("email", inputEmail);
-
-    // 이메일 형식 검사 정규식
-    const patternEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!patternEmail.test(inputEmail) || inputEmail > 50) {
-      setEmailErr("이메일을 올바르게 입력해주세요.");
-    } else {
-      setEmailErr("");
-    }
   };
 
   // 생년월일 input에 입력하는 값을 store의 birthday에 저장
@@ -70,37 +88,22 @@ function InputProfile() {
     const birthyear = inputBirthday.toString().slice(0, 4);
     const birthday = inputBirthday.toString().slice(4);
 
-    // store에 저장
+    handleProfileValid("birth", inputBirthday);
     updateUserStore("birthyear", birthyear);
     updateUserStore("birthday", birthday);
-    if (!/^\d{0,8}$/.test(inputBirthday) || inputBirthday.length !== 8) {
-      setBirthErr("생년월일을 올바르게 입력해주세요.");
-    } else {
-      setBirthErr("");
-    }
   };
 
   // 연락처 input 에 입력하는 값을 store의 phoneNumber에 저장
   const handlePhoneNumber = (event) => {
     const inputPhoneNum = event.target.value;
+    handleProfileValid("phoneNumber", inputPhoneNum);
     updateUserStore("phoneNumber", inputPhoneNum);
-
-    // 전화번호 형식 검사 정규식
-    const patternPhoneNum = /^\d{10,11}$/;
-    if (!patternPhoneNum.test(inputPhoneNum)) {
-      setPhoneNumErr("연락처를 올바르게 입력해주세요.");
-    } else {
-      setPhoneNumErr("");
-    }
   };
 
+  // 성별 정보
   const handleGender = (genderValue) => {
+    handleProfileValid("gender", genderValue);
     updateUserStore("gender", genderValue);
-    if (!genderValue) {
-      setGenderErr("성별을 선택해주세요");
-    } else {
-      setGenderErr("");
-    }
   };
 
   // 서비스 최초 가입 시, 정보 수정을 서버에 요청하는 mutate
@@ -120,6 +123,7 @@ function InputProfile() {
   return (
     <div className="sub-layer top-[60px] gap-4">
       <img src={SignupLogo} alt="회원가입로고" className="m-3" />
+      {/* 이름 입력 및 성별 선택 */}
       <div className="flex w-[330px] justify-between">
         <input
           type="text"
@@ -145,9 +149,10 @@ function InputProfile() {
         </div>
       </div>
 
-      {nameErr && <p className="signup-font text-red-500">{nameErr}</p>}
-      {genderErr && <p className="signup-font text-red-500">{genderErr}</p>}
+      {profileErr.name && <p className="signup-font text-red-500">{profileErr.name}</p>}
+      {profileErr.gender && <p className="signup-font text-red-500">{profileErr.gender}</p>}
 
+      {/* 생년월일 입력 */}
       <input
         type="number"
         placeholder="생년/월/일 8자리를 입력해주세요"
@@ -156,8 +161,9 @@ function InputProfile() {
         onChange={handleBirthday}
         required
       />
-      {birthErr && <p className="signup-font text-red-500">{birthErr}</p>}
+      {profileErr.birth && <p className="signup-font text-red-500">{profileErr.birth}</p>}
 
+      {/* 이메일 입력 */}
       <input
         type="text"
         placeholder="이메일을 입력해주세요."
@@ -166,8 +172,9 @@ function InputProfile() {
         onChange={handleEmail}
         required
       />
-      {emailErr && <p className="signup-font text-red-500">{emailErr}</p>}
+      {profileErr.email && <p className="signup-font text-red-500">{profileErr.email}</p>}
 
+      {/* 연락처 입력 */}
       <input
         type="number"
         placeholder="연락처를 입력해주세요."
@@ -176,7 +183,7 @@ function InputProfile() {
         onChange={handlePhoneNumber}
         required
       />
-      {phoneNumErr && <p className="signup-font text-red-500">{phoneNumErr}</p>}
+      {profileErr.phoneNumber && <p className="signup-font text-red-500">{profileErr.phoneNumber}</p>}
 
       <button
         className="common-btn h-full max-h-[50px] w-full max-w-[284px]"
@@ -184,7 +191,6 @@ function InputProfile() {
       >
         다음
       </button>
-      {totalErr && <p className="signup-font text-red-500">{totalErr}</p>}
     </div>
   );
 }

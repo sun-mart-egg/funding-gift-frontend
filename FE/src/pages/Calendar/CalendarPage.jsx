@@ -13,13 +13,18 @@ const CalendarPage = () => {
   const [selectedEvents, setSelectedEvents] = useState([]); // 선택한 날짜에 있는 행사목록
   const [selectedDay, setSelectedDay] = useState(null); // 선택한 날짜에 대한 useState
 
-  // axios 요청을 위한 연도, 월 데이터
-  const [curYear, setCurYear] = useState("");
-  const [curMonth, setCurMonth] = useState("");
+  // 연도, 월 데이터 상태변수
+  const [curDate, setCurDate] = useState({
+    year: "",
+    month: "",
+  });
+
+  // 기념일 호출 쿼리
+  // 연도, 월 값이 있어야만 기념일을 불러온다
   const { data: events = [] } = useQuery({
-    queryKey: ["events", curYear, curMonth],
-    queryFn: () => getEventsList(curYear, curMonth),
-    enabled: Boolean(curYear && curMonth),
+    queryKey: ["events", curDate.year, curDate.month],
+    queryFn: () => getEventsList(curDate.year, curDate.month),
+    enabled: Boolean(curDate.year && curDate.month),
     select: (data) => data.map((item) => ({
       title: item.title,
       date: item.anniversaryDate,
@@ -60,8 +65,10 @@ const CalendarPage = () => {
     let day = parseInt(KoreaTime().split("-")[2], 10); // 일
 
     console.log(year, month, day);
-    setCurYear(year);
-    setCurMonth(month);
+    setCurDate({
+      year,
+      month,
+    });
   };
 
   // 페이지 접속 시, 오늘 날짜의 이벤트 목록들이 바로 출력되도록 설정
@@ -77,7 +84,7 @@ const CalendarPage = () => {
   // 캘린더에서 날짜 선택 시
   const handleDateClick = (arg) => {
     const clickedDate = arg.dateStr;
-    const ThisDate = events.filter((event) => {event.data === clickedDate});
+    const ThisDate = events.filter((event) => event.date === clickedDate);
     setSelectedEvents(ThisDate);
     setSelectedDay(clickedDate);
     console.log(clickedDate);
@@ -100,6 +107,7 @@ const CalendarPage = () => {
       <CalendarList
         ref={calendarRef}
         events={events}
+        today={KoreaTime}
         handleDateClick={handleDateClick}
         handleCurDate={handleCurDate}
         handleClickToday={handleClickToday}
