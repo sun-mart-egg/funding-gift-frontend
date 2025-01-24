@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { IoLogOut } from "react-icons/io5";
-import { AiFillCamera } from "react-icons/ai";
 import { useNavigate } from "react-router";
 
 import useConsumerInfo from "../../hooks/Consumer/useConsumerInfo";
@@ -8,6 +6,7 @@ import useEditConsumerInfo from "../../hooks/Consumer/useEditConsumerInfo";
 import useConsumerLogout from "../../hooks/Consumer/useConsumerLogout";
 
 import { getCookie, removeAllCookie } from "../../@common/cookies";
+import ConsumerInfo from "../../components/Consumer/ConsumerInfo";
 
 function MyPage() {
   const myFCMToken = getCookie("fcm-token");
@@ -18,30 +17,30 @@ function MyPage() {
   // 소비자 정보에 대한 커스텀 훅
   const [
     { data: userInfo = [] },
-    { data: addressInfo = [], isAddressLoading: isAddressLoading },
+    { data: addressInfo = [] },
     { data: isInprogress },
   ] = useConsumerInfo();
 
-  
-  // 기본 주소지
-  const defaultAddress = addressInfo.find(
-    (address) => address.isDefault === true,
-  );
-  
-  // 기본 주소지 기준으로 select 정렬
-  const sortConsumerAddr = [...addressInfo].sort((a, b) => {
-    return b.isDefault - a.isDefault;
-  });
-  
-  // 소비자 정보 수정을 위한 상태변수
-  const [editName, setEditName] = useState(userInfo.name);
-  const [editAddr, setEditAddr] = useState(defaultAddress?.id);
-  
   // 소비자 프로필, 주소 정보 수정 커스텀 훅
   const { editConsumerAddr, editConsumerInfo } = useEditConsumerInfo();
 
   // 로그아웃, fcm-token 삭제 커스텀 훅
   const { deleteTokenMutate, logOutMutate } = useConsumerLogout(myFCMToken);
+  
+  // 기본 주소지
+  const defaultAddress = addressInfo.find(
+    (address) => address.isDefault === true,
+  );
+
+  // 기본 주소지 기준으로 select 정렬
+  const sortConsumerAddr = [...addressInfo].sort((a, b) => {
+    return b.isDefault - a.isDefault;
+  });
+
+  // 소비자 정보 수정을 위한 상태변수
+  const [editName, setEditName] = useState(userInfo.name);
+  const [editAddr, setEditAddr] = useState(defaultAddress?.id);
+
 
   // 소비자 이름 변경
   const handleNameChange = (e) => {
@@ -54,8 +53,12 @@ function MyPage() {
     setEditAddr(selectAddrId);
     console.log(`선택한 주소 id: ${selectAddrId}`);
 
-    const selectAddr = addressInfo.find((address) => address.id === Number(selectAddrId));
-    console.log(`선택한 주소 정보: ${selectAddr.defaultAddr} ${selectAddr.detailAddr} / ${selectAddr.zipCode}`);
+    const selectAddr = addressInfo.find(
+      (address) => address.id === Number(selectAddrId),
+    );
+    console.log(
+      `선택한 주소 정보: ${selectAddr.defaultAddr} ${selectAddr.detailAddr} / ${selectAddr.zipCode}`,
+    );
   };
 
   // 수정 버튼 클릭 시 호출될 함수
@@ -136,175 +139,19 @@ function MyPage() {
   };
 
   return (
-    <div className="sub-layer font-cusFont3">
-      {isEditMode ? (
-        // 수정 모드 활성화 시 보여줄 UI
-        <>
-          <div className="head absolute top-20 flex w-full items-center px-6">
-            <div className="relative mr-4 ">
-              <img
-                src={userInfo.profileImageUrl}
-                alt=""
-                className=" h-[80px] w-[80px] rounded-full"
-              />
-              {/* 절대 위치를 사용한 카메라 아이콘 */}
-              <AiFillCamera
-                className="absolute bottom-0 right-1 text-[20px] text-[#9B9B9B]"
-                style={{ bottom: "-10px", right: "1px" }}
-              />
-            </div>
-            <div className="flex w-[70%] justify-between">
-              <input
-                type="text"
-                value={editName || ""}
-                onChange={handleNameChange}
-                placeholder={userInfo.name}
-                className="mr-1 w-full rounded-md border border-gray-400 px-2 font-cusFont5 text-[25px]"
-              />
-            </div>
-          </div>
-          <div className="content absolute top-52 w-full px-6 font-cusFont3">
-            <div className="birthday">
-              <div className="sub-title">
-                <p>생일</p>
-                <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
-                  생일 선택
-                </button>
-              </div>
-              <div className="sub-content">
-                <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
-                  {userInfo.birthyear}-{String(userInfo.birthday).slice(0, 2)}-
-                  {String(userInfo.birthday).slice(2)}
-                </p>
-              </div>
-            </div>
-            <div className="address">
-              <div className="sub-title pt-6 ">
-                <p>기본 주소</p>
-                <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
-                  기본 주소 선택
-                </button>
-              </div>
-              <select
-                className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]"
-                onChange={handleAddrChange}
-              >
-                {sortConsumerAddr.map((address) => (
-                  <option value={address.id} key={address.id}>
-                    {address.defaultAddr} {address.detailAddr} /{" "}
-                    {address.zipCode}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="account">
-              <div className="sub-title pt-6">
-                <p>기본 계좌</p>
-                <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
-                  기본 계좌 선택
-                </button>
-              </div>
-              <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
-                ⚠ 계좌정보를 추가해야 합니다. ⚠
-              </p>
-            </div>
-          </div>
-          <button
-            className="absolute bottom-16 right-[15%] pb-3 text-[12px] text-gray-300"
-            onClick={checkMyFunding}
-          >
-            회원 탈퇴
-          </button>
-          <div
-            id="buttonSection"
-            className="absolute bottom-0 flex w-full flex-row items-center justify-around gap-2 p-5"
-          >
-            <button
-              onClick={handleEditClick}
-              style={{ width: "calc(75% )" }} // 버튼 너비 조정
-              className="common-btn"
-            >
-              수정 완료
-            </button>
-            <button
-              onClick={() => setIsEditMode(false)}
-              style={{ width: "calc(75% )" }} // 버튼 너비 조정
-              className="common-btn"
-            >
-              취소
-            </button>
-          </div>
-        </>
-      ) : (
-        // 수정 모드 비활성화
-        <>
-          <div className="head absolute top-20 flex w-full items-center px-6">
-            <img
-              src={userInfo.profileImageUrl}
-              alt=""
-              className=" mr-4 h-[80px] w-[80px] rounded-full"
-            />
-            <div className="flex w-[70%] justify-between ">
-              <p className="mr-1 px-2 font-cusFont5 text-[25px]">
-                {userInfo.name}
-              </p>
-              <button
-                className="flex flex-col items-center justify-center"
-                onClick={handleLogOut}
-              >
-                <IoLogOut className="text-[25px]" />
-                <p className="text-[10px]">로그아웃</p>
-              </button>
-            </div>
-          </div>
-
-          <div className="content absolute top-52 w-full px-6">
-            <div className="birthday">
-              <div className="sub-title">
-                <p>생일</p>
-              </div>
-              <p className="mr-1 w-full rounded-md bg-[#EFEFEF] p-3 px-2 font-cusFont3 text-[14px]">
-                {userInfo.birthyear}-{String(userInfo.birthday).slice(0, 2)}-
-                {String(userInfo.birthday).slice(2)}
-              </p>
-            </div>
-            <div className="address pt-6">
-              <div className="sub-title">
-                <p>기본 주소</p>
-              </div>
-              <p className="mr-1 w-full rounded-md bg-[#EFEFEF] p-3 px-2 font-cusFont3 text-[14px]">
-                {isAddressLoading
-                  ? "로딩 중..."
-                  : defaultAddress
-                    ? `${defaultAddress.defaultAddr} ${defaultAddress.detailAddr} / ${defaultAddress.zipCode}`
-                    : "설정된 기본주소가 없습니다."}
-              </p>
-            </div>
-            <div className="account pt-6">
-              <div className="sub-title">
-                <p>기본 계좌</p>
-              </div>
-
-              <p className="mr-1 w-full rounded-md  bg-[#EFEFEF]  p-3 px-2 font-cusFont3 text-[14px] ">
-                ⚠ 계좌정보를 추가해야 합니다. ⚠
-              </p>
-            </div>
-          </div>
-          <div
-            id="buttonSection"
-            className="absolute bottom-0 flex w-full flex-col items-center justify-around pb-5"
-          >
-            <button
-              onClick={handleEditClick}
-              style={{ width: "calc(75% )" }} // 버튼 너비 조정
-              className="common-btn"
-            >
-              수정 하기
-            </button>
-          </div>
-        </>
-      )}
-    </div>
+    <ConsumerInfo
+      isEditMode={isEditMode}
+      userInfo={userInfo}
+      editName={editName}
+      defaultAddress={defaultAddress}
+      sortConsumerAddr={sortConsumerAddr}
+      handleNameChange={handleNameChange}
+      handleAddrChange={handleAddrChange}
+      checkMyFunding={checkMyFunding}
+      handleEditClick={handleEditClick}
+      setIsEditMode={setIsEditMode}
+      handleLogOut={handleLogOut}
+    />
   );
 }
 
