@@ -2,116 +2,46 @@ import { useState } from "react";
 import { IoLogOut } from "react-icons/io5";
 import { AiFillCamera } from "react-icons/ai";
 import { useNavigate } from "react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import {
-  getConsumers,
-  getInprogressFunding,
-  postConsumerLogout,
-  putConsumers,
-} from "../../services/Consumer/consumers";
-import { getAddressList, putAddress } from "../../services/Address/addresses";
-import { deleteFCMToken } from "../../services/Login/tokens";
+import useConsumerInfo from "../../hooks/Consumer/useConsumerInfo";
+import useEditConsumerInfo from "../../hooks/Consumer/useEditConsumerInfo";
+import useConsumerLogout from "../../hooks/Consumer/useConsumerLogout";
+
 import { getCookie, removeAllCookie } from "../../@common/cookies";
 
 function MyPage() {
-  const queryClient = useQueryClient();
   const myFCMToken = getCookie("fcm-token");
   const navigate = useNavigate();
   // 소비자 정보 수정 상태 ON / OFF
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // 소비자 정보 쿼리
-  const { data: userInfo = [] } = useQuery({
-    queryKey: ["소비자 정보"],
-    queryFn: getConsumers,
-    onError: (err) => {
-      console.error("소비자 정보 요청 실패", err);
-    },
-  });
+  // 소비자 정보에 대한 커스텀 훅
+  const [
+    { data: userInfo = [] },
+    { data: addressInfo = [], isAddressLoading: isAddressLoading },
+    { data: isInprogress },
+  ] = useConsumerInfo();
 
-  // 소비자 주소 정보 목록 호출 쿼리
-  const { data: addressInfo = [], isLoading } = useQuery({
-    queryKey: ["소비자 주소 정보"],
-    queryFn: getAddressList,
-    onError: (err) => {
-      console.error("주소 정보 요청 실패", err);
-    },
-  });
-
-  // 진행 중 펀딩 확인 쿼리
-  const { data: isInprogress } = useQuery({
-    queryKey: ["진행 중 펀딩"],
-    queryFn: getInprogressFunding,
-    onError: (err) => {
-      console.error("진행 중 펀딩 확인 실패", err);
-    },
-  });
-
+  
   // 기본 주소지
-  const defaultAddress = addressInfo.find((address) => address.isDefault === true);
-
+  const defaultAddress = addressInfo.find(
+    (address) => address.isDefault === true,
+  );
+  
   // 기본 주소지 기준으로 select 정렬
   const sortConsumerAddr = [...addressInfo].sort((a, b) => {
     return b.isDefault - a.isDefault;
   });
-
-  // 소비자 정보 수정
+  
+  // 소비자 정보 수정을 위한 상태변수
   const [editName, setEditName] = useState(userInfo.name);
   const [editAddr, setEditAddr] = useState(defaultAddress?.id);
+  
+  // 소비자 프로필, 주소 정보 수정 커스텀 훅
+  const { editConsumerAddr, editConsumerInfo } = useEditConsumerInfo();
 
-  // 로그아웃 요청 mutate
-  const logOutMutate = useMutation({
-    mutationFn: postConsumerLogout,
-    onSuccess: () => {
-      window.alert("로그아웃 되었습니다.");
-    },
-    onError: (err) => {
-      console.error("로그아웃 실패", err);
-    },
-  });
-
-  // fcm-token 삭제 요청 mutate
-  const deleteTokenMutate = useMutation({
-    mutationFn: () => deleteFCMToken(myFCMToken),
-    onSuccess: () => {
-      console.log("fcm-token 삭제 완료");
-    },
-    onError: (err) => {
-      console.error("fcm-token 삭제 실패", err);
-    },
-  });
-
-  // 소비자 정보 수정 요청 mutate
-  // 현재는 이름 변경만 요청하고 있음
-  const editConsumerInfo = useMutation({
-    mutationFn: ({ name, email, phoneNumber, birthyear, birthday, gender }) =>
-      putConsumers(name, email, phoneNumber, birthyear, birthday, gender),
-    onSuccess: () => {
-      console.log("정보 수정 완료");
-      queryClient.invalidateQueries({ queryKey: ["소비자 정보"] });
-    },
-    onError: (err) => {
-      console.error("정보 수정 실패", err);
-      window.alert(err.response.data.msg);
-      setEditName(userInfo.name);
-    },
-  });
-
-  // 소비자 주소 수정 요청 mutate
-  const editConsumerAddr = useMutation({
-    mutationFn: ({ addressId, name, defaultAddr, detailAddr, zipCode, isDefault }) =>
-      putAddress(addressId, name, defaultAddr, detailAddr, zipCode, isDefault),
-    onSuccess: (res) => {
-      console.log("주소 수정 완료");
-      console.log(res);
-      queryClient.invalidateQueries({ queryKey: ["소비자 주소 정보"] })
-    },
-    onError: (err) => {
-      console.error("주소 수정 실패", err);
-      setEditAddr(defaultAddress?.id);
-    },
-  });
+  // 로그아웃, fcm-token 삭제 커스텀 훅
+  const { deleteTokenMutate, logOutMutate } = useConsumerLogout(myFCMToken);
 
   // 소비자 이름 변경
   const handleNameChange = (e) => {
@@ -124,8 +54,8 @@ function MyPage() {
     setEditAddr(selectAddrId);
     console.log(`선택한 주소 id: ${selectAddrId}`);
 
-    const selectAddr = addressInfo.find(address => address.id === Number(selectAddrId));
-    console.log(`선택한 주소 정보: ${selectAddr}`);
+    const selectAddr = addressInfo.find((address) => address.id === Number(selectAddrId));
+    console.log(`선택한 주소 정보: ${selectAddr.defaultAddr} ${selectAddr.detailAddr} / ${selectAddr.zipCode}`);
   };
 
   // 수정 버튼 클릭 시 호출될 함수
@@ -139,7 +69,9 @@ function MyPage() {
     // 수정모드 활성화 상태 시
     // 소비자 정보 수정 요청
     else {
-      const newAddr = addressInfo.find(address => address.id === Number(editAddr));
+      const newAddr = addressInfo.find(
+        (address) => address.id === Number(editAddr),
+      );
       await Promise.all([
         editConsumerInfo.mutateAsync({
           ...userInfo,
@@ -148,14 +80,15 @@ function MyPage() {
 
         // 기본 주소값이 있다면
         // 변경 전 기본 주소에 대해 '주소 기본값' 해제
-        defaultAddress && editConsumerAddr.mutateAsync({
-          addressId: defaultAddress.id,
-          name: defaultAddress.name,
-          defaultAddr: defaultAddress.defaultAddr,
-          detailAddr: defaultAddress.detailAddr,
-          zipCode: defaultAddress.zipCode,
-          isDefault: false,
-        }),
+        defaultAddress &&
+          editConsumerAddr.mutateAsync({
+            addressId: defaultAddress.id,
+            name: defaultAddress.name,
+            defaultAddr: defaultAddress.defaultAddr,
+            detailAddr: defaultAddress.detailAddr,
+            zipCode: defaultAddress.zipCode,
+            isDefault: false,
+          }),
 
         // 새로운 주소에 대해 '주소 기본값' 설정
         editConsumerAddr.mutateAsync({
@@ -166,7 +99,7 @@ function MyPage() {
           zipCode: newAddr.zipCode,
           isDefault: true,
         }),
-      ])
+      ]);
       setIsEditMode(false);
     }
   };
@@ -252,7 +185,10 @@ function MyPage() {
                   기본 주소 선택
                 </button>
               </div>
-              <select className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]" onChange={handleAddrChange}>
+              <select
+                className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]"
+                onChange={handleAddrChange}
+              >
                 {sortConsumerAddr.map((address) => (
                   <option value={address.id} key={address.id}>
                     {address.defaultAddr} {address.detailAddr} /{" "}
@@ -281,7 +217,7 @@ function MyPage() {
           </button>
           <div
             id="buttonSection"
-            className="absolute bottom-0 flex w-full flex-row items-center justify-around p-5 gap-2"
+            className="absolute bottom-0 flex w-full flex-row items-center justify-around gap-2 p-5"
           >
             <button
               onClick={handleEditClick}
@@ -337,7 +273,7 @@ function MyPage() {
                 <p>기본 주소</p>
               </div>
               <p className="mr-1 w-full rounded-md bg-[#EFEFEF] p-3 px-2 font-cusFont3 text-[14px]">
-                {isLoading
+                {isAddressLoading
                   ? "로딩 중..."
                   : defaultAddress
                     ? `${defaultAddress.defaultAddr} ${defaultAddress.detailAddr} / ${defaultAddress.zipCode}`
