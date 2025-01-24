@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { getCookie } from "../../@common/cookies";
 
+//API
 import { getConsumers } from "../../services/Consumer/consumers";
-import { getAnniversaryList } from "../../services/Funding/getAnniversaryList";
+import { getAnniversaryList } from "../../services/Funding/anniversary";
 import { getProductDetail } from "../../services/Products/products";
 
+//Store
 import useFormDataStore from "../../components/Store/FormDataStore";
 import { useStore } from "../../components/Store/MakeStore";
 

@@ -75,7 +75,7 @@ async function getFundingAttendee(token, fundingId, setData) {
         },
       },
     );
-    console.log("내 펀딩에 참여한 목록 응답 : " + response.data.data.data);
+    console.log("내 펀딩에 참여한 목록 응답 : ", response.data.data.data);
     setData(response.data.data.data);
   } catch (error) {
     console.error("내 펀딩에 참여한 펀딩 목록 불러오기 에러", error);
