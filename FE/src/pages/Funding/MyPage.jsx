@@ -3,11 +3,10 @@ import { useNavigate } from "react-router";
 
 import { useConsumer } from "../../hooks/Consumer/useConsumer";
 
-import { getCookie, removeAllCookie } from "../../@common/cookies";
+import { removeAllCookie } from "../../@common/cookies";
 import ConsumerInfo from "../../components/Consumer/ConsumerInfo";
 
 function MyPage() {
-  const myFCMToken = getCookie("fcm-token");
   const navigate = useNavigate();
   // 소비자 정보 수정 상태 ON / OFF
   const [isEditMode, setIsEditMode] = useState(false);
@@ -42,7 +41,7 @@ function MyPage() {
   const [editAddr, setEditAddr] = useState(defaultAddress?.id);
 
   // 소비자 프로필 및 주소 정보 수정 커스텀 훅
-  const editDeleteToken = useConsumerDeleteToken(myFCMToken);
+  const editDeleteToken = useConsumerDeleteToken();
   const editConsumerInfo = useConsumerEditInfo(setEditName);
   const editConsumerAddr = useConsumerEditAddr(setEditAddr, defaultAddress);
 
@@ -116,7 +115,7 @@ function MyPage() {
   const handleLogOut = async () => {
     await Promise.all([
       useConsumerLogout.mutateAsync(),
-      editDeleteToken.mutateAsync(myFCMToken),
+      editDeleteToken.mutateAsync(),
     ]);
     removeAllCookie();
     navigate("/");

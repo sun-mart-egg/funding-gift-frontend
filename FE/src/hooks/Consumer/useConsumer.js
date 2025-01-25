@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getConsumers, getInprogressFunding, postConsumerLogout, putConsumers } from "../../services/Consumer/consumers";
 import { getAddressList, putAddress } from "../../services/Address/addresses";
 import { deleteFCMToken } from "../../services/Login/tokens";
+import { getCookie } from "../../@common/cookies";
 
 export const useConsumer = () => {
   // 1. 소비자 프로필 호출
@@ -43,9 +44,10 @@ export const useConsumer = () => {
   });
 
   // 5. fcm-token 삭제 요청 mutate
-  const useConsumerDeleteToken = (fcmToken) => {
+  const useConsumerDeleteToken = () => {
+    const myFCMToken = getCookie("fcm-token");
     return useMutation({
-      mutationFn: () => deleteFCMToken(fcmToken),
+      mutationFn: () => deleteFCMToken(myFCMToken),
       onSuccess: () => {
         console.log("fcm-token 삭제 완료");
       },
