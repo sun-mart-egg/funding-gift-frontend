@@ -1,28 +1,24 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query"
 import { BsPeopleFill } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
+import { AiOutlinePlus } from "react-icons/ai";
+
 import SearchBar from "../../components/UI/SearchBar";
 import CardList from "../../components/Funding/component/CardList";
-import { useState } from "react";
-import { AiOutlinePlus } from "react-icons/ai";
-import { useNavigate } from "react-router-dom";
 
-import { useQuery } from "@tanstack/react-query"
-import { getConsumers } from "../../services/Consumer/consumers";
+import { useConsumer } from "../../hooks/Consumer/useConsumer";
+
 import { getMyFundings, getMyAttendance } from "../../services/Funding/fundings";
 
 function MyFunding() {
   const navigate = useNavigate();
   const [buttonSelected, setButtonSelected] = useState("myFunding");
+  const { useConsumerInfo } = useConsumer();
 
-  // 소비자 정보 호출 쿼리
-  const { data: userInfo = [] } = useQuery({
-    queryKey: ["소비자 정보"],
-    queryFn: getConsumers,
-    onError: (err) => {
-      console.log("소비자 정보 요청 실패")
-      console.error(err)
-    }
-  })
+  // 소비자 정보 호출
+  const { data: userInfo = [] } = useConsumerInfo;
 
   // 내가 만든 펀딩 호출 쿼리
   // 무한 스크롤 적용 예정
@@ -102,7 +98,7 @@ function MyFunding() {
               : `w-3/6 border-b border-t border-cusColor3 p-4 text-xs`
           }
         >
-          내가 만든 펀딩 ({myFundings.length})
+          내가 만든 펀딩
         </button>
         <button
           onClick={handleClickButton}
@@ -113,7 +109,7 @@ function MyFunding() {
               : `w-3/6 border-b border-t border-cusColor3 p-4 text-xs`
           }
         >
-          내가 참여한 펀딩 ({myAttendance.length})
+          내가 참여한 펀딩
         </button>
       </div>
 
