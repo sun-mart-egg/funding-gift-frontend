@@ -7,6 +7,8 @@ const getEventsList = async(year, month) => {
       month,
     },
   });
+  console.log(`${year}년 ${month}월 기념일 목록`);
+  console.log(response.data.data);
   return response.data.data;
 };
 
