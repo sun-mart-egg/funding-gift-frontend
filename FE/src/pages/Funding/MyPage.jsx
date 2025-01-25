@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import useConsumerInfo from "../../hooks/Consumer/useConsumerInfo";
-import useEditConsumerInfo from "../../hooks/Consumer/useEditConsumerInfo";
-import useConsumerLogout from "../../hooks/Consumer/useConsumerLogout";
+import { useConsumer } from "../../hooks/Consumer/useConsumer";
 
 import { getCookie, removeAllCookie } from "../../@common/cookies";
 import ConsumerInfo from "../../components/Consumer/ConsumerInfo";
@@ -14,19 +12,21 @@ function MyPage() {
   // 소비자 정보 수정 상태 ON / OFF
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // 소비자 정보에 대한 커스텀 훅
-  const [
-    { data: userInfo = [] },
-    { data: addressInfo = [] },
-    { data: isInprogress },
-  ] = useConsumerInfo();
+  // 소비자 관련 커스텀 훅
+  const {
+    useConsumerInfo,
+    useConsumerAddrInfo,
+    useConsumerisProgress,
+    useConsumerLogout,
+    useConsumerDeleteToken,
+    useConsumerEditAddr,
+    useConsumerEditInfo,
+  } = useConsumer();
 
-  // 소비자 프로필, 주소 정보 수정 커스텀 훅
-  const { editConsumerAddr, editConsumerInfo } = useEditConsumerInfo();
+  const { data: userInfo = [] } = useConsumerInfo;
+  const { data: addressInfo = [] } = useConsumerAddrInfo;
+  const { data: isInprogress } = useConsumerisProgress;
 
-  // 로그아웃, fcm-token 삭제 커스텀 훅
-  const { deleteTokenMutate, logOutMutate } = useConsumerLogout(myFCMToken);
-  
   // 기본 주소지
   const defaultAddress = addressInfo.find(
     (address) => address.isDefault === true,
@@ -41,6 +41,10 @@ function MyPage() {
   const [editName, setEditName] = useState(userInfo.name);
   const [editAddr, setEditAddr] = useState(defaultAddress?.id);
 
+  // 소비자 프로필 및 주소 정보 수정 커스텀 훅
+  const editDeleteToken = useConsumerDeleteToken(myFCMToken);
+  const editConsumerInfo = useConsumerEditInfo(setEditName);
+  const editConsumerAddr = useConsumerEditAddr(setEditAddr, defaultAddress);
 
   // 소비자 이름 변경
   const handleNameChange = (e) => {
@@ -111,8 +115,8 @@ function MyPage() {
   // 로그아웃 요청 -> fcm-token 삭제 요청 -> 쿠키에서 토큰 정보 삭제 -> 메인으로 이동
   const handleLogOut = async () => {
     await Promise.all([
-      logOutMutate.mutateAsync(),
-      deleteTokenMutate.mutateAsync(myFCMToken),
+      useConsumerLogout.mutateAsync(),
+      editDeleteToken.mutateAsync(myFCMToken),
     ]);
     removeAllCookie();
     navigate("/");
