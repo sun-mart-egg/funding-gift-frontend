@@ -1,48 +1,38 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { BsPeopleFill } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
+import { AiOutlinePlus } from "react-icons/ai";
+
 import SearchBar from "../../components/UI/SearchBar";
 import CardList from "../../components/Funding/component/CardList";
-import { useState } from "react";
-import { AiOutlinePlus } from "react-icons/ai";
-import { useNavigate } from "react-router-dom";
 
-import { useQuery } from "@tanstack/react-query"
-import { getConsumers } from "../../services/Consumer/consumers";
-import { getMyFundings, getMyAttendance } from "../../services/Funding/fundings";
+import { useConsumer } from "../../hooks/Consumer/useConsumer";
+
+import {
+  getMyFundings,
+  getMyAttendance,
+} from "../../services/Funding/fundings";
 
 function MyFunding() {
   const navigate = useNavigate();
   const [buttonSelected, setButtonSelected] = useState("myFunding");
+  const { useConsumerInfo } = useConsumer();
 
-  // 소비자 정보 호출 쿼리
-  const { data: userInfo = [] } = useQuery({
-    queryKey: ["소비자 정보"],
-    queryFn: getConsumers,
-    onError: (err) => {
-      console.log("소비자 정보 요청 실패")
-      console.error(err)
-    }
-  })
+  // 소비자 정보 호출
+  const { data: userInfo = [] } = useConsumerInfo;
 
-  // 내가 만든 펀딩 호출 쿼리
+  // 내가 생성 및 참여한 펀딩 목록 쿼리
   // 무한 스크롤 적용 예정
-  const { data: myFundings = [] } = useQuery({
-    queryKey: ["내 펀딩"],
-    queryFn: getMyFundings,
+  const { data: fundingList = [] } = useQuery({
+    queryKey:
+      buttonSelected === "myFunding" ? ["내 펀딩"] : ["내가 참여한 펀딩"],
+    queryFn: buttonSelected === "myFunding" ? getMyFundings : getMyAttendance,
     onError: (err) => {
-      console.error(err)
+      console.error("펀딩 목록 호출 실패", err);
     },
   });
-
-  // 내가 참여한 펀딩 호출 쿼리
-  // 무한 스크롤 적용 예정
-  const { data: myAttendance = [] } = useQuery({
-    queryKey: ["내가 참여한 펀딩"],
-    queryFn: getMyAttendance,
-    onError: (err) => {
-      console.error(err)
-    }
-  })
 
   // 버튼 클릭에 따른 펀딩 목록 및 UI 변경
   const handleClickButton = (e) => {
@@ -102,7 +92,7 @@ function MyFunding() {
               : `w-3/6 border-b border-t border-cusColor3 p-4 text-xs`
           }
         >
-          내가 만든 펀딩 ({myFundings.length})
+          내가 만든 펀딩
         </button>
         <button
           onClick={handleClickButton}
@@ -113,30 +103,21 @@ function MyFunding() {
               : `w-3/6 border-b border-t border-cusColor3 p-4 text-xs`
           }
         >
-          내가 참여한 펀딩 ({myAttendance.length})
+          내가 참여한 펀딩
         </button>
       </div>
 
       {/* 나의 펀딩, 참여 펀딩 목록 */}
       <div id="mainSection" className=" flex-center w-full flex-col p-4">
         <SearchBar />
-        {buttonSelected === "myFunding" ? ( // buttonSelected에 따라 조건부 렌더링
-          myFundings.length === 0 ? (
-            <div className="m-1 flex flex-col items-center justify-start p-10 font-cusFont3 text-[20px]">
-              아직 만들어진 펀딩이 없습니다.{" "}
-            </div>
-          ) : (
-            <CardList data={myFundings} basePath="/my-funding-detail" />
-          )
-        ) : (
-          myAttendance.length === 0 ? (
-            <div className="m-1 flex flex-col items-center justify-start p-10 font-cusFont3 text-[20px]">
-              아직 참여한 펀딩이 없습니다.{" "}
-            </div>
-          ) : (
-            <CardList data={myAttendance} basePath="/friend-funding-detail" />
-          )
-        )}
+        <CardList
+          data={fundingList}
+          basePath={
+            buttonSelected === "myFunding"
+              ? "/my-funding-detail"
+              : "/friend-funding-detail"
+          }
+        />
       </div>
 
       {/* 펀딩 생성 버튼 */}
