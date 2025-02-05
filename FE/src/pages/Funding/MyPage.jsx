@@ -1,117 +1,49 @@
 import { useState } from "react";
-import { IoLogOut } from "react-icons/io5";
-import { AiFillCamera } from "react-icons/ai";
 import { useNavigate } from "react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import {
-  getConsumers,
-  getInprogressFunding,
-  postConsumerLogout,
-  putConsumers,
-} from "../../services/Consumer/consumers";
-import { getAddressList, putAddress } from "../../services/Address/addresses";
-import { deleteFCMToken } from "../../services/Login/tokens";
-import { getCookie, removeAllCookie } from "../../@common/cookies";
+import { useConsumer } from "../../hooks/Consumer/useConsumer";
+
+import { removeAllCookie } from "../../@common/cookies";
+import ConsumerInfo from "../../components/Consumer/ConsumerInfo";
 
 function MyPage() {
-  const queryClient = useQueryClient();
-  const myFCMToken = getCookie("fcm-token");
   const navigate = useNavigate();
   // 소비자 정보 수정 상태 ON / OFF
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // 소비자 정보 쿼리
-  const { data: userInfo = [] } = useQuery({
-    queryKey: ["소비자 정보"],
-    queryFn: getConsumers,
-    onError: (err) => {
-      console.error("소비자 정보 요청 실패", err);
-    },
-  });
+  // 소비자 관련 커스텀 훅
+  const {
+    useConsumerInfo,
+    useConsumerAddrInfo,
+    useConsumerisProgress,
+    useConsumerLogout,
+    useConsumerDeleteToken,
+    useConsumerEditAddr,
+    useConsumerEditInfo,
+  } = useConsumer();
 
-  // 소비자 주소 정보 목록 호출 쿼리
-  const { data: addressInfo = [], isLoading } = useQuery({
-    queryKey: ["소비자 주소 정보"],
-    queryFn: getAddressList,
-    onError: (err) => {
-      console.error("주소 정보 요청 실패", err);
-    },
-  });
-
-  // 진행 중 펀딩 확인 쿼리
-  const { data: isInprogress } = useQuery({
-    queryKey: ["진행 중 펀딩"],
-    queryFn: getInprogressFunding,
-    onError: (err) => {
-      console.error("진행 중 펀딩 확인 실패", err);
-    },
-  });
+  const { data: userInfo = [] } = useConsumerInfo;
+  const { data: addressInfo = [] } = useConsumerAddrInfo;
+  const { data: isInprogress } = useConsumerisProgress;
 
   // 기본 주소지
-  const defaultAddress = addressInfo.find((address) => address.isDefault === true);
+  const defaultAddress = addressInfo.find(
+    (address) => address.isDefault === true,
+  );
 
   // 기본 주소지 기준으로 select 정렬
   const sortConsumerAddr = [...addressInfo].sort((a, b) => {
     return b.isDefault - a.isDefault;
   });
 
-  // 소비자 정보 수정
+  // 소비자 정보 수정을 위한 상태변수
   const [editName, setEditName] = useState(userInfo.name);
   const [editAddr, setEditAddr] = useState(defaultAddress?.id);
 
-  // 로그아웃 요청 mutate
-  const logOutMutate = useMutation({
-    mutationFn: postConsumerLogout,
-    onSuccess: () => {
-      window.alert("로그아웃 되었습니다.");
-    },
-    onError: (err) => {
-      console.error("로그아웃 실패", err);
-    },
-  });
-
-  // fcm-token 삭제 요청 mutate
-  const deleteTokenMutate = useMutation({
-    mutationFn: () => deleteFCMToken(myFCMToken),
-    onSuccess: () => {
-      console.log("fcm-token 삭제 완료");
-    },
-    onError: (err) => {
-      console.error("fcm-token 삭제 실패", err);
-    },
-  });
-
-  // 소비자 정보 수정 요청 mutate
-  // 현재는 이름 변경만 요청하고 있음
-  const editConsumerInfo = useMutation({
-    mutationFn: ({ name, email, phoneNumber, birthyear, birthday, gender }) =>
-      putConsumers(name, email, phoneNumber, birthyear, birthday, gender),
-    onSuccess: () => {
-      console.log("정보 수정 완료");
-      queryClient.invalidateQueries({ queryKey: ["소비자 정보"] });
-    },
-    onError: (err) => {
-      console.error("정보 수정 실패", err);
-      window.alert(err.response.data.msg);
-      setEditName(userInfo.name);
-    },
-  });
-
-  // 소비자 주소 수정 요청 mutate
-  const editConsumerAddr = useMutation({
-    mutationFn: ({ addressId, name, defaultAddr, detailAddr, zipCode, isDefault }) =>
-      putAddress(addressId, name, defaultAddr, detailAddr, zipCode, isDefault),
-    onSuccess: (res) => {
-      console.log("주소 수정 완료");
-      console.log(res);
-      queryClient.invalidateQueries({ queryKey: ["소비자 주소 정보"] })
-    },
-    onError: (err) => {
-      console.error("주소 수정 실패", err);
-      setEditAddr(defaultAddress?.id);
-    },
-  });
+  // 소비자 프로필 및 주소 정보 수정 커스텀 훅
+  const editDeleteToken = useConsumerDeleteToken();
+  const editConsumerInfo = useConsumerEditInfo(setEditName);
+  const editConsumerAddr = useConsumerEditAddr(setEditAddr, defaultAddress);
 
   // 소비자 이름 변경
   const handleNameChange = (e) => {
@@ -124,8 +56,12 @@ function MyPage() {
     setEditAddr(selectAddrId);
     console.log(`선택한 주소 id: ${selectAddrId}`);
 
-    const selectAddr = addressInfo.find(address => address.id === Number(selectAddrId));
-    console.log(`선택한 주소 정보: ${selectAddr}`);
+    const selectAddr = addressInfo.find(
+      (address) => address.id === Number(selectAddrId),
+    );
+    console.log(
+      `선택한 주소 정보: ${selectAddr.defaultAddr} ${selectAddr.detailAddr} / ${selectAddr.zipCode}`,
+    );
   };
 
   // 수정 버튼 클릭 시 호출될 함수
@@ -139,7 +75,9 @@ function MyPage() {
     // 수정모드 활성화 상태 시
     // 소비자 정보 수정 요청
     else {
-      const newAddr = addressInfo.find(address => address.id === Number(editAddr));
+      const newAddr = addressInfo.find(
+        (address) => address.id === Number(editAddr),
+      );
       await Promise.all([
         editConsumerInfo.mutateAsync({
           ...userInfo,
@@ -148,14 +86,15 @@ function MyPage() {
 
         // 기본 주소값이 있다면
         // 변경 전 기본 주소에 대해 '주소 기본값' 해제
-        defaultAddress && editConsumerAddr.mutateAsync({
-          addressId: defaultAddress.id,
-          name: defaultAddress.name,
-          defaultAddr: defaultAddress.defaultAddr,
-          detailAddr: defaultAddress.detailAddr,
-          zipCode: defaultAddress.zipCode,
-          isDefault: false,
-        }),
+        defaultAddress &&
+          editConsumerAddr.mutateAsync({
+            addressId: defaultAddress.id,
+            name: defaultAddress.name,
+            defaultAddr: defaultAddress.defaultAddr,
+            detailAddr: defaultAddress.detailAddr,
+            zipCode: defaultAddress.zipCode,
+            isDefault: false,
+          }),
 
         // 새로운 주소에 대해 '주소 기본값' 설정
         editConsumerAddr.mutateAsync({
@@ -166,7 +105,7 @@ function MyPage() {
           zipCode: newAddr.zipCode,
           isDefault: true,
         }),
-      ])
+      ]);
       setIsEditMode(false);
     }
   };
@@ -175,8 +114,8 @@ function MyPage() {
   // 로그아웃 요청 -> fcm-token 삭제 요청 -> 쿠키에서 토큰 정보 삭제 -> 메인으로 이동
   const handleLogOut = async () => {
     await Promise.all([
-      logOutMutate.mutateAsync(),
-      deleteTokenMutate.mutateAsync(myFCMToken),
+      useConsumerLogout.mutateAsync(),
+      editDeleteToken.mutateAsync(),
     ]);
     removeAllCookie();
     navigate("/");
@@ -203,172 +142,19 @@ function MyPage() {
   };
 
   return (
-    <div className="sub-layer font-cusFont3">
-      {isEditMode ? (
-        // 수정 모드 활성화 시 보여줄 UI
-        <>
-          <div className="head absolute top-20 flex w-full items-center px-6">
-            <div className="relative mr-4 ">
-              <img
-                src={userInfo.profileImageUrl}
-                alt=""
-                className=" h-[80px] w-[80px] rounded-full"
-              />
-              {/* 절대 위치를 사용한 카메라 아이콘 */}
-              <AiFillCamera
-                className="absolute bottom-0 right-1 text-[20px] text-[#9B9B9B]"
-                style={{ bottom: "-10px", right: "1px" }}
-              />
-            </div>
-            <div className="flex w-[70%] justify-between">
-              <input
-                type="text"
-                value={editName || ""}
-                onChange={handleNameChange}
-                placeholder={userInfo.name}
-                className="mr-1 w-full rounded-md border border-gray-400 px-2 font-cusFont5 text-[25px]"
-              />
-            </div>
-          </div>
-          <div className="content absolute top-52 w-full px-6 font-cusFont3">
-            <div className="birthday">
-              <div className="sub-title">
-                <p>생일</p>
-                <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
-                  생일 선택
-                </button>
-              </div>
-              <div className="sub-content">
-                <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
-                  {userInfo.birthyear}-{String(userInfo.birthday).slice(0, 2)}-
-                  {String(userInfo.birthday).slice(2)}
-                </p>
-              </div>
-            </div>
-            <div className="address">
-              <div className="sub-title pt-6 ">
-                <p>기본 주소</p>
-                <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
-                  기본 주소 선택
-                </button>
-              </div>
-              <select className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]" onChange={handleAddrChange}>
-                {sortConsumerAddr.map((address) => (
-                  <option value={address.id} key={address.id}>
-                    {address.defaultAddr} {address.detailAddr} /{" "}
-                    {address.zipCode}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="account">
-              <div className="sub-title pt-6">
-                <p>기본 계좌</p>
-                <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
-                  기본 계좌 선택
-                </button>
-              </div>
-              <p className="mr-1 w-full rounded-md border border-gray-400 p-3 px-2 font-cusFont3 text-[14px]">
-                ⚠ 계좌정보를 추가해야 합니다. ⚠
-              </p>
-            </div>
-          </div>
-          <button
-            className="absolute bottom-16 right-[15%] pb-3 text-[12px] text-gray-300"
-            onClick={checkMyFunding}
-          >
-            회원 탈퇴
-          </button>
-          <div
-            id="buttonSection"
-            className="absolute bottom-0 flex w-full flex-row items-center justify-around p-5 gap-2"
-          >
-            <button
-              onClick={handleEditClick}
-              style={{ width: "calc(75% )" }} // 버튼 너비 조정
-              className="common-btn"
-            >
-              수정 완료
-            </button>
-            <button
-              onClick={() => setIsEditMode(false)}
-              style={{ width: "calc(75% )" }} // 버튼 너비 조정
-              className="common-btn"
-            >
-              취소
-            </button>
-          </div>
-        </>
-      ) : (
-        // 수정 모드 비활성화
-        <>
-          <div className="head absolute top-20 flex w-full items-center px-6">
-            <img
-              src={userInfo.profileImageUrl}
-              alt=""
-              className=" mr-4 h-[80px] w-[80px] rounded-full"
-            />
-            <div className="flex w-[70%] justify-between ">
-              <p className="mr-1 px-2 font-cusFont5 text-[25px]">
-                {userInfo.name}
-              </p>
-              <button
-                className="flex flex-col items-center justify-center"
-                onClick={handleLogOut}
-              >
-                <IoLogOut className="text-[25px]" />
-                <p className="text-[10px]">로그아웃</p>
-              </button>
-            </div>
-          </div>
-
-          <div className="content absolute top-52 w-full px-6">
-            <div className="birthday">
-              <div className="sub-title">
-                <p>생일</p>
-              </div>
-              <p className="mr-1 w-full rounded-md bg-[#EFEFEF] p-3 px-2 font-cusFont3 text-[14px]">
-                {userInfo.birthyear}-{String(userInfo.birthday).slice(0, 2)}-
-                {String(userInfo.birthday).slice(2)}
-              </p>
-            </div>
-            <div className="address pt-6">
-              <div className="sub-title">
-                <p>기본 주소</p>
-              </div>
-              <p className="mr-1 w-full rounded-md bg-[#EFEFEF] p-3 px-2 font-cusFont3 text-[14px]">
-                {isLoading
-                  ? "로딩 중..."
-                  : defaultAddress
-                    ? `${defaultAddress.defaultAddr} ${defaultAddress.detailAddr} / ${defaultAddress.zipCode}`
-                    : "설정된 기본주소가 없습니다."}
-              </p>
-            </div>
-            <div className="account pt-6">
-              <div className="sub-title">
-                <p>기본 계좌</p>
-              </div>
-
-              <p className="mr-1 w-full rounded-md  bg-[#EFEFEF]  p-3 px-2 font-cusFont3 text-[14px] ">
-                ⚠ 계좌정보를 추가해야 합니다. ⚠
-              </p>
-            </div>
-          </div>
-          <div
-            id="buttonSection"
-            className="absolute bottom-0 flex w-full flex-col items-center justify-around pb-5"
-          >
-            <button
-              onClick={handleEditClick}
-              style={{ width: "calc(75% )" }} // 버튼 너비 조정
-              className="common-btn"
-            >
-              수정 하기
-            </button>
-          </div>
-        </>
-      )}
-    </div>
+    <ConsumerInfo
+      isEditMode={isEditMode}
+      userInfo={userInfo}
+      editName={editName}
+      defaultAddress={defaultAddress}
+      sortConsumerAddr={sortConsumerAddr}
+      handleNameChange={handleNameChange}
+      handleAddrChange={handleAddrChange}
+      checkMyFunding={checkMyFunding}
+      handleEditClick={handleEditClick}
+      setIsEditMode={setIsEditMode}
+      handleLogOut={handleLogOut}
+    />
   );
 }
 
