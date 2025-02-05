@@ -52,18 +52,22 @@ function Paypage() {
     return <div>Loading...</div>;
   }
 
+  //결제 버튼을 클릭했을때 동작
   const handlePayment = async () => {
+    if (!attendanceResponse) {
+      alert("참여자 정보를 불러오는 중입니다. 잠시만 기다려 주세요.");
+      return;
+    }
     try {
-      requestPay().then(() => {
-        const response = createAttendance(
-          getCookie("access-token"),
-          fundingId,
-          sendMessage,
-          sendMessageTitle,
-          price,
-        );
-        // console.log("참여 후 정보 잘 받아왔나? : " + response.data.fundingName);
-      });
+      const response = await createAttendance(
+        getCookie("access-token"),
+        fundingId,
+        sendMessage,
+        sendMessageTitle,
+        price,
+      );
+      setAttendanceResponse(response);
+      requestPay(response); // 응답 데이터를 requestPay에 전달
     } catch (error) {
       console.error("결제 중 오류가 발생했습니다: ", error);
     }
