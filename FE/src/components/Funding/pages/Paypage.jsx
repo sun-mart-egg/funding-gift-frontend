@@ -2,20 +2,18 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import useAttendanceStore from "../../Store/AttendanceStore";
+import { getCookie } from "../../../@common/cookies";
+
+//API
 import { createAttendance } from "../api/AttendanceAPI";
-import { fetchDetailFunding } from "../api/FundingAPI";
+import { getDetailFunding } from "../../../services/Funding/fundings";
+import { getConsumers } from "../../../services/Consumer/consumers";
+
 function Paypage() {
   const navigate = useNavigate(); // useNavigate 훅을 사용합니다.
   const [fundingDetail, setFundingDetail] = useState(null);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const { sendMessage, sendMessageTitle, price, fundingId } =
     useAttendanceStore();
-
-  // 결제 수단을 선택하는 함수입니다.
-  const selectPaymentMethod = (method) => {
-    setSelectedPaymentMethod(method);
-  };
-
   const [attendanceResponse, setAttendanceResponse] = useState();
 
   useEffect(() => {
@@ -31,55 +29,51 @@ function Paypage() {
     };
   }, []);
 
+  //내 정보 받아오기
   useEffect(() => {
-    console.log("펀딩 id " + fundingId);
-    const token = localStorage.getItem("access-token");
-    if (token && fundingId) {
-      console.log(`Fetching funding details for ID: ${fundingId}`);
-      fetchDetailFunding(token, fundingId, setFundingDetail)
-        .then(() => {
-          console.log("Funding details fetched successfully.");
-        })
-        .catch((error) => {
-          console.error("Error fetching funding details:", error);
-        });
-    }
+    getConsumers().then((data) => {
+      setAttendanceResponse(data);
+    });
+  }, []);
+
+  useEffect(() => {
+    console.log("참여자 정보", attendanceResponse);
+  }, [attendanceResponse]);
+
+  //디테일 펀딩 정보 불러오기
+  useEffect(() => {
+    getDetailFunding(fundingId).then((response) => {
+      setFundingDetail(response);
+    });
   }, [fundingId]);
 
+  //펀딩 정보가 로드 되기 전에 로딩 표시
   if (!fundingDetail) {
-    return <div>Loading...</div>; // 데이터가 로드되기 전에 로딩 표시
+    return <div>Loading...</div>;
   }
 
+  //결제 버튼을 클릭했을때 동작
   const handlePayment = async () => {
+    if (!attendanceResponse) {
+      alert("참여자 정보를 불러오는 중입니다. 잠시만 기다려 주세요.");
+      return;
+    }
     try {
       const response = await createAttendance(
-        localStorage.getItem("access-token"),
+        getCookie("access-token"),
         fundingId,
         sendMessage,
         sendMessageTitle,
         price,
       );
-      console.log("참여 후 정보 잘 받아왔나? : " + response.data.fundingName);
       setAttendanceResponse(response);
-      if (attendanceResponse) {
-        // console.log(attendanceResponse.data.fundingName);
-        requestPay();
-      } else {
-        console.error("참여 정보를 받지 못했습니다.");
-      }
+      requestPay(response); // 응답 데이터를 requestPay에 전달
     } catch (error) {
       console.error("결제 중 오류가 발생했습니다: ", error);
     }
   };
 
   const requestPay = () => {
-    // console.log("참여 번호 확인 :" + attendanceResponse.data.attendanceId);
-    // console.log("펀딩 이름 확인 :" + attendanceResponse.data.fundingName);
-    // console.log("참여가격 확인 :" + attendanceResponse.data.price);
-    // console.log("참여자 이메일 확인 :" + attendanceResponse.data.email);
-    // console.log("참여자 이름 확인 :" + attendanceResponse.data.attendeeName);
-    // console.log("참여자 번호 확인 :" + attendanceResponse.data.phoneNumber);
-
     const { IMP } = window;
     IMP.init("imp40448376");
 
@@ -87,17 +81,19 @@ function Paypage() {
       {
         pg: "html5_inicis.INIpayTest",
         pay_method: "card",
-        merchant_uid: attendanceResponse.data.attendanceId,
-        name: attendanceResponse.data.fundingName,
-        amount: attendanceResponse.data.price,
-        buyer_email: attendanceResponse.data.email,
-        buyer_name: attendanceResponse.data.attendeeName,
-        buyer_tel: attendanceResponse.data.phoneNumber,
+        merchant_uid: 100, //참여 번호
+        name: fundingDetail.title, //펀딩 이름
+        amount: price, //펀딩 참여 가격
+        buyer_email: attendanceResponse.email, //펌딩참여자 이메일
+        buyer_name: attendanceResponse.name, //펀딩 참여자 이름
+        buyer_tel: attendanceResponse.phoneNumber, //펀딩 참여자 핸드폰 번호
         buyer_addr: "서울특별시",
         buyer_postcode: "123-456",
       },
       async (rsp) => {
         try {
+          console.log(IMP.request_pay);
+
           const { data } = await axios.post(
             `${import.meta.env.VITE_BASE_URL}/api/payment-info`,
             {
@@ -107,7 +103,7 @@ function Paypage() {
             {
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("access-token")}`,
+                Authorization: `Bearer ${getCookie("access-token")}`,
               },
             },
           );

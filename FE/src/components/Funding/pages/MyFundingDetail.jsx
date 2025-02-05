@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { getCookie } from "../../../@common/cookies";
 
 //Component
 import FundingDetailInfo from "../component/FundingDetailInfo";
@@ -8,10 +9,10 @@ import CongratulateList from "../component/CongratulateList";
 import BottomSheet from "../component/BottomSheet";
 
 //API
-import { fetchDetailFunding } from "../api/FundingAPI";
 import { deleteFunding } from "../api/FundingAPI";
 import { getFundingAttendee } from "../api/AttendanceAPI";
 import { getAttendanceDetail } from "../api/AttendanceAPI";
+import { getDetailFunding } from "../../../services/Funding/fundings";
 
 function MyFundingDetail() {
   const navigate = useNavigate();
@@ -29,12 +30,7 @@ function MyFundingDetail() {
       detail: "메세지 내용 테스트임 2",
       reply: "ㄳㄳ",
     },
-    {
-      name: "임수빈",
-      title: "시은아 생일 축하해1",
-      detail: "메세지 내용 테스트임 2",
-      reply: "ㄳㄳ",
-    },
+
     {
       name: "김대영",
       title: "시은아 생일 축하해2",
@@ -45,27 +41,6 @@ function MyFundingDetail() {
       name: "이민수",
       title: "시은아 생일 축하해3",
       detail: "메세지 내용 테스트임 4",
-      reply: null,
-    },
-    {
-      name: "박종혁",
-      title: "시은아 생일 축하해4",
-      detail:
-        " 메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5",
-      reply: null,
-    },
-    {
-      name: "박종혁",
-      title: "시은아 생일 축하해4",
-      detail:
-        " 메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5",
-      reply: null,
-    },
-    {
-      name: "박종혁",
-      title: "시은아 생일 축하해4",
-      detail:
-        " 메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5메세지 내용 테스트임 5",
       reply: null,
     },
     {
@@ -86,11 +61,15 @@ function MyFundingDetail() {
   const [attendanceDetail, setAttendanceDetail] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("access-token");
-    if (token && fundingId) {
-      fetchDetailFunding(token, fundingId, setFundingDetail);
-      getFundingAttendee(token, fundingId, setAttendeeList);
-    }
+    const token = getCookie("access-token");
+
+    //펀딩 디테일 정보 불러오기
+    getDetailFunding(fundingId).then((response) => {
+      setFundingDetail(response);
+    });
+
+    //펀딩 참여자 목록 불러오기
+    getFundingAttendee(token, fundingId, setAttendeeList);
   }, [fundingId]);
 
   useEffect(() => {
@@ -106,7 +85,7 @@ function MyFundingDetail() {
     if (!isBottomSheetOpen) {
       setSelectedMessage(message);
       getAttendanceDetail(
-        localStorage.getItem("access-token"),
+        getCookie("access-token"),
         fundingId,
         message.attendanceId,
         setAttendanceDetail,
@@ -130,7 +109,7 @@ function MyFundingDetail() {
   };
 
   const handleDelete = async () => {
-    const token = localStorage.getItem("access-token");
+    const token = getCookie("access-token");
     if (token && fundingId) {
       deleteFunding(token, fundingId, navigate);
     }

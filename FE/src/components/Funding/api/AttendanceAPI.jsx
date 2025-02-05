@@ -15,6 +15,8 @@ async function createAttendance(
     fundingId: fundingId,
   };
 
+  console.log("body", requestBody);
+
   try {
     const response = await fetch(
       import.meta.env.VITE_BASE_URL + "/api/attendance",
@@ -73,7 +75,11 @@ async function getFundingAttendee(token, fundingId, setData) {
         },
       },
     );
-    console.log("내 펀딩에 참여한 목록 응답 : " + response.data.data.data);
+    console.log(
+      fundingId,
+      "번 펀딩에 참여한 목록 응답 : ",
+      response.data.data.data,
+    );
     setData(response.data.data.data);
   } catch (error) {
     console.error("내 펀딩에 참여한 펀딩 목록 불러오기 에러", error);
@@ -97,7 +103,9 @@ async function getAttendanceDetail(token, fundingId, attendanceId, setData) {
     );
     console.log("내 펀딩 참여 디테일 응답 : " + response.data.data);
     setData(response.data.data);
-  } catch (error) {}
+  } catch (error) {
+    console.log("에러", error);
+  }
 }
 export {
   createAttendance,
