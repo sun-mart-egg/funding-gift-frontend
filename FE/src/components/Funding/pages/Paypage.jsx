@@ -37,7 +37,7 @@ function Paypage() {
   }, []);
 
   useEffect(() => {
-    console.log("참여자 정보", attendanceResponse);
+    console.log("참여자 정보", attendanceResponse.data);
   }, [attendanceResponse]);
 
   //디테일 펀딩 정보 불러오기
@@ -81,7 +81,7 @@ function Paypage() {
       {
         pg: "html5_inicis.INIpayTest",
         pay_method: "card",
-        merchant_uid: 100, //참여 번호
+        merchant_uid: attendanceResponse.Number, //참여 번호
         name: fundingDetail.title, //펀딩 이름
         amount: price, //펀딩 참여 가격
         buyer_email: attendanceResponse.email, //펌딩참여자 이메일
