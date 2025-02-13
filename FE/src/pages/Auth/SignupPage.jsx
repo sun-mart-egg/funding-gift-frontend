@@ -67,7 +67,7 @@ function Signup() {
   return (
     <div className="gap-4 sub-layer">
       <img src={SignupLogo} alt="회원가입로고" className="m-3" />
-      <p className="signup-font">물건을 받을 주소를 입력해주세용</p>
+      <p className="signup-font">물건을 받을 주소를 입력해주세요</p>
 
       <div className="flex w-[330px] flex-row items-center gap-5">
         {/* value 값을 통해 FindAddress에서 받아온 postcode를 할당 */}
