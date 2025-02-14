@@ -64,9 +64,9 @@ function Wishlist() {
 	};
 
 	return (
-		<div className="sub-layer mt-[80px] justify-start min-h-screen overflow-hidden font-cusFont2 bg-white">
+		<div className="sub-layer font-cusFont2 pt-[80px] pb-0 h-full">
 			<p className="font-cusFont5 text-4xl">나의 위시리스트</p>
-			<div className="mt-4 flex min-h-[63%] w-[95.5%] flex-grow flex-wrap justify-center overflow-y-auto bg-white font-cusfont2">
+			<div className="flex min-h-[63%] w-[95.5%] flex-grow flex-wrap justify-center overflow-y-auto bg-white font-cusfont2">
 				{wishes.map((product, index) => (
 					<div
 						key={product.productId}
@@ -91,7 +91,7 @@ function Wishlist() {
 				{isLoading && <p>Loading more products...</p>}
 				{renderNoResultsMessage()} {/* 검색 결과가 없을 때 메시지 표시 */}
 			</div>
-
+			
 			{/* 화면 제일 상단으로 */}
 			<ScrollUpButton bottom={25}/>
 		</div>
