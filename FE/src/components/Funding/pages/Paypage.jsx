@@ -7,14 +7,14 @@ import { getCookie } from "../../../@common/cookies";
 //API
 import { createAttendance } from "../api/AttendanceAPI";
 import { getDetailFunding } from "../../../services/Funding/fundings";
-import { getConsumers } from "../../../services/Consumer/consumers";
 
 function Paypage() {
   const navigate = useNavigate(); // useNavigate 훅을 사용합니다.
   const [fundingDetail, setFundingDetail] = useState(null);
   const { sendMessage, sendMessageTitle, price, fundingId } =
     useAttendanceStore();
-  const [attendanceResponse, setAttendanceResponse] = useState();
+  const [attendanceResponse, setAttendanceResponse] = useState(); //참여 정보
+  const [isAttendanceReady, setIsAttendanceReady] = useState(false); // 상태 저장 완료 여부
 
   useEffect(() => {
     const jquery = document.createElement("script");
@@ -23,22 +23,24 @@ function Paypage() {
     iamport.src = "https://cdn.iamport.kr/js/iamport.payment-1.1.7.js";
     document.head.appendChild(jquery);
     document.head.appendChild(iamport);
+    jquery.onload = () => console.log("✅ 아임포트 스크립트 로드 완료");
+
     return () => {
       document.head.removeChild(jquery);
       document.head.removeChild(iamport);
     };
   }, []);
 
-  //내 정보 받아오기
+  // 상태가 완전히 업데이트된 후 결제 실행
   useEffect(() => {
-    getConsumers().then((data) => {
-      setAttendanceResponse(data);
-    });
-  }, []);
-
-  useEffect(() => {
-    console.log("참여자 정보", attendanceResponse);
-  }, [attendanceResponse]);
+    if (isAttendanceReady && attendanceResponse) {
+      console.log("✅ 상태 업데이트 완료. 결제 요청 시작.");
+      console.log("✅ merchant_uid 확인:", attendanceResponse.attendanceId);
+      console.log("정보확인", attendanceResponse.attendeeName);
+      requestPay(attendanceResponse);
+      setIsAttendanceReady(false); // 한 번 실행 후 리셋
+    }
+  }, [attendanceResponse, isAttendanceReady]);
 
   //디테일 펀딩 정보 불러오기
   useEffect(() => {
@@ -54,11 +56,8 @@ function Paypage() {
 
   //결제 버튼을 클릭했을때 동작
   const handlePayment = async () => {
-    if (!attendanceResponse) {
-      alert("참여자 정보를 불러오는 중입니다. 잠시만 기다려 주세요.");
-      return;
-    }
     try {
+      //참여 정보 생성
       const response = await createAttendance(
         getCookie("access-token"),
         fundingId,
@@ -66,39 +65,67 @@ function Paypage() {
         sendMessageTitle,
         price,
       );
-      setAttendanceResponse(response);
-      requestPay(response); // 응답 데이터를 requestPay에 전달
+      // 상태 저장 후 완료 플래그 설정
+      console.log("참여 후 정보 잘 받아왔나? : " + response.data.fundingName);
+      setAttendanceResponse(response.data);
+      setIsAttendanceReady(true); // 상태 업데이트 완료 여부 설정
+      console.log("참여자 정보 생성 완료: ", response);
     } catch (error) {
       console.error("결제 중 오류가 발생했습니다: ", error);
     }
   };
 
-  const requestPay = () => {
-    const { IMP } = window;
-    IMP.init("imp40448376");
+  //결제 요청
+  const requestPay = (attendanceData) => {
+    console.log("✅ requestPay 함수 실행됨");
 
+    //참석 자료가 있으면 console에 찍어보기
+    if (!attendanceData) {
+      console.error("❌ 결제 요청 중 attendanceData가 없음");
+      return;
+    }
+    const { IMP } = window;
+    if (!IMP) {
+      alert(
+        "❌ IMP 객체가 존재하지 않음. 아임포트 스크립트가 정상적으로 로드되었는지 확인",
+      );
+      return;
+    }
+
+    IMP.init("imp40448376"); //정상 IMP
+    // IMP.init("imp40441376"); //잘못된 IMP
+
+    //아임포트 결제창을 띄움
     IMP.request_pay(
       {
         pg: "html5_inicis.INIpayTest",
         pay_method: "card",
-        merchant_uid: 100, //참여 번호
-        name: fundingDetail.title, //펀딩 이름
-        amount: price, //펀딩 참여 가격
+        merchant_uid: attendanceResponse.attendanceId, //참여 번호 -> 다 달라야 함. 고유해야함.
+        name: attendanceResponse.fundingName, //펀딩 이름
+        amount: attendanceResponse.price, //펀딩 참여 가격
         buyer_email: attendanceResponse.email, //펌딩참여자 이메일
-        buyer_name: attendanceResponse.name, //펀딩 참여자 이름
+        buyer_name: attendanceResponse.attendeeName, //펀딩 참여자 이름
         buyer_tel: attendanceResponse.phoneNumber, //펀딩 참여자 핸드폰 번호
         buyer_addr: "서울특별시",
         buyer_postcode: "123-456",
       },
       async (rsp) => {
-        try {
-          console.log(IMP.request_pay);
+        console.log("✅결제 응답 수신 : ", rsp); // 결제 응답 확인
 
+        // 결제 실패 시
+        if (!rsp) {
+          alert("❌ 결제 실패: ", rsp.error_msg);
+          console.log("❌ 결제 실패: ", rsp.error_msg);
+
+          return;
+        }
+
+        try {
           const { data } = await axios.post(
             `${import.meta.env.VITE_BASE_URL}/api/payment-info`,
             {
               paymentInfoUid: rsp.imp_uid, // 결제 고유번호
-              attendanceId: attendanceResponse.data.attendanceId,
+              attendanceId: attendanceResponse.attendanceId,
             },
             {
               headers: {
@@ -107,19 +134,22 @@ function Paypage() {
               },
             },
           );
-          // console.log("rsp data :" + rsp.paid_amount);
-          // console.log(JSON.stringify(data.data.response.amount, null, 2));
-          // console.log(data.data.response.amount);
+          console.log("rsp data :" + rsp.paid_amount);
+          console.log("rsp,data : ", data.data.response.amount);
+          console.log(JSON.stringify(data.data.response.amount, null, 2));
+          console.log(data.data.response.amount);
 
           if (rsp.paid_amount === data.data.response.amount) {
             alert("결제 성공");
             navigate("/participate-funding-finish"); // 결제가 성공적으로 이루어진 후 페이지 이동
           } else {
             alert("결제 실패2");
+            navigate("/");
           }
         } catch (error) {
           console.error("Error while verifying payment:", error);
           alert("결제 실패3");
+          navigate("/");
         }
       },
     );

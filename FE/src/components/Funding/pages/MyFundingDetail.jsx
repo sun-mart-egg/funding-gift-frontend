@@ -10,9 +10,9 @@ import BottomSheet from "../component/BottomSheet";
 
 //API
 import { deleteFunding } from "../api/FundingAPI";
-import { getFundingAttendee } from "../api/AttendanceAPI";
 import { getAttendanceDetail } from "../api/AttendanceAPI";
 import { getDetailFunding } from "../../../services/Funding/fundings";
+import { getAttendanceList } from "../../../services/Funding/attendance";
 
 function MyFundingDetail() {
   const navigate = useNavigate();
@@ -54,22 +54,22 @@ function MyFundingDetail() {
 
   const { fundingId } = useParams(); // URL 파라미터에서 fundingId를 가져옵니다.
   const [fundingDetail, setFundingDetail] = useState(null);
-  const [isBottomSheetOpen, setIsBottomSheetOpen, selectId] = useState(false);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState("");
   const [messageList, setMessageList] = useState(MessageList);
   const [attendeeList, setAttendeeList] = useState([]);
   const [attendanceDetail, setAttendanceDetail] = useState(null);
 
   useEffect(() => {
-    const token = getCookie("access-token");
-
     //펀딩 디테일 정보 불러오기
     getDetailFunding(fundingId).then((response) => {
       setFundingDetail(response);
     });
 
     //펀딩 참여자 목록 불러오기
-    getFundingAttendee(token, fundingId, setAttendeeList);
+    getAttendanceList(fundingId, 0, 8, "").then((response) => {
+      setAttendeeList(response);
+    });
   }, [fundingId]);
 
   useEffect(() => {

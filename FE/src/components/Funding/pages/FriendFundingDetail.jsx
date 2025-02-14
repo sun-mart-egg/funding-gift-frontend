@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { getCookie } from "../../../@common/cookies";
 
 //Component
 import FundingDetailInfo from "../component/FundingDetailInfo";
@@ -9,7 +8,7 @@ import CongratulateList from "../component/CongratulateList";
 import BottomSheet from "../component/BottomSheet";
 
 //API
-import { getFundingAttendee } from "../api/AttendanceAPI";
+import { getAttendanceList } from "../../../services/Funding/attendance";
 import { getDetailFunding } from "../../../services/Funding/fundings";
 
 function FriendFundingDetail() {
@@ -29,14 +28,16 @@ function FriendFundingDetail() {
   const [selectedMessage, setSelectedMessage] = useState("");
   const [attendeeList, setAttendeeList] = useState([]);
 
+  //화면 제일 처음 마운트 되었을 경우
   useEffect(() => {
-    const token = getCookie("access-token");
-    if (token && fundingId) {
-      getDetailFunding(fundingId).then((response) => {
-        setFundingDetail(response);
-      });
-      getFundingAttendee(token, fundingId, setAttendeeList);
-    }
+    //펀딩 정보 불러오기
+    getDetailFunding(fundingId).then((response) => {
+      setFundingDetail(response);
+    });
+    //펀딩 참석자 정보 불러오기
+    getAttendanceList(fundingId, 0, 10, "").then((response) => {
+      setAttendeeList(response);
+    });
   }, [fundingId]);
 
   useEffect(() => {
@@ -45,10 +46,10 @@ function FriendFundingDetail() {
     }
   }, [fundingDetail]);
 
-  const toggleBottomSheet = () => {
-    setSelectedMessage(myParticipate);
-    setIsBottomSheetOpen(!isBottomSheetOpen);
-  };
+  // const toggleBottomSheet = () => {
+  //   setSelectedMessage(myParticipate);
+  //   setIsBottomSheetOpen(!isBottomSheetOpen);
+  // };
 
   const handleItemClick = () => {
     alert("다른사람의 메세지 내용은 볼 수 없습니다.");
