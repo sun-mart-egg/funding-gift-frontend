@@ -54,7 +54,7 @@ function MyFundingDetail() {
 
   const { fundingId } = useParams(); // URL 파라미터에서 fundingId를 가져옵니다.
   const [fundingDetail, setFundingDetail] = useState(null);
-  const [isBottomSheetOpen, setIsBottomSheetOpen, selectId] = useState(false);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState("");
   const [messageList, setMessageList] = useState(MessageList);
   const [attendeeList, setAttendeeList] = useState([]);

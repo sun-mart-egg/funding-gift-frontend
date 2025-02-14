@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { getCookie } from "../../../@common/cookies";
 
 //Component
 import FundingDetailInfo from "../component/FundingDetailInfo";
@@ -47,10 +46,10 @@ function FriendFundingDetail() {
     }
   }, [fundingDetail]);
 
-  const toggleBottomSheet = () => {
-    setSelectedMessage(myParticipate);
-    setIsBottomSheetOpen(!isBottomSheetOpen);
-  };
+  // const toggleBottomSheet = () => {
+  //   setSelectedMessage(myParticipate);
+  //   setIsBottomSheetOpen(!isBottomSheetOpen);
+  // };
 
   const handleItemClick = () => {
     alert("다른사람의 메세지 내용은 볼 수 없습니다.");
