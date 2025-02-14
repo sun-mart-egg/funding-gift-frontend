@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -51,7 +51,7 @@ const FriendPage = () => {
   // 친구목록 필터링
   // 필터아이콘 클릭하면 전체, 친한친구가 나온다.
   // 기본값은 전체, 친한친구를 클릭 시 (filterOption === "favorites") 친구목록에서 favorite가 true인 친구들만 출력된다.
-  const filteredFriends = () => {
+  const filteredFriends = useMemo(() => {
     if (filterOption === "favorites") {
       return friends.list.filter(
         (friend) => friend.isFavorite && friend.name.includes(userInput),
@@ -59,7 +59,7 @@ const FriendPage = () => {
     } else {
       return friends.list.filter((friend) => friend.name.includes(userInput));
     }
-  };
+  }, [friends.list, userInput, filterOption]);
 
   // 친구목록 동기화
   const handleSynkFriends = async () => {
@@ -92,7 +92,7 @@ const FriendPage = () => {
         handleFilterOption={handleFilterOption}
       />
       <FriendsList
-        friends={filteredFriends()}
+        friends={filteredFriends}
         handleFavorite={handleFavorite}
         navigate={navigate}
       />

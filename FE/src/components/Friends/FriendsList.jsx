@@ -1,8 +1,9 @@
 import fish from "/imgs/fish.PNG";
 import star from "/imgs/star.png";
 import graystar from "/imgs/graystar.png";
+import { memo } from "react";
 
-const FriendsList = ({ friends, handleFavorite, navigate }) => {
+const FriendsList = memo(({ friends, handleFavorite, navigate }) => {
   return (
     <div className="fixed top-[110px] flex h-full max-h-[calc(100vh-90px)] w-full max-w-[500px] flex-col items-center justify-start">
       <div className="w-full h-full gap-3 overflow-y-scroll">
@@ -32,6 +33,11 @@ const FriendsList = ({ friends, handleFavorite, navigate }) => {
       </div>
     </div>
   );
-};
+});
+
+// displayName: 디버깅을 용이하게 하기 위한 속성
+// memo의 콜백 함수로 익명 함수 '() => {}' 넘겨줬기 때문에
+// displayName을 적어줌
+FriendsList.displayName = "FriendsList";
 
 export default FriendsList;
