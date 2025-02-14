@@ -79,9 +79,4 @@ async function getAttendanceDetail(token, fundingId, attendanceId, setData) {
     console.log("에러", error);
   }
 }
-export {
-  createAttendance,
-  getMyAttendance,
-  getFundingAttendee,
-  getAttendanceDetail,
-};
+export { createAttendance, getMyAttendance, getAttendanceDetail };
