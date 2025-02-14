@@ -67,7 +67,9 @@ function MyFundingDetail() {
     });
 
     //펀딩 참여자 목록 불러오기
-    getAttendanceList(fundingId, 0, 8, "");
+    getAttendanceList(fundingId, 0, 8, "").then((response) => {
+      setAttendeeList(response);
+    });
   }, [fundingId]);
 
   useEffect(() => {
