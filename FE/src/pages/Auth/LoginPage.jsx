@@ -12,7 +12,7 @@ function Login() {
   return (
     <div className="sub-layer">
       <img src={LoginLogo} alt="login" />
-      <p className="signup-font m-5">소셜 계정으로 편리햐게 로그인 해보세요!</p>
+      <p className="signup-font m-5">소셜 계정으로 편리하게 로그인 해보세요!</p>
       <button onClick={kakaoLoginHandler}>
         <img src={KakaoLogin} alt="login" className=" mt-7" />
       </button>
