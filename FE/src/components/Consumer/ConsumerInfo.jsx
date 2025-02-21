@@ -68,11 +68,6 @@ const ConsumerInfo = ({
         <section id="birthday">
           <div className="sub-title">
             <p>생일</p>
-            {isEditMode && (
-              <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
-                생일 선택
-              </button>
-            )}
           </div>
           <div className="sub-content">
             <p
