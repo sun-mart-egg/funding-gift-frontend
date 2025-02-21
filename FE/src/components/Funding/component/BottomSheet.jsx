@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
+
+//API
 import { getAttendanceDetail } from "../api/AttendanceAPI";
+import { putThankyouMessage } from "../../../services/Funding/attendance";
 
 const BottomSheet = ({
   message,
@@ -14,6 +17,10 @@ const BottomSheet = ({
   const [currentTouchY, setCurrentTouchY] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [editReply, setEditReply] = useState("");
+
+  useEffect(() => {
+    getAttendanceDetail();
+  });
 
   const handleTouchStart = (e) => {
     setStartTouchY(e.touches[0].clientY);
@@ -38,6 +45,7 @@ const BottomSheet = ({
 
   const handleSave = () => {
     updateReply(message.name, editReply);
+    putThankyouMessage();
     setIsEditing(false);
     setEditReply(""); // 상태 초기화
   };
