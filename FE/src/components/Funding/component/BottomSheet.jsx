@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 //API
-import { getAttendanceDetail } from "../api/AttendanceAPI";
 import { putThankyouMessage } from "../../../services/Funding/attendance";
 
 const BottomSheet = ({
-  message,
   fundingId,
   children,
   isOpen,
@@ -13,14 +11,12 @@ const BottomSheet = ({
   updateReply,
   attendanceDetail,
 }) => {
+  console.log("attendance Detail", attendanceDetail);
+
   const [startTouchY, setStartTouchY] = useState(0);
   const [currentTouchY, setCurrentTouchY] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [editReply, setEditReply] = useState("");
-
-  useEffect(() => {
-    getAttendanceDetail();
-  });
 
   const handleTouchStart = (e) => {
     setStartTouchY(e.touches[0].clientY);
@@ -40,18 +36,18 @@ const BottomSheet = ({
 
   const handleEdit = () => {
     setIsEditing(true);
-    setEditReply(message.reply);
+    setEditReply(attendanceDetail.reply);
   };
 
   const handleSave = () => {
-    updateReply(message.name, editReply);
+    updateReply(attendanceDetail.name, editReply);
     putThankyouMessage();
     setIsEditing(false);
     setEditReply(""); // 상태 초기화
   };
 
   const handleDelete = () => {
-    updateReply(message.name, null);
+    updateReply(attendanceDetail.name, null);
     setIsEditing(false);
     setEditReply(""); // 상태 초기화
   };
@@ -81,8 +77,12 @@ const BottomSheet = ({
             className="relative mx-auto mt-4 flex h-2/5 w-[85%] flex-col space-y-2 rounded-lg bg-white p-4"
           >
             <div className="flex h-full flex-col items-center justify-center font-cusFont4">
-              <p className="pt-2 text-[30px]">{message.sendMessageTitle}</p>
-              <p className="pt-2 text-[18px]">by {message.consumerName}</p>
+              <p className="pt-2 text-[30px]">
+                {attendanceDetail.sendMessageTitle}
+              </p>
+              <p className="pt-2 text-[18px]">
+                by {attendanceDetail.consumerName}
+              </p>
               <p className="pt-3 text-[18px]">{attendanceDetail.sendMessage}</p>
             </div>
             <img
@@ -114,11 +114,11 @@ const BottomSheet = ({
             </div>
           ) : (
             <div className="mx-auto w-[93%] p-4">
-              {message.reply ? (
+              {attendanceDetail.receiveMessage ? (
                 <>
                   <div className="flex h-full flex-col items-center justify-center font-cusFont4">
                     <p className="font mb-[30px] text-[30px]">
-                      {message.consumerName} 님에게 보낸 답장
+                      {attendanceDetail.consumerName} 님에게 보낸 답장
                     </p>{" "}
                     <img
                       src="/imgs/yellowRibbon.png"
@@ -126,7 +126,7 @@ const BottomSheet = ({
                       alt="Description"
                     />
                     <p className="relative mb-[10px] mt-[-20px] flex h-2/5 w-full flex-col space-y-2 rounded-lg bg-white p-4">
-                      {message.reply}
+                      {attendanceDetail.receiveMessage}
                     </p>
                   </div>
                   <button

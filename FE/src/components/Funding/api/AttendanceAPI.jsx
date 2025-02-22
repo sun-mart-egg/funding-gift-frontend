@@ -73,7 +73,7 @@ async function getAttendanceDetail(token, fundingId, attendanceId, setData) {
         },
       },
     );
-    console.log("내 펀딩 참여 디테일 응답 : " + response.data.data);
+    console.log("내 펀딩 참여 디테일 응답 : " + response.data.data.data);
     setData(response.data.data);
   } catch (error) {
     console.log("에러", error);
