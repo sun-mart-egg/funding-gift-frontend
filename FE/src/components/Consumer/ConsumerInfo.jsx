@@ -25,13 +25,6 @@ const ConsumerInfo = ({
             alt=""
             className=" h-[80px] w-[80px] rounded-full"
           />
-
-          {isEditMode && (
-            <AiFillCamera
-              className="absolute bottom-0 right-1 text-[20px] text-[#9B9B9B]"
-              style={{ bottom: "-10px", right: "1px" }}
-            />
-          )}
         </div>
         {/* 이름 */}
         {/* 수정모드일 경우 변경할 이름 입력할 input 태그 활성화 */}
@@ -68,11 +61,6 @@ const ConsumerInfo = ({
         <section id="birthday">
           <div className="sub-title">
             <p>생일</p>
-            {isEditMode && (
-              <button className="w-[25%] rounded-md bg-[#9B9B9B] text-[12px] text-white">
-                생일 선택
-              </button>
-            )}
           </div>
           <div className="sub-content">
             <p

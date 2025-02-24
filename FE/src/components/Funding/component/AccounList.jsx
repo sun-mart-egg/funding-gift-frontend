@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import AccountCard from "./AccountCard";
 import { useStore } from "../../Store/MakeStore";
 function AccounList({ listData }) {

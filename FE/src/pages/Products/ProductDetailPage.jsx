@@ -9,10 +9,14 @@ import Down from "/imgs/down.png";
 import useProductStore from "../../components/Store/ProductStore.jsx";
 import { useStore } from "../../components/Store/MakeStore.jsx";
 import useFormDataStore from "../../components/Store/FormDataStore.jsx";
+import { getCookie } from "../../@common/cookies";
 
-import { getProductDetail } from "../../services/Products/products.js"
-import { getReviews, deleteReviews} from "../../services/Products/reviews.js"
-import { addWishlists, deleteWishlists} from "../../services/Products/wishlists.js"
+import { getProductDetail } from "../../services/Products/products.js";
+import { getReviews, deleteReviews } from "../../services/Products/reviews.js";
+import {
+  addWishlists,
+  deleteWishlists,
+} from "../../services/Products/wishlists.js";
 import { formattedPrice } from "../../@common/formattedNumber.js";
 import ReviewList from "../../components/Products/ReviewList.jsx";
 import ProductDetailInfo from "../../components/Products/ProductDetailInfo.jsx";
@@ -24,7 +28,7 @@ function ProductDetailPage() {
   const resetStore = useStore((state) => state.reset);
   const resetProductData = useProductStore((state) => state.resetProductData);
   const resetFormData = useFormDataStore((state) => state.resetFormData);
-  const updateFormData = useFormDataStore((state) => state.updateFormData)
+  const updateFormData = useFormDataStore((state) => state.updateFormData);
   const [selectedOption, setSelectedOption] = useState(null);
 
   // 옵션 토글 가시성 상태
@@ -39,12 +43,15 @@ function ProductDetailPage() {
   const handleMakeFunding = () => {
     if (selectedOption === null) {
       alert("옵션을 선택해주세요!");
+    } else if (!getCookie("access-token")) {
+      alert("로그인을 해주세요");
+      navigate("/login-page");
     } else {
       resetStore(); // useStore의 상태 초기화
       resetProductData(); // useProductStore의 상태 초기화
       resetFormData(); // useFormDataStore의 상태 초기화
-      updateFormData("productId", productId)
-      updateFormData("productOptionId", selectedOption)
+      updateFormData("productId", productId);
+      updateFormData("productOptionId", selectedOption);
       navigate("/make-funding-detail");
     }
   };

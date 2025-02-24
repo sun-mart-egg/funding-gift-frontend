@@ -1,6 +1,13 @@
 import Star from "/imgs/star.png";
 
-const ProductDetailInfo = ({ product, selectedOption, selectedToggleVisible, onOptionChange, onToggleVisible, formattedPrice}) => {
+const ProductDetailInfo = ({
+  product,
+  selectedOption,
+  selectedToggleVisible,
+  onOptionChange,
+  onToggleVisible,
+  formattedPrice,
+}) => {
   return (
     <>
       {/* 이미지 들어갈 영역 */}
@@ -20,7 +27,6 @@ const ProductDetailInfo = ({ product, selectedOption, selectedToggleVisible, onO
           onClick={() => onToggleVisible(!selectedToggleVisible)}
           className="rounded-xl border border-cusColor3 p-2"
         >
-          선택된 옵션:{" "}
           {selectedOption
             ? product.options.find((option) => option.id === selectedOption)
                 ?.name
