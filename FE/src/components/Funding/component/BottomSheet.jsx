@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 //API
 import { putThankyouMessage } from "../../../services/Funding/attendance";
@@ -34,11 +34,13 @@ const BottomSheet = ({
     }
   };
 
+  //수정
   const handleEdit = () => {
     setIsEditing(true);
     setEditReply(attendanceDetail.reply);
   };
 
+  //저장
   const handleSave = () => {
     updateReply(attendanceDetail.name, editReply);
     putThankyouMessage();
@@ -46,6 +48,7 @@ const BottomSheet = ({
     setEditReply(""); // 상태 초기화
   };
 
+  //삭제
   const handleDelete = () => {
     updateReply(attendanceDetail.name, null);
     setIsEditing(false);
